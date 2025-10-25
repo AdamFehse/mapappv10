@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Test Embla Carousel - Working Touchpad Scroll</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .title {
+      padding: 20px;
+      background: #2196F3;
+      color: white;
+      text-align: center;
+      font-size: 1.5rem;
+    }
+
+    /* Embla Carousel Styles - VERTICAL */
+    .embla {
+      width: 100%;
+      height: 500px;
+      --slide-height: 120px;
+    }
+
+    .embla__viewport {
+      overflow: hidden;
+      width: 100%;
+      height: 100%;
+    }
+
+    .embla__container {
+      display: flex;
+      flex-direction: column;
+      touch-action: pan-x pinch-zoom;
+      margin-top: -1rem;
+      gap: 1rem;
+      height: 100%;
+    }
+
+    .embla__slide {
+      flex: 0 0 var(--slide-height);
+      min-height: 0;
+      padding-top: 1rem;
+      width: 100%;
+      height: var(--slide-height);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.2rem;
+      font-weight: bold;
+      cursor: grab;
+      margin: 0 1rem;
+      width: calc(100% - 2rem);
+    }
+
+    .embla__slide:active {
+      cursor: grabbing;
+    }
+
+    /* Progress Bar - VERTICAL (on the right side) */
+    .embla__progress {
+      position: absolute;
+      right: 10px;
+      top: 0;
+      width: 4px;
+      height: 100%;
+      background: #e5e7eb;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .embla__progress__bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(180deg, #3b82f6, #2563eb);
+      transform: translate3d(0, -100%, 0);
+      transition: transform 0.12s linear;
+      border-radius: inherit;
+    }
+
+    .info {
+      padding: 20px;
+      background: #f9f9f9;
+      border-top: 1px solid #eee;
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .info p {
+      margin: 8px 0;
+    }
+
+    .status {
+      padding: 10px;
+      background: #e8f5e9;
+      border-left: 4px solid #4caf50;
+      margin-top: 10px;
+      font-weight: bold;
+      color: #2e7d32;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="title">✨ Embla Carousel - Touchpad Scroll Test</div>
+
+    <div class="embla">
+      <div class="embla__viewport">
+        <div class="embla__container">
+          <div class="embla__slide">Item 1</div>
+          <div class="embla__slide">Item 2</div>
+          <div class="embla__slide">Item 3</div>
+          <div class="embla__slide">Item 4</div>
+          <div class="embla__slide">Item 5</div>
+          <div class="embla__slide">Item 6</div>
+          <div class="embla__slide">Item 7</div>
+          <div class="embla__slide">Item 8</div>
+          <div class="embla__slide">Item 9</div>
+          <div class="embla__slide">Item 10</div>
+        </div>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="embla__progress">
+        <div class="embla__progress__bar"></div>
+      </div>
+    </div>
+
+    <div class="info">
+      <p><strong>Key Settings Used:</strong></p>
+      <p>✓ <code>dragFree: true</code> - Enables smooth touchpad scrolling</p>
+      <p>✓ <code>axis: 'y'</code> - Vertical scrolling</p>
+      <p>✓ <code>touch-action: pan-x pinch-zoom</code> - Allows horizontal pan (locks vertical)</p>
+      <p>✓ <code>containScroll: "trimSnaps"</code> - Trims snap points</p>
+      <p><strong>Test all scroll methods:</strong></p>
+      <p>✓ Mouse drag</p>
+      <p>✓ Mousepad two-finger scroll</p>
+      <p>✓ Mouse wheel</p>
+      <div class="status" id="status">Loading...</div>
+    </div>
+  </div>
+
+  <!-- Embla Carousel CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/embla-carousel@8.1.0/embla-carousel.umd.min.js"></script>
+  <script src="https://unpkg.com/embla-carousel-wheel-gestures@8.1.0/dist/embla-carousel-wheel-gestures.umd.js"></script>
+
+  <script>
+    // Utility function
+    function clamp(value, min, max) {
+      return Math.min(Math.max(value, min), max);
+    }
+
+    // Progress Bar Setup
+    function setupProgressBar(embla, progressNode) {
+      if (!progressNode) return () => {};
+
+      function applyProgress() {
+        const progress = clamp(embla.scrollProgress(), 0, 1);
+        const barProgress = progress * 100;
+
+        // Update progress bar position
+        progressNode.style.transform = `translate3d(${barProgress}%, 0px, 0px)`;
+      }
+
+      applyProgress();
+      embla.on("scroll", applyProgress);
+      embla.on("select", applyProgress);
+      embla.on("reInit", applyProgress);
+
+      return () => {
+        embla.off("scroll", applyProgress);
+        embla.off("select", applyProgress);
+        embla.off("reInit", applyProgress);
+      };
+    }
+
+    // Initialize Carousel
+    function initCarousel() {
+      const viewport = document.querySelector('.embla__viewport');
+      const progressBar = document.querySelector('.embla__progress__bar');
+      const statusEl = document.getElementById('status');
+
+      if (!viewport || !window.EmblaCarousel) {
+        statusEl.textContent = '❌ Missing dependencies';
+        statusEl.style.background = '#ffebee';
+        statusEl.style.color = '#c62828';
+        return;
+      }
+
+      try {
+        // Create carousel with FREE DRAG enabled (KEY for touchpad scrolling)
+        const embla = window.EmblaCarousel(
+          viewport,
+          {
+            axis: 'y',                 // Vertical scrolling
+            align: 'start',            // Start alignment
+            containScroll: 'trimSnaps', // Trims snap points
+            dragFree: true,            // ← ENABLES SMOOTH TOUCHPAD SCROLLING
+          },
+          window.EmblaCarouselWheelGestures
+            ? [window.EmblaCarouselWheelGestures()]
+            : []
+        );
+
+        // Setup progress bar
+        setupProgressBar(embla, progressBar);
+
+        statusEl.textContent = '✅ Carousel ready! Try touchpad scroll, mouse drag, and wheel scroll.';
+        statusEl.style.background = '#e8f5e9';
+        statusEl.style.borderColor = '#4caf50';
+        statusEl.style.color = '#2e7d32';
+
+        console.log('✅ Embla carousel initialized with dragFree and wheel gestures');
+        console.log('Wheel Gestures loaded:', !!window.EmblaCarouselWheelGestures);
+
+      } catch (error) {
+        console.error('Error initializing carousel:', error);
+        statusEl.textContent = '❌ Error: ' + error.message;
+        statusEl.style.background = '#ffebee';
+        statusEl.style.borderColor = '#c62828';
+        statusEl.style.color = '#c62828';
+      }
+    }
+
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initCarousel);
+    } else {
+      initCarousel();
+    }
+  </script>
+</body>
+</html>

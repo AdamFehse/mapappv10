@@ -1,0 +1,438 @@
+/**
+ * explore-bar.css - ExploreBar component styles
+ *
+ * Handles search/filter controls and cards carousel
+ * Uses Embla Carousel for vertical scrolling with touchpad support
+ */
+
+/* ===== PANEL TOP (Controls) ===== */
+
+.explore-bar .panel-top {
+  padding: 0.6rem 0.85rem;
+  border-bottom: 1px solid var(--pico-muted-color);
+  background: var(--gradient-primary-light);
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  align-items: stretch;
+}
+
+.explore-bar .panel-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  flex: none;
+  width: 100%;
+}
+
+.explore-bar .panel-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--pico-text-color);
+  line-height: 1.15;
+}
+
+.explore-bar .panel-subtitle {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--pico-muted-color);
+  line-height: 1;
+}
+
+.explore-bar .panel-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.4rem;
+  align-items: center;
+  width: 100%;
+}
+
+.explore-bar .panel-control {
+  display: flex;
+  min-width: 0;
+}
+
+.explore-bar .search-control {
+  grid-column: span 1;
+}
+
+.explore-bar .search-input {
+  width: 100%;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid var(--pico-form-element-border-color);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  background: var(--pico-form-element-background-color);
+  color: var(--pico-text-color);
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.explore-bar .search-input:focus {
+  border-color: var(--pico-primary);
+  box-shadow: 0 0 0 2px var(--primary-focus);
+  outline: none;
+}
+
+.explore-bar .filter-select {
+  width: 100%;
+  padding: 0.38rem 2rem 0.38rem 0.7rem;
+  border: 1px solid var(--pico-form-element-border-color);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  background: var(--pico-form-element-background-color);
+  color: var(--pico-text-color);
+  cursor: pointer;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.explore-bar .filter-select:hover {
+  border-color: var(--pico-primary);
+}
+
+.explore-bar .filter-select:focus {
+  border-color: var(--pico-primary);
+  box-shadow: 0 0 0 2px var(--primary-focus);
+  outline: none;
+}
+
+.explore-bar .panel-clear-btn {
+  padding: 0.38rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid var(--primary-strong);
+  background: var(--primary-accent);
+  color: var(--pico-primary);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 160ms ease;
+  width: 100%;
+  user-select: none;
+}
+
+.explore-bar .panel-clear-btn:hover {
+  background: var(--primary-hover);
+}
+
+/* ===== CARDS CAROUSEL ===== */
+
+.explore-bar .cards-container {
+  flex: 1 1 auto;
+  overflow: hidden;
+  user-select: text;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.explore-bar .cards-container.embla {
+  display: flex;
+  overflow: hidden;
+  height: 100%;
+}
+
+.explore-bar .cards-container .embla__container {
+  flex-direction: column;
+  touch-action: pan-x pinch-zoom;
+  gap: 0.7rem;
+  padding: 0.75rem 0.85rem 1rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+  margin-top: -0.75rem;
+}
+
+.explore-bar .cards-container .embla__slide {
+  flex: 0 0 auto;
+  width: calc(100% - 1.7rem);
+  margin: 0 0.85rem;
+  padding-top: 0.75rem;
+  min-height: 0;
+}
+
+/* ===== PROJECT CARDS ===== */
+
+.explore-bar .glowy-card {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--pico-form-element-background-color);
+  border: 1px solid rgba(255, 255, 255, 0.02);
+  border-radius: 14px;
+  overflow: hidden;
+  transition: var(--transition-smooth);
+  box-shadow: var(--shadow-card);
+  position: relative;
+  cursor: pointer;
+}
+
+.explore-bar .cards-container .glowy-card {
+  height: auto;
+}
+
+.explore-bar .glowy-card.is-featured {
+  border-color: var(--primary-strong);
+  box-shadow: var(--shadow-featured);
+}
+
+.explore-bar .glowy-card.is-selected {
+  border-color: var(--pico-primary);
+  box-shadow: var(--shadow-selected);
+}
+
+.explore-bar .glowy-card.is-selected .card-view-btn {
+  background: var(--gradient-primary-accent);
+}
+
+.explore-bar .glowy-card:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--primary-focus);
+}
+
+.explore-bar .glowy-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* Card Image */
+
+.explore-bar .card-image-wrapper {
+  width: 100%;
+  height: 120px;
+  overflow: hidden;
+  background: var(--gradient-primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.explore-bar .card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 300ms ease;
+}
+
+.explore-bar .glowy-card:hover .card-image {
+  transform: scale(1.05);
+}
+
+.explore-bar .image-placeholder {
+  font-size: 2.6rem;
+  opacity: 0.45;
+}
+
+/* Card Body */
+
+.explore-bar .card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.75rem 0.85rem 0.85rem;
+  min-height: 0;
+}
+
+.explore-bar .card-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--pico-text-color);
+  word-break: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+.explore-bar .card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.8rem;
+  font-size: 0.8rem;
+  color: var(--pico-muted-color);
+}
+
+.explore-bar .meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.explore-bar .card-category {
+  margin: 0.1rem 0;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.45em;
+  color: var(--pico-primary);
+  font-weight: 600;
+}
+
+/* Badges */
+
+.explore-bar .card-themes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.2rem;
+}
+
+.explore-bar .badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  background: var(--primary-accent);
+  color: var(--pico-primary);
+  font-size: 0.7rem;
+  font-weight: 600;
+  border: 1px solid var(--primary-focus);
+  white-space: nowrap;
+}
+
+.explore-bar .badge.theme {
+  background: rgba(15, 23, 42, 0.06);
+  color: var(--pico-text-color);
+  border-color: rgba(15, 23, 42, 0.12);
+}
+
+.explore-bar .card-content-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: auto;
+  padding-top: 0.55rem;
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+/* View Button */
+
+.explore-bar .card-view-btn {
+  margin-top: 0.5rem;
+  padding: 0.45rem 0.85rem;
+  background: var(--gradient-primary-light);
+  color: var(--pico-primary);
+  border: 1px solid var(--primary-focus);
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-focus);
+  width: 100%;
+  user-select: none;
+}
+
+.explore-bar .card-view-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px var(--primary-focus);
+}
+
+.explore-bar .card-view-btn:active {
+  transform: translateY(0);
+}
+
+/* No Results */
+
+.explore-bar .no-results {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem;
+  text-align: center;
+  color: var(--pico-muted-color);
+}
+
+.explore-bar .no-results p {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+/* Scrollbar styling */
+
+.explore-bar .cards-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.explore-bar .cards-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.explore-bar .cards-container::-webkit-scrollbar-thumb {
+  background: var(--primary-focus);
+  border-radius: 4px;
+}
+
+.explore-bar .cards-container::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-hover);
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 1024px) {
+  .explore-bar .panel-controls {
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .explore-bar .panel-top {
+    padding: 0.55rem 0.75rem;
+    gap: 0.4rem;
+  }
+
+  .explore-bar .panel-title {
+    font-size: 0.85rem;
+  }
+
+  .explore-bar .panel-subtitle {
+    font-size: 0.6rem;
+  }
+
+  .explore-bar .panel-controls {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.35rem;
+  }
+
+  .explore-bar .search-control {
+    grid-column: span 2;
+  }
+
+  .explore-bar .cards-container .embla__container {
+    padding: 0.65rem 0.75rem 0.9rem;
+    gap: 0.6rem;
+  }
+
+  .explore-bar .card-body {
+    padding: 0.65rem 0.75rem 0.75rem;
+    gap: 0.3rem;
+  }
+
+  .explore-bar .card-title {
+    font-size: 0.85rem;
+  }
+
+  .explore-bar .card-meta {
+    font-size: 0.7rem;
+  }
+}
+
+/* ===== REDUCED MOTION ===== */
+
+@media (prefers-reduced-motion: reduce) {
+  .explore-bar .glowy-card,
+  .explore-bar .card-image,
+  .explore-bar .card-view-btn,
+  .explore-bar .panel-clear-btn,
+  .explore-bar .filter-select,
+  .explore-bar .search-input {
+    transition: none;
+  }
+}

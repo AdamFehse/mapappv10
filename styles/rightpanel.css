@@ -1,0 +1,289 @@
+/**
+ * rightpanel.css - RightPanel container styles
+ *
+ * Primary container for NarrativeBar and ExploreBar components
+ * Also manages the detail view modal overlay
+ */
+
+/* ===== EMBLA CAROUSEL BASE STYLES ===== */
+
+.embla {
+  overflow: hidden;
+}
+
+.embla__container {
+  display: flex;
+  flex-direction: inherit;
+  touch-action: pan-y pinch-zoom;
+}
+
+.embla__slide {
+  flex: 0 0 100%;
+  min-width: 0;
+  position: relative;
+}
+
+/* ===== RIGHT PANEL CONTAINER ===== */
+
+.right-panel {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--pico-background-color);
+  border-left: 1px solid var(--pico-muted-color);
+  position: relative;
+}
+
+.right-panel.narrative-mode {
+  border-left: none;
+  background: radial-gradient(circle at top right, var(--primary-focus), transparent 45%), var(--pico-background-color);
+}
+
+.right-panel.detail-open {
+  background: var(--pico-background-color);
+}
+
+/* ===== DETAIL VIEW MODAL OVERLAY ===== */
+
+.project-detail-modal {
+  position: absolute;
+  inset: 0;
+  background: var(--pico-background-color);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  animation: slideInUp 300ms ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Detail view container */
+
+.project-detail {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0;
+}
+
+/* Close button (X) */
+
+.detail-close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: var(--primary-focus);
+  color: var(--pico-text-color);
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 200ms ease, background 200ms ease;
+  z-index: 10;
+  user-select: none;
+}
+
+.detail-close-btn:hover {
+  background: var(--primary-hover);
+  transform: scale(1.08);
+}
+
+/* Back button */
+
+.detail-back-btn {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  padding: 1rem 1.2rem;
+  background: var(--gradient-primary-light);
+  border: none;
+  border-bottom: 1px solid var(--pico-muted-color);
+  color: var(--pico-primary);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: background 180ms ease;
+  text-align: left;
+  z-index: 5;
+  user-select: none;
+}
+
+.detail-back-btn:hover {
+  background: var(--gradient-primary-accent);
+}
+
+/* Detail image */
+
+.detail-image-wrapper {
+  width: 100%;
+  height: 300px;
+  overflow: hidden;
+  background: var(--gradient-primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.detail-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.detail-image-placeholder {
+  font-size: 4.5rem;
+  opacity: 0.3;
+}
+
+/* Detail body */
+
+.detail-body {
+  flex: 1;
+  padding: 2rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.detail-title {
+  margin: 0;
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: var(--pico-text-color);
+  line-height: 1.25;
+}
+
+/* Metadata section */
+
+.detail-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1.1rem;
+  background: var(--primary-accent);
+  border-radius: 10px;
+  border-left: 4px solid var(--pico-primary);
+}
+
+.detail-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.95rem;
+}
+
+.detail-meta-item strong {
+  color: var(--pico-muted-color);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.detail-meta-item span {
+  color: var(--pico-text-color);
+  font-weight: 500;
+}
+
+/* Content sections */
+
+.detail-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.detail-section h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--pico-text-color);
+  padding-bottom: 0.45rem;
+  border-bottom: 2px solid var(--primary-focus);
+}
+
+.detail-section p {
+  margin: 0;
+  line-height: 1.6;
+  color: var(--pico-text-color);
+  font-size: 0.95rem;
+}
+
+.detail-section ul {
+  margin: 0;
+  padding-left: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.detail-section li {
+  color: var(--pico-text-color);
+  font-size: 0.95rem;
+}
+
+/* Badges */
+
+.detail-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.detail-badge {
+  display: inline-block;
+  padding: 0.45rem 0.95rem;
+  background: var(--primary-accent);
+  color: var(--pico-primary);
+  border: 1px solid var(--primary-focus);
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: background 180ms ease, border-color 180ms ease;
+}
+
+.detail-badge.active {
+  background: var(--primary-hover);
+  border-color: var(--pico-primary);
+}
+
+.detail-badge:hover {
+  background: var(--primary-hover);
+  border-color: var(--pico-primary);
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 768px) {
+  .right-panel {
+    border-left: none;
+  }
+}
+
+/* ===== REDUCED MOTION ===== */
+
+@media (prefers-reduced-motion: reduce) {
+  .project-detail-modal {
+    animation: none;
+  }
+}

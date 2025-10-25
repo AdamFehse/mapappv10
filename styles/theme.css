@@ -1,0 +1,150 @@
+/**
+ * theme.css - Pico CSS Overrides & Custom Theme
+ *
+ * PHILOSOPHY:
+ * - Let Pico handle 95% of styling
+ * - Only override CSS custom properties
+ * - Keep this file MINIMAL (<100 lines)
+ * - Easy theme switching (change variables)
+ *
+ * STRUCTURE:
+ * 1. Color palette overrides
+ * 2. Component-specific variables
+ * 3. Utility classes (minimal)
+ */
+
+:root {
+  /* ===== BRAND COLORS ===== */
+  /* Override Pico's primary color for globe accent */
+  --pico-primary: #2196F3;       /* Blue for markers/buttons */
+  --pico-primary-hover: #1976D2; /* Darker blue on hover */
+
+  /* ===== GLOBE-SPECIFIC ===== */
+  --globe-accent: var(--pico-primary);
+  --globe-hover: var(--pico-primary-hover);
+  --globe-selected: #FF5722; /* Orange-red for selected marker */
+
+  /* ===== SIDEBAR ===== */
+  --sidebar-width: 420px;
+  --sidebar-bg: var(--pico-background-color);
+  --sidebar-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  --sidebar-transition: transform 300ms ease-out;
+
+  /* ===== PROJECT CARDS ===== */
+  --card-spacing: 1rem;
+  --card-border-left-width: 4px;
+  --card-thumbnail-size: 80px;
+
+  /* ===== TRANSITIONS & ANIMATIONS ===== */
+  --transition-fast: 160ms ease;
+  --transition-normal: 200ms ease;
+  --transition-smooth: 220ms ease;
+  --transition-focus: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+  --transition-slide: 300ms ease;
+
+  /* ===== COLORS - RGBA VARIANTS ===== */
+  --primary-rgb: 33, 150, 243;
+  --primary-light: rgba(33, 150, 243, 0.08);
+  --primary-lighter: rgba(33, 150, 243, 0.02);
+  --primary-accent: rgba(33, 150, 243, 0.12);
+  --primary-focus: rgba(33, 150, 243, 0.18);
+  --primary-hover: rgba(33, 150, 243, 0.28);
+  --primary-strong: rgba(33, 150, 243, 0.45);
+
+  /* ===== GRADIENTS ===== */
+  --gradient-primary-light: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-lighter) 100%);
+  --gradient-primary-accent: linear-gradient(135deg, rgba(33, 150, 243, 0.28) 0%, rgba(33, 150, 243, 0.12) 100%);
+
+  /* ===== SHADOWS & EFFECTS ===== */
+  --shadow-card: 0 6px 20px rgba(15, 23, 42, 0.08);
+  --shadow-card-hover: 0 14px 28px rgba(15, 23, 42, 0.12);
+  --shadow-featured: 0 16px 30px rgba(33, 150, 243, 0.18);
+  --shadow-selected: 0 0 0 3px rgba(33, 150, 243, 0.28), 0 18px 32px rgba(33, 150, 243, 0.22);
+}
+
+/* Dark theme overrides */
+[data-theme="dark"] {
+  --globe-accent: #64B5F6; /* Lighter blue for dark mode */
+  --sidebar-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+}
+
+/* ===== LAYOUT UTILITIES ===== */
+
+/* Full-height app container */
+.app-container {
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, var(--sidebar-width));
+  gap: 0;
+}
+
+/* Loading state */
+.app-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font-size: 1.5rem;
+}
+
+/* Screen-reader only (for ARIA announcements) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ===== RESPONSIVE ===== */
+
+/* Tablet and below: Narrower sidebar */
+@media (max-width: 1024px) {
+  .app-container {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 55vh) minmax(0, 45vh);
+  }
+
+  .right-panel {
+    border-left: none;
+    border-top: 1px solid var(--pico-muted-color);
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --sidebar-width: 320px;
+  }
+
+  .app-container {
+    grid-template-rows: minmax(0, 50vh) minmax(0, 50vh);
+  }
+}
+
+/* Mobile: Full-width sidebar (overlay) */
+@media (max-width: 480px) {
+  :root {
+    --sidebar-width: 100%;
+  }
+}
+
+/* ===== REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --sidebar-transition: none;
+  }
+
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

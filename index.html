@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>3D Globe Story Map - Arizona-Sonora Borderlands</title>
+
+  <!-- Pico CSS (Theme system) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
+
+  <!-- Cesium CSS -->
+  <link rel="stylesheet" href="https://cesium.com/downloads/cesiumjs/releases/1.112/Build/Cesium/Widgets/widgets.css" />
+
+  <!-- Custom Styles (Pico overrides) -->
+  <link rel="stylesheet" href="./styles/theme.css" />
+  <link rel="stylesheet" href="./styles/globe.css" />
+  <link rel="stylesheet" href="./styles/rightpanel.css" />
+  <link rel="stylesheet" href="./styles/narrative-bar.css" />
+  <link rel="stylesheet" href="./styles/explore-bar.css" />
+
+  <!-- Cesium.js (3D Globe Engine) -->
+  <script src="https://cesium.com/downloads/cesiumjs/releases/1.112/Build/Cesium/Cesium.js"></script>
+
+  <!-- Set Cesium Ion Token -->
+  <script>
+    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2NDcyMjhhMy0yMjFhLTRmOWYtYmE5YS1mM2JiZWJiODJhNTMiLCJpZCI6MzUzNTQ5LCJpYXQiOjE3NjEyNzUyODN9.Q2XPrnYFJemqZ2XkHwp543O3UV0vFELSk7lHemqB6FM';
+  </script>
+
+  <!-- React (Component framework) -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+  <!-- Embla Carousel (Carousel/carousel component library) -->
+  <script src="https://cdn.jsdelivr.net/npm/embla-carousel@8.1.0/embla-carousel.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/embla-carousel-autoplay@8.1.0/embla-carousel-autoplay.umd.min.js"></script>
+  <script src="https://unpkg.com/embla-carousel-wheel-gestures@8.1.0/dist/embla-carousel-wheel-gestures.umd.js"></script>
+
+  <!-- Configuration -->
+  <script src="./config/cesium-config.js"></script>
+
+  <!-- Utilities -->
+  <script src="./utils/routing.js"></script>
+  <script src="./utils/accessibility.js"></script>
+
+  <!-- Components -->
+  <script src="./components/NarrativeBar.js"></script>
+  <script src="./components/ExploreBar.js"></script>
+  <script src="./components/RightPanel.js"></script>
+  <script src="./components/GlobeContainer.js"></script>
+  <script src="./components/App.js"></script>
+</head>
+
+<body data-theme="auto">
+  <!-- Root container -->
+  <div id="root"></div>
+
+  <script>
+    // Initialize app once all components are loaded
+    function initializeApp() {
+      // Check if all required components are loaded
+      if (
+        !window.MapApp?.App ||
+        !window.MapApp?.GlobeContainer ||
+        !window.MapApp?.RightPanel ||
+        !window.CesiumConfig ||
+        !window.Cesium
+      ) {
+        // Not ready yet, retry
+        setTimeout(initializeApp, 50);
+        return;
+      }
+
+      // All dependencies loaded - render app
+      console.log('🚀 Initializing MapApp V10');
+      ReactDOM.createRoot(document.getElementById('root')).render(
+        React.createElement(window.MapApp.App)
+      );
+    }
+
+    // Start initialization after DOM ready
+    if (document.readyState === 'loading') {
+      window.addEventListener('DOMContentLoaded', initializeApp);
+    } else {
+      initializeApp();
+    }
+  </script>
+</body>
+</html>

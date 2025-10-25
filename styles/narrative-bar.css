@@ -1,0 +1,142 @@
+.narrative-bar {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	margin: 0;
+	background: #050c18;
+	color: #ffffff;
+	overflow: hidden;
+}
+
+.narrative-hero {
+	position: relative;
+	flex: 1 1 auto;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+	min-height: 100%;
+	margin: 0;
+	padding: clamp(2rem, 6vw, 4rem);
+	cursor: pointer;
+	overflow: hidden;
+	background: transparent;
+	outline: none;
+}
+
+.narrative-hero:focus-visible {
+	box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.45);
+}
+
+.hero-background {
+	position: absolute;
+	inset: 0;
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	filter: blur(8px) saturate(1.08) brightness(1.05);
+	transform: scale(1.04);
+	opacity: 0.94;
+}
+
+.hero-overlay {
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(180deg, rgba(5, 12, 24, 0.35) 0%, rgba(5, 12, 24, 0.7) 60%, rgba(5, 12, 24, 0.55) 100%);
+}
+
+.hero-content {
+	position: relative;
+	z-index: 1;
+	display: flex;
+	flex-direction: column;
+	gap: clamp(0.75rem, 2vw, 1.2rem);
+	width: min(640px, 92%);
+	text-align: center;
+}
+
+.hero-label {
+	font-size: 0.78rem;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	font-weight: 600;
+	color: rgba(255, 255, 255, 0.75);
+}
+
+.hero-title {
+	margin: 0;
+	font-size: clamp(2rem, 4.6vw, 3.1rem);
+	line-height: 1.1;
+	font-weight: 600;
+}
+
+.hero-meta {
+	margin: 0;
+	font-size: clamp(0.95rem, 2.2vw, 1.1rem);
+	color: rgba(255, 255, 255, 0.78);
+}
+
+.hero-progress {
+	display: flex;
+	justify-content: center;
+	gap: 0.5rem;
+	margin-top: clamp(1rem, 3vw, 1.5rem);
+}
+
+.hero-progress-dot {
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.35);
+	transition: transform 160ms ease, background 160ms ease;
+}
+
+.hero-progress-dot.completed {
+	background: rgba(255, 255, 255, 0.6);
+}
+
+.hero-progress-dot.active {
+	background: #ffffff;
+	transform: scale(1.15);
+}
+
+.narrative-empty {
+	display: grid;
+	place-content: center;
+	text-align: center;
+	gap: 0.75rem;
+	flex: 1 1 auto;
+	padding: clamp(2rem, 5vw, 3.5rem);
+	color: rgba(255, 255, 255, 0.85);
+}
+
+.narrative-empty h2 {
+	margin: 0;
+	font-size: clamp(1.8rem, 4vw, 2.4rem);
+}
+
+.narrative-empty p {
+	margin: 0;
+	font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+	.narrative-hero {
+		padding: clamp(1.5rem, 8vw, 3rem);
+	}
+
+	.hero-content {
+		width: 100%;
+	}
+
+	.hero-title {
+		font-size: clamp(1.8rem, 6vw, 2.6rem);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.hero-background {
+		transform: none;
+		transition: none;
+	}
+}
