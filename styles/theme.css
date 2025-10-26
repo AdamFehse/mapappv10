@@ -14,6 +14,7 @@
  */
 
 :root {
+  color-scheme: light dark;
   /* ===== BRAND COLORS ===== */
   /* Override Pico's primary color for globe accent */
   --pico-primary: #2196F3;       /* Blue for markers/buttons */
@@ -60,12 +61,293 @@
   --shadow-card-hover: 0 14px 28px rgba(15, 23, 42, 0.12);
   --shadow-featured: 0 16px 30px rgba(33, 150, 243, 0.18);
   --shadow-selected: 0 0 0 3px rgba(33, 150, 243, 0.28), 0 18px 32px rgba(33, 150, 243, 0.22);
+
+  /* ===== SURFACE TOKENS (LIGHT DEFAULTS) ===== */
+  --surface-panel: color-mix(in srgb, var(--pico-background-color) 94%, rgba(var(--primary-rgb), 0.06));
+  --surface-panel-strong: color-mix(in srgb, var(--pico-background-color) 88%, rgba(var(--primary-rgb), 0.14));
+  --surface-glass: color-mix(in srgb, var(--pico-background-color) 90%, rgba(var(--primary-rgb), 0.1));
+  --surface-glass-strong: color-mix(in srgb, var(--pico-background-color) 82%, rgba(var(--primary-rgb), 0.2));
+  --surface-overlay-soft: color-mix(in srgb, var(--pico-background-color) 80%, rgba(0, 0, 0, 0) 20%);
+  --surface-overlay-strong: color-mix(in srgb, rgba(15, 23, 42, 1) 60%, rgba(0, 0, 0, 0) 40%);
+  --surface-overlay-accent: color-mix(in srgb, var(--pico-primary) 35%, rgba(0, 0, 0, 0) 65%);
+
+  --border-soft: color-mix(in srgb, var(--pico-border-color) 85%, rgba(var(--primary-rgb), 0.12) 15%);
+  --border-strong: color-mix(in srgb, var(--pico-border-color) 65%, rgba(var(--primary-rgb), 0.32) 35%);
+  --border-glass: color-mix(in srgb, var(--pico-border-color) 78%, rgba(var(--primary-rgb), 0.22) 22%);
+
+  --text-inverse: var(--pico-contrast-color);
+  --text-inverse-muted: color-mix(in srgb, var(--text-inverse) 70%, rgba(0, 0, 0, 0) 30%);
+  --text-muted-strong: color-mix(in srgb, var(--pico-muted-color) 80%, rgba(0, 0, 0, 0) 20%);
+
+  --narrative-background: var(--surface-panel-strong);
+  --narrative-overlay-gradient: linear-gradient(180deg, color-mix(in srgb, var(--surface-overlay-strong) 40%, rgba(0, 0, 0, 0) 60%) 0%, color-mix(in srgb, var(--surface-overlay-strong) 60%, rgba(0, 0, 0, 0) 40%) 55%, color-mix(in srgb, var(--surface-overlay-strong) 75%, rgba(0, 0, 0, 0) 25%) 100%);
+  --narrative-label-color: color-mix(in srgb, var(--pico-text-color) 60%, rgba(0, 0, 0, 0) 40%);
+  --narrative-meta-color: color-mix(in srgb, var(--pico-text-color) 70%, rgba(0, 0, 0, 0) 30%);
+  --narrative-progress-passive: color-mix(in srgb, var(--pico-text-color) 25%, rgba(0, 0, 0, 0) 75%);
+  --narrative-progress-active: color-mix(in srgb, var(--pico-primary) 65%, var(--pico-text-color) 35%);
+  --narrative-progress-complete: color-mix(in srgb, var(--pico-primary) 45%, var(--pico-text-color) 55%);
+
+  --navigator-background: color-mix(in srgb, var(--pico-background-color) 92%, rgba(var(--primary-rgb), 0.08));
+  --navigator-border: var(--border-soft);
+  --navigator-slide-border: color-mix(in srgb, var(--navigator-border) 75%, rgba(0, 0, 0, 0) 25%);
+  --navigator-slide-border-hover: color-mix(in srgb, var(--navigator-border) 60%, var(--pico-primary) 40%);
+  --navigator-slide-border-active: color-mix(in srgb, var(--pico-primary) 70%, var(--pico-border-color) 30%);
+  --navigator-slide-overlay: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, color-mix(in srgb, var(--surface-overlay-strong) 70%, rgba(0, 0, 0, 0) 30%) 100%);
+  --navigator-dot: color-mix(in srgb, var(--pico-text-color) 30%, rgba(0, 0, 0, 0) 70%);
+  --navigator-dot-hover: color-mix(in srgb, var(--pico-text-color) 45%, rgba(0, 0, 0, 0) 55%);
+  --navigator-dot-active: color-mix(in srgb, var(--pico-primary) 80%, var(--pico-text-color) 20%);
+  --navigator-nav-background: color-mix(in srgb, var(--pico-background-color) 85%, rgba(var(--primary-rgb), 0.16) 15%);
+  --navigator-nav-border: color-mix(in srgb, var(--pico-border-color) 70%, rgba(var(--primary-rgb), 0.3) 30%);
+  --navigator-nav-color: color-mix(in srgb, var(--pico-text-color) 80%, rgba(0, 0, 0, 0) 20%);
+
+  --toolbar-background: color-mix(in srgb, var(--pico-background-color) 93%, rgba(var(--primary-rgb), 0.12) 7%);
+  --toolbar-border: var(--border-glass);
+  --toolbar-text-muted: color-mix(in srgb, var(--pico-muted-color) 85%, rgba(0, 0, 0, 0) 15%);
+
+  --intro-overlay-gradient: radial-gradient(ellipse at center, color-mix(in srgb, var(--surface-overlay-strong) 55%, rgba(0, 0, 0, 0) 45%) 0%, color-mix(in srgb, var(--surface-overlay-strong) 75%, rgba(0, 0, 0, 0) 25%) 100%);
+  --intro-text-color: var(--text-inverse);
+  --intro-muted-color: var(--text-inverse-muted);
+  --intro-button-background: linear-gradient(135deg, color-mix(in srgb, var(--pico-primary) 85%, rgba(255, 255, 255, 0) 15%) 0%, color-mix(in srgb, var(--pico-primary-hover) 90%, rgba(255, 255, 255, 0) 10%) 100%);
+  --intro-button-text: var(--pico-contrast-color);
+  --intro-button-shadow: 0 8px 24px color-mix(in srgb, rgba(var(--primary-rgb), 0.35) 70%, rgba(0, 0, 0, 0.12) 30%);
+  --intro-button-shadow-strong: 0 12px 32px color-mix(in srgb, rgba(var(--primary-rgb), 0.5) 75%, rgba(0, 0, 0, 0.2) 25%);
+  --intro-skip-background: color-mix(in srgb, var(--pico-background-color) 60%, rgba(var(--primary-rgb), 0.1) 40%);
+  --intro-skip-border: color-mix(in srgb, var(--pico-border-color) 75%, rgba(var(--primary-rgb), 0.25) 25%);
+
+  --badge-theme-bg: color-mix(in srgb, var(--pico-background-color) 95%, rgba(var(--primary-rgb), 0.08) 5%);
+  --badge-theme-border: color-mix(in srgb, var(--pico-border-color) 85%, rgba(var(--primary-rgb), 0.15) 15%);
+  --badge-theme-text: var(--pico-text-color);
+  --badge-theme-bg-hover: color-mix(in srgb, var(--pico-primary) 12%, var(--pico-background-color) 88%);
+
+  --badge-background: color-mix(in srgb, var(--pico-primary) 10%, var(--pico-background-color) 90%);
+  --badge-color: var(--pico-primary);
+  --badge-border: color-mix(in srgb, var(--pico-primary) 25%, var(--pico-border-color) 75%);
+
+  --panel-top-background: color-mix(in srgb, var(--pico-background-color) 96%, rgba(var(--primary-rgb), 0.06));
+  --panel-narrative-gradient: radial-gradient(circle at top right, var(--primary-focus), transparent 45%), var(--pico-background-color);
+  --panel-clear-background: color-mix(in srgb, var(--pico-primary) 10%, var(--pico-background-color) 90%);
+  --panel-clear-border: color-mix(in srgb, var(--pico-primary) 30%, var(--pico-border-color) 70%);
+  --panel-clear-background-hover: color-mix(in srgb, var(--pico-primary) 18%, var(--pico-background-color) 82%);
+
+  --card-background: var(--pico-form-element-background-color);
+  --card-border: color-mix(in srgb, var(--pico-border-color) 50%, rgba(var(--primary-rgb), 0.02) 50%);
+  --card-border-featured: color-mix(in srgb, var(--pico-primary) 45%, var(--pico-border-color) 55%);
+  --card-border-selected: var(--pico-primary);
+  --card-image-placeholder-bg: var(--surface-panel);
+  --card-view-btn-background: var(--surface-panel);
+  --card-view-btn-color: var(--pico-primary);
+  --card-view-btn-border: var(--border-soft);
+  --card-view-btn-selected: color-mix(in srgb, var(--pico-primary) 15%, var(--pico-background-color) 85%);
+  --card-view-btn-shadow-hover: 0 8px 18px color-mix(in srgb, rgba(var(--primary-rgb), 0.3) 60%, rgba(0, 0, 0, 0.05) 40%);
+
+  --detail-close-background: color-mix(in srgb, var(--pico-primary) 18%, var(--pico-background-color) 82%);
+  --detail-close-color: var(--pico-text-color);
+  --detail-close-background-hover: color-mix(in srgb, var(--pico-primary) 25%, var(--pico-background-color) 75%);
+  --detail-back-background: var(--surface-panel);
+  --detail-back-background-hover: color-mix(in srgb, var(--pico-primary) 12%, var(--pico-background-color) 88%);
+  --detail-image-placeholder-bg: var(--surface-panel);
+  --detail-meta-background: color-mix(in srgb, var(--pico-primary) 8%, var(--pico-background-color) 92%);
+
+  --navigator-image-placeholder-bg: linear-gradient(135deg, var(--surface-overlay-soft) 0%, color-mix(in srgb, var(--pico-primary) 10%, var(--pico-background-color) 90%) 100%);
+
+  --scrollbar-thumb: color-mix(in srgb, var(--pico-primary) 25%, var(--pico-border-color) 75%);
+  --scrollbar-thumb-hover: color-mix(in srgb, var(--pico-primary) 40%, var(--pico-border-color) 60%);
+
+  --text-shadow-strong: 0 2px 4px rgba(0, 0, 0, 0.5);
+  --text-shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 /* Dark theme overrides */
 [data-theme="dark"] {
+  color-scheme: dark;
   --globe-accent: #64B5F6; /* Lighter blue for dark mode */
   --sidebar-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+  --surface-panel: color-mix(in srgb, var(--pico-background-color) 82%, rgba(var(--primary-rgb), 0.22));
+  --surface-panel-strong: color-mix(in srgb, var(--pico-background-color) 72%, rgba(var(--primary-rgb), 0.32));
+  --surface-glass: color-mix(in srgb, var(--pico-background-color) 78%, rgba(var(--primary-rgb), 0.28));
+  --surface-glass-strong: color-mix(in srgb, var(--pico-background-color) 66%, rgba(var(--primary-rgb), 0.4));
+  --surface-overlay-soft: color-mix(in srgb, rgba(8, 12, 24, 0.65) 60%, rgba(0, 0, 0, 0) 40%);
+  --surface-overlay-strong: color-mix(in srgb, rgba(5, 12, 24, 0.9) 75%, rgba(0, 0, 0, 0) 25%);
+  --surface-overlay-accent: color-mix(in srgb, rgba(var(--primary-rgb), 0.55) 55%, rgba(5, 12, 24, 0.45) 45%);
+
+  --border-soft: color-mix(in srgb, rgba(148, 163, 184, 0.24) 60%, rgba(var(--primary-rgb), 0.24) 40%);
+  --border-strong: color-mix(in srgb, rgba(148, 163, 184, 0.4) 55%, rgba(var(--primary-rgb), 0.38) 45%);
+  --border-glass: color-mix(in srgb, rgba(148, 163, 184, 0.35) 55%, rgba(var(--primary-rgb), 0.45) 45%);
+
+  --text-inverse: color-mix(in srgb, #ffffff 92%, rgba(var(--primary-rgb), 0.08));
+  --text-inverse-muted: color-mix(in srgb, var(--text-inverse) 65%, rgba(0, 0, 0, 0) 35%);
+  --text-muted-strong: color-mix(in srgb, rgba(203, 213, 225, 0.75), rgba(var(--primary-rgb), 0.1));
+
+  --narrative-background: color-mix(in srgb, rgba(5, 12, 24, 1) 70%, rgba(var(--primary-rgb), 0.25));
+  --narrative-overlay-gradient: linear-gradient(180deg, rgba(5, 12, 24, 0.55) 0%, rgba(5, 12, 24, 0.78) 60%, rgba(5, 12, 24, 0.72) 100%);
+  --narrative-label-color: rgba(255, 255, 255, 0.75);
+  --narrative-meta-color: rgba(255, 255, 255, 0.82);
+  --narrative-progress-passive: rgba(255, 255, 255, 0.3);
+  --narrative-progress-active: color-mix(in srgb, rgba(var(--primary-rgb), 0.85), rgba(255, 255, 255, 0.2));
+  --narrative-progress-complete: rgba(255, 255, 255, 0.6);
+
+  --navigator-background: color-mix(in srgb, rgba(5, 12, 24, 0.85), rgba(var(--primary-rgb), 0.18));
+  --navigator-border: color-mix(in srgb, rgba(148, 163, 184, 0.25) 55%, rgba(var(--primary-rgb), 0.25) 45%);
+  --navigator-slide-border: color-mix(in srgb, rgba(255, 255, 255, 0.18) 55%, rgba(var(--primary-rgb), 0.2) 45%);
+  --navigator-slide-border-hover: color-mix(in srgb, rgba(255, 255, 255, 0.32) 55%, rgba(var(--primary-rgb), 0.38) 45%);
+  --navigator-slide-border-active: color-mix(in srgb, rgba(var(--primary-rgb), 0.8) 65%, rgba(255, 255, 255, 0.35) 35%);
+  --navigator-slide-overlay: linear-gradient(180deg, rgba(5, 12, 24, 0) 0%, rgba(5, 12, 24, 0.85) 100%);
+  --navigator-dot: rgba(255, 255, 255, 0.3);
+  --navigator-dot-hover: rgba(255, 255, 255, 0.5);
+  --navigator-dot-active: rgba(var(--primary-rgb), 0.9);
+  --navigator-nav-background: color-mix(in srgb, rgba(var(--primary-rgb), 0.22) 45%, rgba(5, 12, 24, 0.75) 55%);
+  --navigator-nav-border: color-mix(in srgb, rgba(var(--primary-rgb), 0.4) 55%, rgba(148, 163, 184, 0.28) 45%);
+  --navigator-nav-color: rgba(255, 255, 255, 0.82);
+
+  --toolbar-background: color-mix(in srgb, rgba(8, 15, 30, 0.82) 70%, rgba(var(--primary-rgb), 0.2) 30%);
+  --toolbar-border: color-mix(in srgb, rgba(148, 163, 184, 0.28) 55%, rgba(var(--primary-rgb), 0.35) 45%);
+  --toolbar-text-muted: rgba(226, 232, 240, 0.75);
+
+  --intro-overlay-gradient: radial-gradient(ellipse at center, rgba(10, 20, 40, 0.7) 0%, rgba(0, 0, 0, 0.9) 100%);
+  --intro-text-color: rgba(255, 255, 255, 0.95);
+  --intro-muted-color: rgba(255, 255, 255, 0.8);
+  --intro-button-background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.95) 0%, rgba(var(--primary-rgb), 0.8) 100%);
+  --intro-button-text: #ffffff;
+  --intro-button-shadow: 0 8px 24px rgba(0, 128, 255, 0.35);
+  --intro-button-shadow-strong: 0 12px 32px rgba(0, 128, 255, 0.5);
+  --intro-skip-background: rgba(255, 255, 255, 0.05);
+  --intro-skip-border: rgba(255, 255, 255, 0.3);
+
+  --badge-theme-bg: color-mix(in srgb, rgba(15, 23, 42, 0.3) 55%, rgba(var(--primary-rgb), 0.18) 45%);
+  --badge-theme-border: color-mix(in srgb, rgba(148, 163, 184, 0.28) 55%, rgba(var(--primary-rgb), 0.35) 45%);
+  --badge-theme-text: rgba(226, 232, 240, 0.92);
+  --badge-theme-bg-hover: color-mix(in srgb, rgba(var(--primary-rgb), 0.28) 65%, rgba(15, 23, 42, 0.5) 35%);
+
+  --badge-background: color-mix(in srgb, rgba(var(--primary-rgb), 0.25) 55%, rgba(15, 23, 42, 0.6) 45%);
+  --badge-color: color-mix(in srgb, var(--pico-primary) 80%, rgba(255, 255, 255, 0.3) 20%);
+  --badge-border: color-mix(in srgb, rgba(var(--primary-rgb), 0.4) 65%, rgba(148, 163, 184, 0.3) 35%);
+
+  --panel-top-background: color-mix(in srgb, rgba(8, 15, 30, 0.7) 65%, rgba(var(--primary-rgb), 0.15) 35%);
+  --panel-narrative-gradient: radial-gradient(circle at top right, color-mix(in srgb, rgba(var(--primary-rgb), 0.4), rgba(10, 20, 40, 0.5)), transparent 45%), var(--pico-background-color);
+  --panel-clear-background: color-mix(in srgb, rgba(var(--primary-rgb), 0.22) 55%, rgba(15, 23, 42, 0.7) 45%);
+  --panel-clear-border: color-mix(in srgb, rgba(var(--primary-rgb), 0.45) 65%, rgba(148, 163, 184, 0.3) 35%);
+  --panel-clear-background-hover: color-mix(in srgb, rgba(var(--primary-rgb), 0.32) 60%, rgba(15, 23, 42, 0.65) 40%);
+
+  --card-background: color-mix(in srgb, rgba(8, 15, 30, 0.85) 70%, rgba(var(--primary-rgb), 0.12) 30%);
+  --card-border: color-mix(in srgb, rgba(148, 163, 184, 0.15) 60%, rgba(var(--primary-rgb), 0.15) 40%);
+  --card-border-featured: color-mix(in srgb, rgba(var(--primary-rgb), 0.65) 70%, rgba(148, 163, 184, 0.3) 30%);
+  --card-border-selected: color-mix(in srgb, rgba(var(--primary-rgb), 0.85) 85%, rgba(255, 255, 255, 0.15) 15%);
+  --card-image-placeholder-bg: var(--surface-panel);
+  --card-view-btn-background: color-mix(in srgb, rgba(var(--primary-rgb), 0.15) 45%, rgba(15, 23, 42, 0.75) 55%);
+  --card-view-btn-color: color-mix(in srgb, var(--pico-primary) 85%, rgba(255, 255, 255, 0.25) 15%);
+  --card-view-btn-border: color-mix(in srgb, rgba(var(--primary-rgb), 0.35) 60%, rgba(148, 163, 184, 0.25) 40%);
+  --card-view-btn-selected: color-mix(in srgb, rgba(var(--primary-rgb), 0.28) 65%, rgba(15, 23, 42, 0.7) 35%);
+  --card-view-btn-shadow-hover: 0 8px 18px color-mix(in srgb, rgba(var(--primary-rgb), 0.4) 60%, rgba(0, 0, 0, 0.3) 40%);
+
+  --detail-close-background: color-mix(in srgb, rgba(var(--primary-rgb), 0.25) 60%, rgba(15, 23, 42, 0.75) 40%);
+  --detail-close-color: rgba(255, 255, 255, 0.92);
+  --detail-close-background-hover: color-mix(in srgb, rgba(var(--primary-rgb), 0.38) 65%, rgba(15, 23, 42, 0.65) 35%);
+  --detail-back-background: color-mix(in srgb, rgba(8, 15, 30, 0.8) 65%, rgba(var(--primary-rgb), 0.18) 35%);
+  --detail-back-background-hover: color-mix(in srgb, rgba(var(--primary-rgb), 0.22) 55%, rgba(8, 15, 30, 0.75) 45%);
+  --detail-image-placeholder-bg: var(--surface-panel);
+  --detail-meta-background: color-mix(in srgb, rgba(var(--primary-rgb), 0.18) 50%, rgba(15, 23, 42, 0.7) 50%);
+
+  --navigator-image-placeholder-bg: linear-gradient(135deg, var(--surface-overlay-soft) 0%, color-mix(in srgb, rgba(var(--primary-rgb), 0.22), rgba(15, 23, 42, 0.85)) 100%);
+
+  --scrollbar-thumb: color-mix(in srgb, rgba(var(--primary-rgb), 0.4) 65%, rgba(148, 163, 184, 0.3) 35%);
+  --scrollbar-thumb-hover: color-mix(in srgb, rgba(var(--primary-rgb), 0.6) 70%, rgba(148, 163, 184, 0.4) 30%);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --globe-accent: #64B5F6;
+    --sidebar-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+    --surface-panel: color-mix(in srgb, var(--pico-background-color) 82%, rgba(var(--primary-rgb), 0.22));
+    --surface-panel-strong: color-mix(in srgb, var(--pico-background-color) 72%, rgba(var(--primary-rgb), 0.32));
+    --surface-glass: color-mix(in srgb, var(--pico-background-color) 78%, rgba(var(--primary-rgb), 0.28));
+    --surface-glass-strong: color-mix(in srgb, var(--pico-background-color) 66%, rgba(var(--primary-rgb), 0.4));
+    --surface-overlay-soft: color-mix(in srgb, rgba(8, 12, 24, 0.65) 60%, rgba(0, 0, 0, 0) 40%);
+    --surface-overlay-strong: color-mix(in srgb, rgba(5, 12, 24, 0.9) 75%, rgba(0, 0, 0, 0) 25%);
+    --surface-overlay-accent: color-mix(in srgb, rgba(var(--primary-rgb), 0.55), rgba(5, 12, 24, 0.45));
+
+    --border-soft: color-mix(in srgb, rgba(148, 163, 184, 0.24), rgba(var(--primary-rgb), 0.24));
+    --border-strong: color-mix(in srgb, rgba(148, 163, 184, 0.4), rgba(var(--primary-rgb), 0.38));
+    --border-glass: color-mix(in srgb, rgba(148, 163, 184, 0.35), rgba(var(--primary-rgb), 0.45));
+
+    --text-inverse: color-mix(in srgb, #ffffff 92%, rgba(var(--primary-rgb), 0.08));
+    --text-inverse-muted: color-mix(in srgb, var(--text-inverse) 65%, rgba(0, 0, 0, 0) 35%);
+    --text-muted-strong: color-mix(in srgb, rgba(203, 213, 225, 0.75), rgba(var(--primary-rgb), 0.1));
+
+    --narrative-background: color-mix(in srgb, rgba(5, 12, 24, 1) 70%, rgba(var(--primary-rgb), 0.25));
+    --narrative-overlay-gradient: linear-gradient(180deg, rgba(5, 12, 24, 0.55) 0%, rgba(5, 12, 24, 0.78) 60%, rgba(5, 12, 24, 0.72) 100%);
+    --narrative-label-color: rgba(255, 255, 255, 0.75);
+    --narrative-meta-color: rgba(255, 255, 255, 0.82);
+    --narrative-progress-passive: rgba(255, 255, 255, 0.3);
+    --narrative-progress-active: color-mix(in srgb, rgba(var(--primary-rgb), 0.85), rgba(255, 255, 255, 0.2));
+    --narrative-progress-complete: rgba(255, 255, 255, 0.6);
+
+    --navigator-background: color-mix(in srgb, rgba(5, 12, 24, 0.85), rgba(var(--primary-rgb), 0.18));
+    --navigator-border: color-mix(in srgb, rgba(148, 163, 184, 0.25), rgba(var(--primary-rgb), 0.25));
+    --navigator-slide-border: color-mix(in srgb, rgba(255, 255, 255, 0.18), rgba(var(--primary-rgb), 0.2));
+    --navigator-slide-border-hover: color-mix(in srgb, rgba(255, 255, 255, 0.32), rgba(var(--primary-rgb), 0.38));
+    --navigator-slide-border-active: color-mix(in srgb, rgba(var(--primary-rgb), 0.8), rgba(255, 255, 255, 0.35));
+    --navigator-slide-overlay: linear-gradient(180deg, rgba(5, 12, 24, 0) 0%, rgba(5, 12, 24, 0.85) 100%);
+    --navigator-dot: rgba(255, 255, 255, 0.3);
+    --navigator-dot-hover: rgba(255, 255, 255, 0.5);
+    --navigator-dot-active: rgba(var(--primary-rgb), 0.9);
+    --navigator-nav-background: color-mix(in srgb, rgba(var(--primary-rgb), 0.22), rgba(5, 12, 24, 0.75));
+    --navigator-nav-border: color-mix(in srgb, rgba(var(--primary-rgb), 0.4), rgba(148, 163, 184, 0.28));
+    --navigator-nav-color: rgba(255, 255, 255, 0.82);
+
+    --toolbar-background: color-mix(in srgb, rgba(8, 15, 30, 0.82), rgba(var(--primary-rgb), 0.2));
+    --toolbar-border: color-mix(in srgb, rgba(148, 163, 184, 0.28), rgba(var(--primary-rgb), 0.35));
+    --toolbar-text-muted: rgba(226, 232, 240, 0.75);
+
+    --intro-overlay-gradient: radial-gradient(ellipse at center, rgba(10, 20, 40, 0.7) 0%, rgba(0, 0, 0, 0.9) 100%);
+    --intro-text-color: rgba(255, 255, 255, 0.95);
+    --intro-muted-color: rgba(255, 255, 255, 0.8);
+    --intro-button-background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.95) 0%, rgba(var(--primary-rgb), 0.8) 100%);
+    --intro-button-text: #ffffff;
+    --intro-button-shadow: 0 8px 24px rgba(0, 128, 255, 0.35);
+    --intro-button-shadow-strong: 0 12px 32px rgba(0, 128, 255, 0.5);
+    --intro-skip-background: rgba(255, 255, 255, 0.05);
+    --intro-skip-border: rgba(255, 255, 255, 0.3);
+
+    --badge-theme-bg: color-mix(in srgb, rgba(15, 23, 42, 0.3), rgba(var(--primary-rgb), 0.18));
+    --badge-theme-border: color-mix(in srgb, rgba(148, 163, 184, 0.28), rgba(var(--primary-rgb), 0.35));
+    --badge-theme-text: rgba(226, 232, 240, 0.92);
+    --badge-theme-bg-hover: color-mix(in srgb, rgba(var(--primary-rgb), 0.28), rgba(15, 23, 42, 0.5));
+
+    --badge-background: color-mix(in srgb, rgba(var(--primary-rgb), 0.25), rgba(15, 23, 42, 0.6));
+    --badge-color: color-mix(in srgb, var(--pico-primary) 80%, rgba(255, 255, 255, 0.3) 20%);
+    --badge-border: color-mix(in srgb, rgba(var(--primary-rgb), 0.4), rgba(148, 163, 184, 0.3));
+
+    --panel-top-background: color-mix(in srgb, rgba(8, 15, 30, 0.7), rgba(var(--primary-rgb), 0.15));
+    --panel-narrative-gradient: radial-gradient(circle at top right, color-mix(in srgb, rgba(var(--primary-rgb), 0.4), rgba(10, 20, 40, 0.5)), transparent 45%), var(--pico-background-color);
+    --panel-clear-background: color-mix(in srgb, rgba(var(--primary-rgb), 0.22), rgba(15, 23, 42, 0.7));
+    --panel-clear-border: color-mix(in srgb, rgba(var(--primary-rgb), 0.45), rgba(148, 163, 184, 0.3));
+    --panel-clear-background-hover: color-mix(in srgb, rgba(var(--primary-rgb), 0.32), rgba(15, 23, 42, 0.65));
+
+    --card-background: color-mix(in srgb, rgba(8, 15, 30, 0.85), rgba(var(--primary-rgb), 0.12));
+    --card-border: color-mix(in srgb, rgba(148, 163, 184, 0.15), rgba(var(--primary-rgb), 0.15));
+    --card-border-featured: color-mix(in srgb, rgba(var(--primary-rgb), 0.65), rgba(148, 163, 184, 0.3));
+    --card-border-selected: color-mix(in srgb, rgba(var(--primary-rgb), 0.85), rgba(255, 255, 255, 0.15));
+    --card-image-placeholder-bg: var(--surface-panel);
+    --card-view-btn-background: color-mix(in srgb, rgba(var(--primary-rgb), 0.15), rgba(15, 23, 42, 0.75));
+    --card-view-btn-color: color-mix(in srgb, var(--pico-primary) 85%, rgba(255, 255, 255, 0.25) 15%);
+    --card-view-btn-border: color-mix(in srgb, rgba(var(--primary-rgb), 0.35), rgba(148, 163, 184, 0.25));
+    --card-view-btn-selected: color-mix(in srgb, rgba(var(--primary-rgb), 0.28), rgba(15, 23, 42, 0.7));
+    --card-view-btn-shadow-hover: 0 8px 18px color-mix(in srgb, rgba(var(--primary-rgb), 0.4), rgba(0, 0, 0, 0.3));
+
+    --detail-close-background: color-mix(in srgb, rgba(var(--primary-rgb), 0.25), rgba(15, 23, 42, 0.75));
+    --detail-close-color: rgba(255, 255, 255, 0.92);
+    --detail-close-background-hover: color-mix(in srgb, rgba(var(--primary-rgb), 0.38), rgba(15, 23, 42, 0.65));
+    --detail-back-background: color-mix(in srgb, rgba(8, 15, 30, 0.8), rgba(var(--primary-rgb), 0.18));
+    --detail-back-background-hover: color-mix(in srgb, rgba(var(--primary-rgb), 0.22), rgba(8, 15, 30, 0.75));
+    --detail-image-placeholder-bg: var(--surface-panel);
+    --detail-meta-background: color-mix(in srgb, rgba(var(--primary-rgb), 0.18), rgba(15, 23, 42, 0.7));
+
+    --navigator-image-placeholder-bg: linear-gradient(135deg, var(--surface-overlay-soft) 0%, color-mix(in srgb, rgba(var(--primary-rgb), 0.22), rgba(15, 23, 42, 0.85)) 100%);
+
+    --scrollbar-thumb: color-mix(in srgb, rgba(var(--primary-rgb), 0.4), rgba(148, 163, 184, 0.3));
+    --scrollbar-thumb-hover: color-mix(in srgb, rgba(var(--primary-rgb), 0.6), rgba(148, 163, 184, 0.4));
+  }
 }
 
 /* ===== LAYOUT UTILITIES ===== */

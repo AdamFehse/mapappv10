@@ -1,4 +1,4 @@
-// RightPanel.js - Right side panel with narrative showcase and project explorer
+// RightPanel.js - Narrative onboarding + simple scroll
 
 (function() {
   const { useState, useEffect } = React;
@@ -6,21 +6,17 @@
 
   /**
    * RightPanel Component
-   *
-   * RESPONSIBILITY:
-   * - Orchestrates NarrativeBar and ExploreBar components
-   * - Manages detail view overlay for expanded projects
-   * - Handles narrative phase switching
    */
   window.MapApp.RightPanel = function RightPanel({
     projects = [],
     onSelectProject = () => {},
     narrativeIndex = 0,
-    selectedProjectId = null
+    typewriterProgress = 0,
+    selectedProjectId = null,
+    showNarrativeIntro = true
   }) {
     const [expandedProject, setExpandedProject] = useState(null);
-
-    const isNarrativeIntro = narrativeIndex < 2;
+    const isNarrativeIntro = !!showNarrativeIntro;
 
     // Close detail view
     const closeDetail = () => {
@@ -137,24 +133,67 @@
     }
     if (isNarrativeIntro && !expandedProject) {
       panelClasses.push('narrative-mode');
-    } else {
-      panelClasses.push('explore-mode');
     }
 
     return React.createElement('div', { className: panelClasses.join(' ') },
-      isNarrativeIntro ?
-        React.createElement(window.MapApp.NarrativeBar, {
+      isNarrativeIntro
+        ? React.createElement(window.MapApp.NarrativeBar, {
           projects: projects,
           onSelectProject: handleExpandProject,
           isActive: isNarrativeIntro,
-          narrativeIndex: narrativeIndex
-        }) :
-        React.createElement(window.MapApp.ExploreBar, {
-          projects: projects,
-          onSelectProject: handleExpandProject,
-          selectedProjectId: selectedProjectId,
-          onExpandProject: handleExpandProject
-        }),
+          narrativeIndex: narrativeIndex,
+          typewriterProgress: typewriterProgress
+        })
+        : // SIMPLE VERTICAL SCROLL - NO EMBLA
+        React.createElement('div', { style: { width: '100%', height: '100%', display: 'flex', flexDirection: 'column' } },
+          // Title
+          React.createElement('div', {
+            style: {
+              padding: '20px',
+              background: '#2196F3',
+              color: 'white',
+              textAlign: 'center',
+              fontSize: '1.5rem',
+              fontWeight: 'bold',
+              flexShrink: 0
+            }
+          }, '✨ Projects'),
+
+          // Scrollable container - SIMPLE CSS SCROLL
+          React.createElement('div', {
+            style: {
+              flex: 1,
+              width: '100%',
+              overflow: 'auto',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1rem',
+              padding: '1rem'
+            }
+          },
+            // Render all projects
+            projects.map((project, index) =>
+              React.createElement('div', {
+                key: project.id || index,
+                style: {
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  borderRadius: '8px',
+                  padding: '20px',
+                  color: 'white',
+                  fontSize: '1rem',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                  minHeight: '80px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  textAlign: 'center'
+                }
+              }, project.ProjectName || `Project ${index + 1}`)
+            )
+          )
+        ),
       expandedProject && React.createElement('div', { className: 'project-detail-modal' },
         renderCardDetails(expandedProject)
       )

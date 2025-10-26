@@ -26,6 +26,8 @@
     const [selectedProject, setSelectedProject] = useState(null);
     const [loading, setLoading] = useState(true);
     const [narrativeIndex, setNarrativeIndex] = useState(0);
+    const [typewriterProgress, setTypewriterProgress] = useState(0);
+    const [showNarrativeIntro, setShowNarrativeIntro] = useState(true);
 
     // Component references
     const GlobeContainer = window.MapApp.GlobeContainer;
@@ -136,7 +138,9 @@
         onProjectClick: handleSelectProject,
         onGlobeReady: () => console.log('Globe ready'),
         narrativeIndex: narrativeIndex,
-        onNarrativeChange: setNarrativeIndex
+        onNarrativeChange: setNarrativeIndex,
+        onTypewriterProgress: setTypewriterProgress,
+        onIntroComplete: setShowNarrativeIntro
       }),
 
       // Right: Project discovery panel
@@ -144,7 +148,9 @@
         projects,
         onSelectProject: handleSelectProject,
         narrativeIndex,
-        selectedProjectId: selectedProject ? selectedProject.id : null
+        typewriterProgress,
+        selectedProjectId: selectedProject ? selectedProject.id : null,
+        showNarrativeIntro
       })
     );
   };

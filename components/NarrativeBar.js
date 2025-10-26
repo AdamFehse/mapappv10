@@ -1,109 +1,237 @@
-// NarrativeBar.js - Minimal narrative hero banner
+// NarrativeBar.js - Displays typewriter text synced from GlobeContainer with progress bar
 (function() {
-  const { useMemo, useCallback } = React;
+  const { useState, useEffect } = React;
   window.MapApp = window.MapApp || {};
-
-  const FEATURED_PROJECT_IDS = [
-    'project-1-the-place-where-clouds-are-for',
-    'project-8-undergraduate-internship-progr',
-    'project-19-online-collaboration-and-acade'
-  ];
-
-  const resolveHeroImage = (project) => {
-    if (!project) return null;
-    const primary = project.ImageUrl;
-    if (primary && typeof primary === 'string') {
-      return primary;
-    }
-    if (Array.isArray(project.Artworks)) {
-      const artworkWithImage = project.Artworks.find(item => item && item.imageUrl);
-      if (artworkWithImage) {
-        return artworkWithImage.imageUrl;
-      }
-    }
-    return null;
-  };
 
   window.MapApp.NarrativeBar = function NarrativeBar({
     projects = [],
     onSelectProject = () => {},
     isActive = true,
-    narrativeIndex = 0
+    narrativeIndex = 0,
+    typewriterProgress = 0
   }) {
-    const narrativeProjects = useMemo(() => {
-      if (!Array.isArray(projects) || projects.length === 0) {
-        return [];
-      }
-      const featuredMatches = FEATURED_PROJECT_IDS
-        .map(featuredId => projects.find(project => project && project.id === featuredId))
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    // Get featured projects from narrative config
+    const narrativeConfig = React.useMemo(() => {
+      return window.MapAppConfig?.narrative || { passages: [] };
+    }, []);
+    const narrativePassages = narrativeConfig.passages || [];
+
+    // Build featured projects list from narrative passage featuredProjectIds
+    const featuredProjects = React.useMemo(() => {
+      return narrativePassages
+        .map(passage => {
+          if (!passage.featuredProjectId) return null;
+          return projects.find(p => p.id === passage.featuredProjectId);
+        })
         .filter(Boolean);
-      if (featuredMatches.length > 0) {
-        return featuredMatches;
+    }, [projects, narrativePassages]);
+
+    const currentProject = featuredProjects[currentIndex] || null;
+
+    // Auto-cycle based on typewriter progress reaching 100%
+    useEffect(() => {
+      if (typewriterProgress >= 100) {
+        const timer = setTimeout(() => {
+          setCurrentIndex((prev) => (prev + 1) % featuredProjects.length);
+        }, 4000); // Wait 4 seconds before cycling to next
+        return () => clearTimeout(timer);
       }
-      return projects.slice(0, Math.min(projects.length, 3));
-    }, [projects]);
+    }, [typewriterProgress, featuredProjects.length]);
 
-    const safeIndex = Math.max(0, Math.min(narrativeIndex, Math.max(narrativeProjects.length - 1, 0)));
-
-    const heroProject = narrativeProjects[safeIndex] || narrativeProjects[0] || null;
-    const heroImage = resolveHeroImage(heroProject);
-
-    const handleActivate = useCallback(() => {
-      if (heroProject && isActive) {
-        onSelectProject(heroProject);
+    const handleSelectProject = () => {
+      if (currentProject && isActive) {
+        onSelectProject(currentProject);
       }
-    }, [heroProject, onSelectProject, isActive]);
+    };
 
-    const handleKeyDown = useCallback((event) => {
-      if (!heroProject || !isActive) return;
-      if (event.key === 'Enter' || event.key === ' ') {
-        event.preventDefault();
-        onSelectProject(heroProject);
-      }
-    }, [heroProject, onSelectProject, isActive]);
-
-    if (!heroProject) {
-      return React.createElement('section', { className: 'narrative-bar' },
-        React.createElement('div', { className: 'narrative-empty' },
-          React.createElement('h2', null, 'Borderlands Story Map'),
-          React.createElement('p', null, 'Stories will appear here once projects are available.')
+    if (!currentProject) {
+      return React.createElement('section', {
+        style: {
+          width: '100%',
+          height: '100%',
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'white',
+          padding: '40px',
+          textAlign: 'center',
+          cursor: 'pointer'
+        },
+        onClick: handleSelectProject
+      },
+        React.createElement('div', null,
+          React.createElement('h1', {
+            style: {
+              fontSize: '3rem',
+              fontWeight: 'bold',
+              margin: 0,
+              marginBottom: '20px'
+            }
+          }, 'Welcome'),
+          React.createElement('p', {
+            style: {
+              fontSize: '1.1rem',
+              margin: 0
+            }
+          }, 'Loading featured projects...')
         )
       );
     }
 
-    return React.createElement('section', { className: 'narrative-bar' },
-      React.createElement('article', {
-        className: 'narrative-hero',
-        role: 'button',
-        tabIndex: 0,
-        onClick: handleActivate,
-        onKeyDown: handleKeyDown,
-        'aria-label': `Open story for ${heroProject.ProjectName || 'project'}`
+    return React.createElement('section', {
+      style: {
+        width: '100%',
+        height: '100%',
+        position: 'relative',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: 'white',
+        padding: '40px 30px',
+        textAlign: 'center',
+        cursor: 'pointer',
+        overflow: 'hidden'
       },
-        heroImage && React.createElement('div', {
-          className: 'hero-background',
-          style: { backgroundImage: `url(${heroImage})` },
-          'aria-hidden': 'true'
-        }),
-        React.createElement('div', { className: 'hero-overlay', 'aria-hidden': 'true' }),
-        React.createElement('div', { className: 'hero-content' },
-          React.createElement('div', { className: 'hero-label' }, 'Featured Story'),
-          React.createElement('h1', { className: 'hero-title' }, heroProject.ProjectName || 'Untitled Project'),
-          heroProject.Location && React.createElement('p', { className: 'hero-meta' }, heroProject.Location),
-          isActive && narrativeProjects.length > 1 && React.createElement('div', {
-            className: 'hero-progress',
-            role: 'group',
-            'aria-label': 'Narrative progress'
-          },
-            narrativeProjects.map((project, idx) =>
-              React.createElement('span', {
-                key: project.id || idx,
-                className: `hero-progress-dot${idx === safeIndex ? ' active' : ''}${idx < safeIndex ? ' completed' : ''}`,
-                'aria-hidden': 'true'
-              })
-            )
-          )
+      onClick: handleSelectProject
+    },
+      // Blurred background image
+      currentProject.ImageUrl && React.createElement('div', {
+        style: {
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundImage: `url(${currentProject.ImageUrl})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          filter: 'blur(8px) brightness(0.6)',
+          zIndex: 0
+        }
+      }),
+
+      // Dark overlay
+      React.createElement('div', {
+        style: {
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0, 0, 0, 0.4)',
+          zIndex: 1
+        }
+      }),
+
+      // Content - positioned above background
+      React.createElement('div', {
+        style: {
+          position: 'relative',
+          zIndex: 2,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flex: 1,
+          width: '100%'
+        }
+      },
+        // Title - SYNCED with typewriter from left side (NO typewriter animation here)
+        React.createElement('h1', {
+          style: {
+            fontSize: '2.8rem',
+            fontWeight: 'bold',
+            margin: 0,
+            marginBottom: '20px',
+            lineHeight: '1.2',
+            minHeight: '140px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }
+        }, currentProject.ProjectName),
+
+        // Location
+        currentProject.Location && React.createElement('p', {
+          style: {
+            fontSize: '1rem',
+            margin: '15px 0 0 0',
+            opacity: 0.95,
+            fontWeight: '500'
+          }
+        }, `📍 ${currentProject.Location}`),
+
+        // Description
+        (currentProject.DescriptionShort || currentProject.Description) && React.createElement('p', {
+          style: {
+            fontSize: '0.95rem',
+            marginTop: '25px',
+            marginBottom: 0,
+            maxWidth: '400px',
+            lineHeight: '1.6',
+            opacity: 0.9,
+            fontWeight: '400'
+          }
+        }, currentProject.DescriptionShort || currentProject.Description)
+      ),
+
+      // Progress dots - at bottom
+      React.createElement('div', {
+        style: {
+          position: 'relative',
+          zIndex: 2,
+          display: 'flex',
+          gap: '10px',
+          marginTop: 'auto',
+          marginBottom: '30px',
+          justifyContent: 'center'
+        }
+      },
+        featuredProjects.map((_, idx) =>
+          React.createElement('div', {
+            key: idx,
+            style: {
+              width: '10px',
+              height: '10px',
+              borderRadius: '50%',
+              background: idx === currentIndex ? 'white' : 'rgba(255,255,255,0.4)',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease'
+            },
+            onClick: (e) => {
+              e.stopPropagation();
+              setCurrentIndex(idx);
+            }
+          })
         )
+      ),
+
+      // Progress bar - shows typewriter completion
+      React.createElement('div', {
+        style: {
+          position: 'relative',
+          zIndex: 2,
+          width: '100%',
+          height: '3px',
+          background: 'rgba(255, 255, 255, 0.2)',
+          marginBottom: 0,
+          borderRadius: '2px',
+          overflow: 'hidden'
+        }
+      },
+        React.createElement('div', {
+          style: {
+            height: '100%',
+            background: 'linear-gradient(90deg, #3b82f6, #2563eb)',
+            width: `${Math.max(0, Math.min(100, typewriterProgress * 100))}%`,
+            transition: 'width 0.05s linear',
+            borderRadius: '2px'
+          }
+        })
       )
     );
   };

@@ -24,34 +24,26 @@
     onProjectClick,
     onGlobeReady,
     narrativeIndex = 0,
-    onNarrativeChange
+    onNarrativeChange,
+    onTypewriterProgress,
+    onIntroComplete
   }) {
     const container3DRef = useRef(null);
     const view3DRef = useRef(null);
     const entitiesRef = useRef({}); // Map of project.id -> Cesium.Entity
     const clockViewModelRef = useRef(null);
-    const [showIntro, setShowIntro] = useState(true);
+    const [showIntro, setShowIntro] = useState(() => {
+      const passages = window.MapAppConfig?.narrative?.passages;
+      return Array.isArray(passages) && passages.length > 0;
+    });
     const [markersRevealed, setMarkersRevealed] = useState(false);
     const [displayedText, setDisplayedText] = useState('');
 
-    // Narrative passages for the cosmic opening (memoized to prevent recreation)
-    const narrativePassages = React.useMemo(() => [
-      {
-        title: 'In space, there are no borders.',
-        text: 'From this perspective, Earth is whole. No walls divide it. No lines separate it. Just one planet, turning beneath endless stars.',
-        duration: 4000
-      },
-      {
-        title: 'But below...',
-        text: 'Below are stories. Stories of people who cross lines. Who create art and music and research. Who build communities despite walls.',
-        duration: 4000
-      },
-      {
-        title: 'The Arizona-Sonora Borderlands',
-        text: 'This is where our story begins. Where borders and cultures collide, merge, and create something entirely new.',
-        duration: 3000
-      }
-    ], []);
+    const narrativeConfig = React.useMemo(() => {
+      return window.MapAppConfig?.narrative || { passages: [], characterIntervalMs: 50 };
+    }, []);
+    const narrativePassages = narrativeConfig.passages || [];
+    const characterInterval = narrativeConfig.characterIntervalMs ?? 50;
 
     // Initialize 3D viewer
     useEffect(() => {
@@ -262,28 +254,49 @@
 
     }, [projects, showIntro]);
 
-    // Typewriter effect for narrative text
+    // Typewriter effect for narrative text with progress tracking
     useEffect(() => {
-      if (!showIntro || narrativeIndex >= narrativePassages.length) return;
+      if (!showIntro || narrativeIndex >= narrativePassages.length || narrativePassages.length === 0) return;
 
       const passage = narrativePassages[narrativeIndex];
       let charIndex = 0;
       let timeoutId;
+      const holdDuration = passage.holdDurationMs ?? 0;
+      const typingDuration = passage.text.length * characterInterval;
+      const totalDuration = typingDuration + holdDuration;
 
       const typeCharacter = () => {
         if (charIndex <= passage.text.length) {
           setDisplayedText(passage.text.substring(0, charIndex));
+          const elapsedTime = charIndex * characterInterval;
+          const progress = Math.min(1, elapsedTime / totalDuration);
+          onTypewriterProgress && onTypewriterProgress(progress);
           charIndex++;
-          timeoutId = setTimeout(typeCharacter, 50); // 50ms between characters
+          timeoutId = setTimeout(typeCharacter, characterInterval); // configurable delay between characters
         } else {
-          // Text finished typing, wait before advancing (only auto-advance for middle passages)
-          if (narrativeIndex < narrativePassages.length - 1) {
-            timeoutId = setTimeout(() => {
-              const nextIndex = narrativeIndex + 1;
-              onNarrativeChange && onNarrativeChange(nextIndex);
-              setDisplayedText('');
-            }, passage.duration);
-          }
+          // Text finished typing, now in wait phase
+          const startWaitTime = Date.now();
+          const waitStart = typingDuration;
+
+          const updateWaitProgress = () => {
+            const elapsed = Date.now() - startWaitTime;
+            const progress = Math.min(1, (waitStart + elapsed) / totalDuration);
+            onTypewriterProgress && onTypewriterProgress(progress);
+
+            if (elapsed < holdDuration) {
+              timeoutId = setTimeout(updateWaitProgress, 16); // ~60fps progress updates
+            } else {
+              // Wait phase complete, advance to next passage
+              if (narrativeIndex < narrativePassages.length - 1) {
+                const nextIndex = narrativeIndex + 1;
+                onNarrativeChange && onNarrativeChange(nextIndex);
+                setDisplayedText('');
+                onTypewriterProgress && onTypewriterProgress(0);
+              }
+            }
+          };
+
+          updateWaitProgress();
         }
       };
 
@@ -291,7 +304,7 @@
       typeCharacter();
 
       return () => clearTimeout(timeoutId);
-    }, [showIntro, narrativeIndex, narrativePassages]);
+    }, [showIntro, narrativeIndex, narrativePassages, onTypewriterProgress, characterInterval]);
 
     // Fly to selected project
     useEffect(() => {
@@ -349,6 +362,8 @@
     // Handle intro begin: fly to Arizona-Sonora and then reveal markers
     function beginJourney() {
       setShowIntro(false);
+      onTypewriterProgress && onTypewriterProgress(0);
+      onIntroComplete && onIntroComplete(false);
       flyToBorderlands(() => {
         revealMarkers();
       });
@@ -357,6 +372,8 @@
     // Handle skip: jump to region immediately and reveal markers
     function skipIntro() {
       setShowIntro(false);
+      onTypewriterProgress && onTypewriterProgress(0);
+      onIntroComplete && onIntroComplete(false);
       flyToBorderlands(() => {
         revealMarkers();
       }, true);
