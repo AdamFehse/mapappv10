@@ -10,6 +10,9 @@
   window.MapApp.RightPanel = function RightPanel({
     projects = [],
     onSelectProject = () => {},
+    onNarrativeChange = () => {},
+    onToggleSidebar = () => {},
+    isSidebarOpen = true,
     narrativeIndex = 0,
     typewriterProgress = 0,
     selectedProjectId = null,
@@ -134,66 +137,56 @@
     if (isNarrativeIntro && !expandedProject) {
       panelClasses.push('narrative-mode');
     }
+    if (isSidebarOpen) {
+      panelClasses.push('sidebar-visible');
+    } else {
+      panelClasses.push('sidebar-hidden');
+    }
 
-    return React.createElement('div', { className: panelClasses.join(' ') },
-      isNarrativeIntro
-        ? React.createElement(window.MapApp.NarrativeBar, {
-          projects: projects,
-          onSelectProject: handleExpandProject,
-          isActive: isNarrativeIntro,
-          narrativeIndex: narrativeIndex,
-          typewriterProgress: typewriterProgress
-        })
-        : // SIMPLE VERTICAL SCROLL - NO EMBLA
-        React.createElement('div', { style: { width: '100%', height: '100%', display: 'flex', flexDirection: 'column' } },
-          // Title
-          React.createElement('div', {
-            style: {
-              padding: '20px',
-              background: '#2196F3',
-              color: 'white',
-              textAlign: 'center',
-              fontSize: '1.5rem',
-              fontWeight: 'bold',
-              flexShrink: 0
-            }
-          }, '✨ Projects'),
+    const modeLabel = isNarrativeIntro ? 'Narrative Mode' : 'Explorer Mode';
 
-          // Scrollable container - SIMPLE CSS SCROLL
-          React.createElement('div', {
-            style: {
-              flex: 1,
-              width: '100%',
-              overflow: 'auto',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '1rem',
-              padding: '1rem'
-            }
-          },
-            // Render all projects
-            projects.map((project, index) =>
-              React.createElement('div', {
-                key: project.id || index,
-                style: {
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  borderRadius: '8px',
-                  padding: '20px',
-                  color: 'white',
-                  fontSize: '1rem',
-                  fontWeight: 'bold',
-                  cursor: 'pointer',
-                  flexShrink: 0,
-                  minHeight: '80px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  textAlign: 'center'
-                }
-              }, project.ProjectName || `Project ${index + 1}`)
+    return React.createElement('div', {
+      className: panelClasses.join(' '),
+      id: 'right-panel',
+      role: 'complementary',
+      'aria-label': 'Featured projects panel',
+      'aria-hidden': isSidebarOpen ? 'false' : 'true'
+    },
+      React.createElement('button', {
+        type: 'button',
+        className: `panel-edge-tab ${isSidebarOpen ? 'open' : 'collapsed'}`,
+        onClick: onToggleSidebar,
+        'aria-label': isSidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'
+      },
+        React.createElement('span', { className: 'panel-edge-icon' }, isSidebarOpen ? '❮' : '❯'),
+        React.createElement('span', { className: 'panel-edge-label' }, isSidebarOpen ? 'Hide' : 'Show')
+      ),
+      React.createElement('div', { className: 'panel-toolbar' },
+        React.createElement('div', { className: 'panel-mode-label' }, modeLabel)
+      ),
+      React.createElement('div', { className: 'panel-content' },
+        isNarrativeIntro
+          ? React.createElement(window.MapApp.NarrativeBar, {
+            projects: projects,
+            onSelectProject: handleExpandProject,
+            onNarrativeChange: onNarrativeChange,
+            isActive: isNarrativeIntro,
+            narrativeIndex: narrativeIndex,
+            typewriterProgress: typewriterProgress
+          })
+          : // SIMPLE VERTICAL SCROLL - NO EMBLA
+          React.createElement('div', { className: 'panel-projects-list' },
+            React.createElement('div', { className: 'panel-projects-heading' }, '✨ Projects'),
+            React.createElement('div', { className: 'panel-projects-scroll' },
+              projects.map((project, index) =>
+                React.createElement('div', {
+                  key: project.id || index,
+                  className: 'panel-project-card'
+                }, project.ProjectName || `Project ${index + 1}`)
+              )
             )
           )
-        ),
+      ),
       expandedProject && React.createElement('div', { className: 'project-detail-modal' },
         renderCardDetails(expandedProject)
       )

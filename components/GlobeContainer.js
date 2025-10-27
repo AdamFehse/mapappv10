@@ -3,6 +3,143 @@
   const { useEffect, useRef, useState } = React;
   window.MapApp = window.MapApp || {};
 
+  const MARKER_PALETTE_FALLBACK = ['#4fc3f7', '#ff8a65', '#66bb6a', '#ffd54f', '#ba68c8'];
+
+  function hashString(str) {
+    if (!str) return 0;
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = ((hash << 5) - hash) + str.charCodeAt(i);
+      hash |= 0;
+    }
+    return Math.abs(hash);
+  }
+
+  function pickMarkerColor(project, palette, fallbackColor) {
+    const basis = project?.ProjectCategory || project?.Theme || project?.id || 'marker';
+    if (!Array.isArray(palette) || palette.length === 0) {
+      return fallbackColor;
+    }
+    const idx = hashString(basis) % palette.length;
+    return palette[idx] || fallbackColor;
+  }
+
+  function normalizeHex(hex) {
+    if (!hex) return null;
+    let clean = hex.trim().replace('#', '');
+    if (clean.length === 3) {
+      clean = clean.split('').map(ch => ch + ch).join('');
+    }
+    return clean.length === 6 ? clean : null;
+  }
+
+  function lightenHex(hex, amount = 0.2) {
+    const clean = normalizeHex(hex);
+    if (!clean) return hex;
+    const num = parseInt(clean, 16);
+    const r = (num >> 16) & 255;
+    const g = (num >> 8) & 255;
+    const b = num & 255;
+    const lighten = (channel) => Math.min(255, Math.round(channel + (255 - channel) * amount));
+    const next = (lighten(r) << 16) | (lighten(g) << 8) | lighten(b);
+    return `#${next.toString(16).padStart(6, '0')}`;
+  }
+
+  function getMarkerBadgeText(project) {
+    const explicit = (project?.MarkerLabel || project?.Abbreviation || '').trim();
+    if (explicit) {
+      return explicit.slice(0, 3).toUpperCase();
+    }
+    const name = (project?.ProjectName || '').trim();
+    if (!name) return '•';
+    const words = name.split(/\s+/).filter(Boolean);
+    if (words.length === 1) {
+      return words[0].slice(0, 3).toUpperCase();
+    }
+    return (words[0][0] + words[1][0]).toUpperCase();
+  }
+
+  function getMarkerLabelText(project, maxChars) {
+    const name = (project?.ProjectName || '').trim();
+    if (!name || typeof maxChars !== 'number' || maxChars <= 0) return name;
+    return name.length <= maxChars ? name : `${name.slice(0, Math.max(0, maxChars - 3))}...`;
+  }
+
+  function svgToDataUri(svgString) {
+    if (typeof window !== 'undefined' && typeof window.btoa === 'function') {
+      return 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(svgString)));
+    }
+    return 'data:image/svg+xml;base64,' + btoa(svgString);
+  }
+
+  function createMarkerSvg({ text, baseColor, accentColor, strokeColor, fontSize, isSelected }) {
+    const glow = isSelected ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.35)';
+    return `
+      <svg width="64" height="80" viewBox="0 0 64 80" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="markerGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="${accentColor}"/>
+            <stop offset="100%" stop-color="${baseColor}"/>
+          </linearGradient>
+          <filter id="markerShadow" x="-50%" y="-50%" width="200%" height="200%">
+            <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="${glow}" flood-opacity="0.8"/>
+          </filter>
+        </defs>
+        <path d="M32 2C19 2 9 12.6 9 26.3c0 19.8 23 45.9 23 45.9s23-25.6 23-45.9C55 12.6 45 2 32 2z"
+          fill="url(#markerGrad)" stroke="${strokeColor}" stroke-width="2" filter="url(#markerShadow)" />
+        <circle cx="32" cy="27" r="15" fill="rgba(255,255,255,0.12)"/>
+        <text x="32" y="32" text-anchor="middle" font-family="Inter, Arial, sans-serif"
+          font-size="${fontSize}" font-weight="700" fill="#ffffff" letter-spacing="0.5">${text}</text>
+      </svg>
+    `.trim();
+  }
+
+  function buildMarkerVisual(project, markerOptions, isSelected) {
+    if (!project) return null;
+    const paletteColor = pickMarkerColor(project, markerOptions.palette, markerOptions.defaultColor);
+    const baseColor = isSelected ? (markerOptions.selectedColor || paletteColor) : paletteColor;
+    const accentColor = lightenHex(baseColor, 0.25);
+    const strokeColor = isSelected ? lightenHex(baseColor, 0.35) : 'rgba(13, 27, 42, 0.45)';
+    const badgeText = getMarkerBadgeText(project);
+    const fontSize = badgeText.length === 1 ? 22 : badgeText.length === 2 ? 18 : 14;
+    const svgMarkup = createMarkerSvg({
+      text: badgeText,
+      baseColor,
+      accentColor,
+      strokeColor,
+      fontSize,
+      isSelected
+    });
+
+    return {
+      image: svgToDataUri(svgMarkup),
+      width: markerOptions.size,
+      height: Math.round(markerOptions.size * 1.25),
+      scale: isSelected ? 1.08 : 1,
+      labelText: getMarkerLabelText(project, markerOptions.labelMaxChars)
+    };
+  }
+
+  function updateMarkerGraphics(entity, markerOptions, isSelected) {
+    if (!entity || !entity.projectData || !entity.billboard) return;
+    const visual = buildMarkerVisual(entity.projectData, markerOptions, isSelected);
+    if (!visual) return;
+    entity.billboard.image = visual.image;
+    entity.billboard.width = visual.width;
+    entity.billboard.height = visual.height;
+    entity.billboard.scale = visual.scale;
+    entity.billboard.verticalOrigin = Cesium.VerticalOrigin.BOTTOM;
+    entity.billboard.pixelOffset = new Cesium.Cartesian2(0, -8);
+    entity.billboard.disableDepthTestDistance = Number.POSITIVE_INFINITY;
+
+    if (entity.label) {
+      entity.label.text = visual.labelText;
+      entity.label.show = !!markerOptions.showLabels;
+      entity.label.pixelOffset = new Cesium.Cartesian2(0, 14);
+      entity.label.font = '600 12px "Inter", sans-serif';
+    }
+  }
+
   /**
    * GlobeContainer Component
    *
@@ -38,6 +175,33 @@
     });
     const [markersRevealed, setMarkersRevealed] = useState(false);
     const [displayedText, setDisplayedText] = useState('');
+    const [viewerReady, setViewerReady] = useState(false);
+    const globeQualityRef = useRef(null);
+
+    const markerOptions = React.useMemo(() => {
+      const config = window.CesiumConfig?.markers || {};
+      const defaults = {
+        defaultColor: '#2196F3',
+        selectedColor: '#FF5722',
+        hoverColor: '#1976D2',
+        size: 36,
+        palette: MARKER_PALETTE_FALLBACK,
+        showLabels: false,
+        labelMaxChars: 18
+      };
+      return {
+        ...defaults,
+        ...config,
+        palette: Array.isArray(config.palette) && config.palette.length ? config.palette : defaults.palette
+      };
+    }, []);
+
+    const performanceFlags = React.useMemo(() => {
+      return {
+        isLowPower: !!window.MapAppPerf?.isLowPower,
+        prefersReducedMotion: !!window.MapAppPerf?.prefersReducedMotion
+      };
+    }, []);
 
     const narrativeConfig = React.useMemo(() => {
       return window.MapAppConfig?.narrative || { passages: [], characterIntervalMs: 50 };
@@ -109,6 +273,15 @@
         // Create 3D viewer
         const view3D = new Cesium.Viewer(container3DRef.current, options3D);
         view3DRef.current = view3D;
+        setViewerReady(true);
+
+        const scene = view3D.scene;
+        if (scene && scene.globe) {
+          globeQualityRef.current = scene.globe.maximumScreenSpaceError;
+          if (performanceFlags.isLowPower) {
+            scene.globe.maximumScreenSpaceError = Math.max(scene.globe.maximumScreenSpaceError, 6);
+          }
+        }
 
         // Optional globe lighting (for day/night shading) from config
         if (typeof cfg.enableLighting === 'boolean') {
@@ -123,7 +296,7 @@
           }
         }
 
-        // Optional: Add Earth-at-Night (Black Marble) imagery as base or overlay
+        // Add Earth-at-Night (Black Marble) imagery as base or overlay
         try {
           const nightAssetId = typeof cfg.nightAssetId === 'number' ? cfg.nightAssetId : 3812; // 3812: Black Marble
           if (cfg.nightAsBase) {
@@ -193,6 +366,7 @@
           view3DRef.current.destroy();
           view3DRef.current = null;
         }
+        setViewerReady(false);
       };
     }, []);
 
@@ -211,7 +385,7 @@
 
       // Add new markers
       projects.forEach(project => {
-        if (!project.Latitude || !project.Longitude) return;
+        if (typeof project.Latitude !== 'number' || typeof project.Longitude !== 'number') return;
 
         const entity = view3D.entities.add({
           position: Cesium.Cartesian3.fromDegrees(
@@ -219,32 +393,31 @@
             project.Latitude
           ),
           billboard: {
-            image: 'data:image/svg+xml;base64,' + btoa(`
-              <svg width="32" height="32" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="16" cy="16" r="8" fill="#2196F3" stroke="white" stroke-width="2"/>
-              </svg>
-            `),
-            width: 32,
-            height: 32,
+            image: '',
+            width: markerOptions.size,
+            height: Math.round(markerOptions.size * 1.25),
             verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-            show: !showIntro // keep hidden until intro completes
+            show: !showIntro,
+            disableDepthTestDistance: Number.POSITIVE_INFINITY
           },
-          label: {
-            text: project.ProjectName,
-            font: '12px sans-serif',
+          label: markerOptions.showLabels ? {
+            text: getMarkerLabelText(project, markerOptions.labelMaxChars),
+            font: '600 12px "Inter", sans-serif',
             fillColor: Cesium.Color.WHITE,
-            outlineColor: Cesium.Color.BLACK,
+            outlineColor: Cesium.Color.fromAlpha(Cesium.Color.BLACK, 0.6),
             outlineWidth: 2,
             style: Cesium.LabelStyle.FILL_AND_OUTLINE,
             verticalOrigin: Cesium.VerticalOrigin.TOP,
-            pixelOffset: new Cesium.Cartesian2(0, 10),
+            pixelOffset: new Cesium.Cartesian2(0, 12),
             disableDepthTestDistance: Number.POSITIVE_INFINITY,
+            translucencyByDistance: new Cesium.NearFarScalar(100000.0, 1.0, 600000.0, 0.0),
             show: !showIntro
-          },
+          } : undefined,
           projectData: project
         });
 
         entitiesRef.current[project.id] = entity;
+        updateMarkerGraphics(entity, markerOptions, !!(selectedProject && project.id === selectedProject.id));
       });
 
       // If intro already completed, ensure markers are visible
@@ -329,14 +502,22 @@
 
     }, [selectedProject]);
 
+    useEffect(() => {
+      Object.values(entitiesRef.current).forEach(entity => {
+        if (!entity || !entity.projectData) return;
+        const isSelected = !!(selectedProject && entity.projectData.id === selectedProject.id);
+        updateMarkerGraphics(entity, markerOptions, isSelected);
+      });
+    }, [selectedProject]);
+
     // Reveal markers with a gentle stagger
     function revealMarkers() {
       const view3D = view3DRef.current;
       if (!view3D) return;
-      const prefersReduced = !!(window.CesiumConfig && window.CesiumConfig.accessibility && window.CesiumConfig.accessibility.reducedMotion);
+      const prefersReduced = performanceFlags.prefersReducedMotion;
       const entities = Object.values(entitiesRef.current);
       entities.forEach((entity, idx) => {
-        const delay = prefersReduced ? 0 : Math.min(idx * 50, 800); // cap total delay
+        const delay = (prefersReduced || performanceFlags.isLowPower) ? 0 : Math.min(idx * 50, 800); // cap total delay
         setTimeout(() => {
           if (!entity || entity.isDestroyed && entity.isDestroyed()) return;
           entity.billboard && (entity.billboard.show = true);
@@ -366,7 +547,7 @@
       onIntroComplete && onIntroComplete(false);
       flyToBorderlands(() => {
         revealMarkers();
-      });
+      }, performanceFlags.isLowPower);
     }
 
     // Handle skip: jump to region immediately and reveal markers
@@ -384,8 +565,21 @@
       const view3D = view3DRef.current;
       if (!view3D) return;
       const { lat, lon, alt } = window.CesiumConfig.camera.center;
-      const prefersReduced = !!(window.CesiumConfig && window.CesiumConfig.accessibility && window.CesiumConfig.accessibility.reducedMotion);
-      const duration = instantOverride || prefersReduced ? 0 : 5.0; // slower cinematic zoom
+      const prefersReduced = performanceFlags.prefersReducedMotion;
+      const duration = instantOverride || prefersReduced || performanceFlags.isLowPower ? 0 : 5.0; // slower cinematic zoom
+
+      const scene = view3D.scene;
+      let restoreQuality;
+      if (scene && scene.globe) {
+        const globe = scene.globe;
+        const original = globe.maximumScreenSpaceError;
+        const boosted = performanceFlags.isLowPower ? Math.max(original, 12) : Math.max(original * 1.5, original + 2);
+        globe.maximumScreenSpaceError = boosted;
+        restoreQuality = () => {
+          globe.maximumScreenSpaceError = original;
+          scene.requestRender();
+        };
+      }
 
       view3D.camera.flyTo({
         destination: Cesium.Cartesian3.fromDegrees(lon, lat, alt),
@@ -397,10 +591,96 @@
         },
         duration,
         complete: () => {
+          if (typeof restoreQuality === 'function') restoreQuality();
           if (typeof onComplete === 'function') onComplete();
         }
       });
     }
+
+    useEffect(() => {
+      if (!viewerReady) return;
+      const view3D = view3DRef.current;
+      const borderConfig = window.MapAppData && window.MapAppData.borderWall;
+      if (!view3D || !borderConfig || !Array.isArray(borderConfig.positions)) return;
+
+      const coordinates = [];
+      const minHeights = [];
+      const maxHeights = [];
+      const capHeights = [];
+      const baseHeight = borderConfig.baseHeightMeters ?? 0;
+      const wallHeight = borderConfig.heightMeters ?? 1400;
+      const widthMeters = borderConfig.widthMeters ?? 5000;
+
+      borderConfig.positions.forEach(point => {
+        if (typeof point.lon !== 'number' || typeof point.lat !== 'number') return;
+        coordinates.push(point.lon, point.lat);
+        const pointBase = point.baseHeight ?? baseHeight;
+        const pointTop = point.height ?? (baseHeight + wallHeight);
+        minHeights.push(pointBase);
+        maxHeights.push(pointTop);
+        capHeights.push(point.lon, point.lat, pointTop + (borderConfig.capHeightOffset ?? 0));
+      });
+
+      if (coordinates.length < 4) return;
+
+      const createdEntities = [];
+      const registerEntity = (options) => {
+        const entity = view3D.entities.add(options);
+        createdEntities.push(entity);
+        return entity;
+      };
+
+      const faceColor = Cesium.Color.fromCssColorString(borderConfig.material?.face || borderConfig.material?.color || '#f97316').withAlpha(0.9);
+      const outerColor = Cesium.Color.fromCssColorString(borderConfig.material?.color || '#f97316').withAlpha(0.7);
+      const outlineColor = Cesium.Color.fromCssColorString(borderConfig.material?.outline || '#7a3f00').withAlpha(0.6);
+      const glowColor = Cesium.Color.fromCssColorString(borderConfig.material?.glow || '#ffd166').withAlpha(0.95);
+
+      registerEntity({
+        name: borderConfig.name || 'Border Wall - Face',
+        wall: {
+          positions: Cesium.Cartesian3.fromDegreesArray(coordinates),
+          minimumHeights: minHeights,
+          maximumHeights: maxHeights,
+          material: outerColor,
+          outline: true,
+          outlineColor: outlineColor
+        }
+      });
+
+      registerEntity({
+        name: borderConfig.name || 'Border Wall - Volume',
+        corridor: {
+          positions: Cesium.Cartesian3.fromDegreesArray(coordinates),
+          width: widthMeters,
+          height: baseHeight,
+          extrudedHeight: baseHeight + wallHeight,
+          material: faceColor,
+          outline: true,
+          outlineColor: outlineColor,
+          cornerType: Cesium.CornerType.BEVELED
+        }
+      });
+
+      registerEntity({
+        name: borderConfig.name || 'Border Wall - Spine',
+        polyline: {
+          positions: Cesium.Cartesian3.fromDegreesArrayHeights(capHeights),
+          width: borderConfig.capWidth || 6,
+          material: new Cesium.PolylineGlowMaterialProperty({
+            glowPower: 0.3,
+            color: glowColor
+          })
+        }
+      });
+
+      return () => {
+        createdEntities.forEach(entity => {
+          if (entity && !entity.isDestroyed()) {
+            view3D.entities.remove(entity);
+          }
+        });
+      };
+    }, [viewerReady]);
 
     // Render 3D globe
     return React.createElement('div', {

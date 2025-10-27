@@ -13,6 +13,123 @@
   flex-direction: column;
   overflow: hidden;
   position: relative;
+  background: var(--sidebar-bg);
+  border-left: 1px solid var(--border-soft);
+  z-index: 210;
+  transform: translateX(0);
+  opacity: 1;
+  transition: transform var(--sidebar-transition, 300ms ease), opacity var(--sidebar-transition, 300ms ease);
+}
+
+.right-panel.sidebar-hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(24px);
+}
+
+.right-panel.sidebar-visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.panel-toolbar {
+  width: 100%;
+  padding: 0.85rem 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  background: var(--panel-top-background);
+  border-bottom: 1px solid var(--border-soft);
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.panel-mode-label {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.78rem;
+  color: var(--pico-muted-color);
+}
+
+.panel-edge-tab {
+  position: absolute;
+  top: 1rem;
+  left: -2.9rem;
+  width: 2.75rem;
+  padding: 0.35rem 0.25rem;
+  background: var(--panel-clear-background);
+  border: 1px solid var(--panel-clear-border);
+  border-radius: 999px 0 0 999px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1rem;
+  color: var(--pico-contrast-color);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  box-shadow: var(--shadow-card);
+  transition: background var(--transition-focus), transform var(--transition-focus);
+  z-index: 15;
+}
+
+.panel-edge-tab:hover {
+  background: var(--panel-clear-background-hover);
+}
+
+.panel-edge-label {
+  font-weight: 600;
+}
+
+.panel-edge-icon {
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.panel-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.panel-projects-list {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-projects-heading {
+  padding: 1rem 1.25rem;
+  background: var(--panel-clear-background);
+  color: var(--pico-contrast-color);
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.panel-projects-scroll {
+  flex: 1;
+  overflow: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.panel-project-card {
+  background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.15) 0%, rgba(var(--primary-rgb), 0.35) 100%);
+  border-radius: 10px;
+  padding: 1rem;
+  color: #fff;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: var(--shadow-card);
 }
 
 /* ===== DETAIL VIEW MODAL OVERLAY ===== */
@@ -247,6 +364,17 @@
 @media (max-width: 768px) {
   .right-panel {
     border-left: none;
+  }
+
+  .panel-edge-tab {
+    top: auto;
+    bottom: 1rem;
+    left: 1rem;
+    border-radius: 999px;
+    flex-direction: row;
+    width: auto;
+    padding: 0.45rem 1rem;
+    gap: 0.4rem;
   }
 }
 

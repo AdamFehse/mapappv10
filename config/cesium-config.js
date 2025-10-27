@@ -62,7 +62,10 @@ window.CesiumConfig = {
     hoverColor: '#1976D2',     // Dark blue
     size: 32,                  // Billboard size (pixels)
     clusteringEnabled: true,   // Group nearby markers
-    clusterRadius: 80          // Pixels to group within
+    clusterRadius: 80,         // Pixels to group within
+    palette: ['#4fc3f7', '#ff8a65', '#66bb6a', '#ffd54f', '#ba68c8'],
+    showLabels: false,
+    labelMaxChars: 18
   },
 
   // Camera animation settings

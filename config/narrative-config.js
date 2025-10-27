@@ -22,7 +22,7 @@
       title: 'The Arizona-Sonora Borderlands',
       text: 'This is where our story begins. Where borders and cultures collide, merge, and create something entirely new.',
       holdDurationMs: 3000,
-      featuredProjectId: 'project-42-cross-border-recovery-and-peda'
+      featuredProjectId: 'project-19-online-collaboration-and-acade'
     }
   ];
 
@@ -36,7 +36,6 @@
       'project-1-the-place-where-clouds-are-for',
       'project-37-creating-emancipatory-spaces-t',
       'project-19-online-collaboration-and-acade',
-      'project-42-cross-border-recovery-and-peda',
       'project-8-undergraduate-internship-progr'
     ]
   };

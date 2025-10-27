@@ -1,16 +1,15 @@
 // NarrativeBar.js - Displays typewriter text synced from GlobeContainer with progress bar
 (function() {
-  const { useState, useEffect } = React;
   window.MapApp = window.MapApp || {};
 
   window.MapApp.NarrativeBar = function NarrativeBar({
     projects = [],
     onSelectProject = () => {},
+    onNarrativeChange = () => {},
     isActive = true,
     narrativeIndex = 0,
     typewriterProgress = 0
   }) {
-    const [currentIndex, setCurrentIndex] = useState(0);
 
     // Get featured projects from narrative config
     const narrativeConfig = React.useMemo(() => {
@@ -19,26 +18,26 @@
     const narrativePassages = narrativeConfig.passages || [];
 
     // Build featured projects list from narrative passage featuredProjectIds
-    const featuredProjects = React.useMemo(() => {
-      return narrativePassages
-        .map(passage => {
-          if (!passage.featuredProjectId) return null;
-          return projects.find(p => p.id === passage.featuredProjectId);
-        })
-        .filter(Boolean);
+    const passageProjects = React.useMemo(() => {
+      return narrativePassages.map(passage => {
+        if (!passage?.featuredProjectId) return null;
+        return projects.find(p => p.id === passage.featuredProjectId) || null;
+      });
     }, [projects, narrativePassages]);
 
-    const currentProject = featuredProjects[currentIndex] || null;
+    const totalPassages = narrativePassages.length;
+    const safeIndex = totalPassages > 0
+      ? Math.min(Math.max(narrativeIndex, 0), totalPassages - 1)
+      : 0;
+    const currentProject = passageProjects[safeIndex] || passageProjects.find(Boolean) || null;
+    const progressPercent = Math.max(0, Math.min(100, (typewriterProgress || 0) * 100));
 
-    // Auto-cycle based on typewriter progress reaching 100%
-    useEffect(() => {
-      if (typewriterProgress >= 100) {
-        const timer = setTimeout(() => {
-          setCurrentIndex((prev) => (prev + 1) % featuredProjects.length);
-        }, 4000); // Wait 4 seconds before cycling to next
-        return () => clearTimeout(timer);
+    const handleDotNavigate = (index, event) => {
+      event.stopPropagation();
+      if (typeof onNarrativeChange === 'function') {
+        onNarrativeChange(index);
       }
-    }, [typewriterProgress, featuredProjects.length]);
+    };
 
     const handleSelectProject = () => {
       if (currentProject && isActive) {
@@ -180,7 +179,7 @@
       ),
 
       // Progress dots - at bottom
-      React.createElement('div', {
+      totalPassages > 0 && React.createElement('div', {
         style: {
           position: 'relative',
           zIndex: 2,
@@ -191,21 +190,18 @@
           justifyContent: 'center'
         }
       },
-        featuredProjects.map((_, idx) =>
+        narrativePassages.map((_, idx) =>
           React.createElement('div', {
             key: idx,
             style: {
               width: '10px',
               height: '10px',
               borderRadius: '50%',
-              background: idx === currentIndex ? 'white' : 'rgba(255,255,255,0.4)',
+              background: idx === safeIndex ? 'white' : 'rgba(255,255,255,0.4)',
               cursor: 'pointer',
               transition: 'all 0.3s ease'
             },
-            onClick: (e) => {
-              e.stopPropagation();
-              setCurrentIndex(idx);
-            }
+            onClick: (event) => handleDotNavigate(idx, event)
           })
         )
       ),
@@ -227,7 +223,7 @@
           style: {
             height: '100%',
             background: 'linear-gradient(90deg, #3b82f6, #2563eb)',
-            width: `${Math.max(0, Math.min(100, typewriterProgress * 100))}%`,
+            width: `${progressPercent}%`,
             transition: 'width 0.05s linear',
             borderRadius: '2px'
           }
