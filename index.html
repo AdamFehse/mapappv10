@@ -5,22 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>3D Globe Story Map - Arizona-Sonora Borderlands</title>
 
-  <!-- Pico CSS (Theme system) -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
+  <!-- Cesium CSS - Latest version for Google Maps support -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cesium@latest/Build/Cesium/Widgets/widgets.css" />
 
-  <!-- Cesium CSS -->
-  <link rel="stylesheet" href="https://cesium.com/downloads/cesiumjs/releases/1.112/Build/Cesium/Widgets/widgets.css" />
-
-  <!-- Custom Styles (Pico overrides) -->
+  <!-- Custom Styles (No Pico - full control!) -->
+  <link rel="stylesheet" href="./styles/reset.css" />
   <link rel="stylesheet" href="./styles/theme.css" />
   <link rel="stylesheet" href="./styles/globe.css" />
   <link rel="stylesheet" href="./styles/narrative-bar.css" />
-  <link rel="stylesheet" href="./styles/rightpanel.css" />
+  <link rel="stylesheet" href="./styles/explorer-bar.css" />
 
-  <!-- Cesium.js (3D Globe Engine) -->
-  <script src="https://cesium.com/downloads/cesiumjs/releases/1.112/Build/Cesium/Cesium.js"></script>
+  <!-- Cesium.js (3D Globe Engine) - Latest version -->
+  <script src="https://cdn.jsdelivr.net/npm/cesium@latest/Build/Cesium/Cesium.js"></script>
 
-  <!-- Set Cesium Ion Token -->
+  <!-- Set Cesium Ion Token (unrestricted) -->
   <script>
     Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2NDcyMjhhMy0yMjFhLTRmOWYtYmE5YS1mM2JiZWJiODJhNTMiLCJpZCI6MzUzNTQ5LCJpYXQiOjE3NjEyNzUyODN9.Q2XPrnYFJemqZ2XkHwp543O3UV0vFELSk7lHemqB6FM';
   </script>
@@ -51,7 +49,7 @@
   <script src="./components/App.js"></script>
 </head>
 
-<body data-theme="auto">
+<body>
   <!-- Root container -->
   <div id="root"></div>
 

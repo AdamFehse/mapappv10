@@ -51,7 +51,7 @@
       return explicit.slice(0, 3).toUpperCase();
     }
     const name = (project?.ProjectName || '').trim();
-    if (!name) return '•';
+    if (!name) return 'NA';
     const words = name.split(/\s+/).filter(Boolean);
     if (words.length === 1) {
       return words[0].slice(0, 3).toUpperCase();
@@ -176,6 +176,7 @@
     const [markersRevealed, setMarkersRevealed] = useState(false);
     const [displayedText, setDisplayedText] = useState('');
     const [viewerReady, setViewerReady] = useState(false);
+    const [qualityMenuOpen, setQualityMenuOpen] = useState(false);
     const globeQualityRef = useRef(null);
 
     const markerOptions = React.useMemo(() => {
@@ -196,6 +197,7 @@
       };
     }, []);
 
+    // PERFORMANCE FLAGS RE-ENABLED
     const performanceFlags = React.useMemo(() => {
       return {
         isLowPower: !!window.MapAppPerf?.isLowPower,
@@ -221,6 +223,18 @@
         const clockViewModel = new Cesium.ClockViewModel();
         clockViewModelRef.current = clockViewModel;
 
+        // Get quality settings based on device capabilities
+        const qualitySettings = window.MapAppPerf ? window.MapAppPerf.getQualitySettings() : {
+          resolutionScale: 0.9,
+          maximumScreenSpaceError: 3,
+          msaaSamples: 2,
+          antialias: true,
+          maximumAnisotropy: 8,
+          tileCacheSize: 100
+        };
+
+        console.log('Using quality preset:', window.MapAppPerf?.qualityTier || 'unknown', qualitySettings);
+
         // 3D Viewer options derived from CesiumConfig to avoid clashes
         const cfg = window.CesiumConfig && window.CesiumConfig.viewerOptions ? window.CesiumConfig.viewerOptions : {};
         // Map config strings to Cesium providers
@@ -228,46 +242,54 @@
           ? Cesium.Terrain.fromWorldTerrain()
           : undefined; // undefined => default flat terrain
 
-        let imageryOpt;
-        try {
-          switch (cfg.imageryProvider) {
-            case 'ION_ASSET': {
-              const assetId = cfg.ionAssetId;
-              if (typeof assetId === 'number') {
-                imageryOpt = new Cesium.IonImageryProvider({ assetId });
-              } else {
-                console.warn('ION_ASSET selected but ionAssetId is not set. Falling back to Ion World Imagery (2).');
-                imageryOpt = new Cesium.IonImageryProvider({ assetId: 2 });
-              }
-              break;
-            }
-            case 'ION_WORLD_IMAGERY':
-            default:
-              // Cesium Ion World Imagery (assetId: 2)
-              imageryOpt = new Cesium.IonImageryProvider({ assetId: 2 });
-              break;
-          }
-        } catch (e) {
-          console.warn('Falling back to default imagery provider due to error:', e);
-          imageryOpt = undefined; // Let Viewer choose default imagery
-        }
+        // Don't specify imagery provider - will add after viewer creation
+        // This avoids the broken Bing Maps default
+        let imageryOpt = undefined;
+        console.log('No imagery provider set - will add Sentinel-2 + Labels after viewer creation');
 
         const options3D = {
-          // Respect config flags; fall back to sensible defaults
-          animation: cfg.animation ?? false,
-          timeline: cfg.timeline ?? false,
-          baseLayerPicker: cfg.baseLayerPicker ?? false,
-          geocoder: cfg.geocoder ?? false,
-          homeButton: cfg.homeButton ?? true,
-          sceneModePicker: cfg.sceneModePicker ?? true,
-          navigationHelpButton: cfg.navigationHelpButton ?? false,
-          fullscreenButton: cfg.fullscreenButton ?? true,
-          vrButton: cfg.vrButton ?? false,
-          requestRenderMode: cfg.requestRenderMode ?? true,
-          maximumRenderTimeChange: cfg.maximumRenderTimeChange ?? Infinity,
+          // Simplified options to avoid Bing Maps
+          animation: false,
+          timeline: false,
+          baseLayerPicker: false,  // Disabled to avoid Bing Maps
+          geocoder: false,         // Disabled to avoid Bing Maps
+          homeButton: true,
+          sceneModePicker: true,
+          navigationHelpButton: false,
+          fullscreenButton: true,
+          vrButton: false,
+
+          // DYNAMIC PERFORMANCE SETTINGS (based on device capabilities)
+          requestRenderMode: true,  // Only render when needed (HUGE perf boost)
+          maximumRenderTimeChange: Infinity,
+
+          // Use low-res imagery on low-power devices
           imageryProvider: imageryOpt,
           terrain: terrainOpt,
-          clockViewModel: clockViewModel
+          clockViewModel: clockViewModel,
+
+          // Disable ALL shadows
+          shadows: false,
+
+          // No terrain exaggeration
+          terrainExaggeration: 1.0,
+
+          // Dynamic anti-aliasing based on device tier
+          msaaSamples: qualitySettings.msaaSamples,
+
+          // Use simple rendering mode
+          orderIndependentTranslucency: false,
+
+          // Dynamic WebGL context quality
+          contextOptions: {
+            webgl: {
+              alpha: false,
+              depth: true,
+              stencil: false,
+              antialias: qualitySettings.antialias,
+              powerPreference: 'high-performance'
+            }
+          }
         };
 
         // Create 3D viewer
@@ -277,11 +299,99 @@
 
         const scene = view3D.scene;
         if (scene && scene.globe) {
-          globeQualityRef.current = scene.globe.maximumScreenSpaceError;
-          if (performanceFlags.isLowPower) {
-            scene.globe.maximumScreenSpaceError = Math.max(scene.globe.maximumScreenSpaceError, 6);
-          }
+          // Ensure globe is visible
+          scene.globe.show = true;
+          console.log('Globe visibility:', scene.globe.show);
+
+          // DYNAMIC QUALITY OPTIMIZATIONS (based on device tier)
+          const globe = scene.globe;
+          globeQualityRef.current = globe.maximumScreenSpaceError;
+
+          // Apply quality-based terrain detail
+          globe.maximumScreenSpaceError = qualitySettings.maximumScreenSpaceError;
+
+          // Disable depth testing for better occlusion
+          globe.depthTestAgainstTerrain = false;
+
+          // Dynamic tile cache size
+          globe.tileCacheSize = qualitySettings.tileCacheSize;
+
+          // Disable ALL lighting
+          globe.enableLighting = false;
+
+          // Disable water effects
+          globe.showWaterEffect = false;
+
+          // Disable atmosphere (saves GPU cycles)
+          scene.skyAtmosphere.show = false;
+
+          // Disable fog
+          scene.fog.enabled = false;
+
+          // Disable ground atmosphere
+          scene.globe.showGroundAtmosphere = false;
+
+          // Dynamic resolution scaling
+          view3D.resolutionScale = qualitySettings.resolutionScale;
+
+          // Disable scene lighting
+          scene.sun.show = false;
+          scene.moon.show = false;
+
+          // Target 60 FPS by skipping frames if needed
+          view3D.targetFrameRate = 60;
+
+          // Reduce LOD (Level of Detail) aggressiveness
+          scene.screenSpaceCameraController.minimumZoomDistance = 100;
+
+          console.log('Dynamic quality settings applied:', {
+            tier: window.MapAppPerf?.qualityTier || 'unknown',
+            maximumScreenSpaceError: globe.maximumScreenSpaceError,
+            resolutionScale: view3D.resolutionScale,
+            tileCacheSize: globe.tileCacheSize,
+            msaaSamples: qualitySettings.msaaSamples,
+            antialias: qualitySettings.antialias,
+            maximumAnisotropy: qualitySettings.maximumAnisotropy
+          });
         }
+
+        // Remove default imagery (broken Bing Maps)
+        console.log('Initial imagery layers:', view3D.imageryLayers.length);
+        view3D.imageryLayers.removeAll();
+        console.log('Removed default Bing imagery');
+
+        // Add imagery with performance optimizations
+        (async () => {
+          try {
+            console.log('Loading Sentinel-2 base imagery (asset 3954)...');
+            const baseLayer = view3D.imageryLayers.addImageryProvider(
+              await Cesium.IonImageryProvider.fromAssetId(3954)
+            );
+
+            // Dynamic texture filtering quality
+            baseLayer.maximumAnisotropy = qualitySettings.maximumAnisotropy;
+
+            console.log('Sentinel-2 loaded successfully with quality tier:', window.MapAppPerf?.qualityTier || 'unknown');
+
+            // SKIP LABELS FOR BETTER PERFORMANCE
+            // Labels layer adds significant overhead - disable for now
+            console.log('Skipping labels layer for better performance');
+
+            // If you want labels back, uncomment this:
+            /*
+            console.log('Adding Google Maps Labels (asset 3830185)...');
+            const labelsLayer = view3D.imageryLayers.addImageryProvider(
+              await Cesium.IonImageryProvider.fromAssetId(3830185)
+            );
+            labelsLayer.maximumAnisotropy = 1;
+            console.log('Labels layer added!');
+            */
+
+            console.log('Total imagery layers:', view3D.imageryLayers.length);
+          } catch (e) {
+            console.error('Failed to load imagery:', e);
+          }
+        })();
 
         // Optional globe lighting (for day/night shading) from config
         if (typeof cfg.enableLighting === 'boolean') {
@@ -296,36 +406,7 @@
           }
         }
 
-        // Add Earth-at-Night (Black Marble) imagery as base or overlay
-        try {
-          const nightAssetId = typeof cfg.nightAssetId === 'number' ? cfg.nightAssetId : 3812; // 3812: Black Marble
-          if (cfg.nightAsBase) {
-            // Replace base layer with Black Marble
-            if (Cesium.ImageryLayer && typeof Cesium.ImageryLayer.fromAssetId === 'function') {
-              const bmLayer = Cesium.ImageryLayer.fromAssetId(nightAssetId);
-              view3D.imageryLayers.removeAll();
-              view3D.imageryLayers.add(bmLayer, 0);
-            } else {
-              const provider = new Cesium.IonImageryProvider({ assetId: nightAssetId });
-              view3D.imageryLayers.removeAll();
-              view3D.imageryLayers.addImageryProvider(provider, 0);
-            }
-          } else if (cfg.addNightOverlay) {
-            // Add as an overlay with alpha blending
-            const alpha = typeof cfg.nightOverlayAlpha === 'number' ? cfg.nightOverlayAlpha : 0.8;
-            if (Cesium.ImageryLayer && typeof Cesium.ImageryLayer.fromAssetId === 'function') {
-              const overlay = Cesium.ImageryLayer.fromAssetId(nightAssetId);
-              overlay.alpha = alpha;
-              view3D.imageryLayers.add(overlay);
-            } else {
-              const provider = new Cesium.IonImageryProvider({ assetId: nightAssetId });
-              const overlay = view3D.imageryLayers.addImageryProvider(provider);
-              if (overlay) overlay.alpha = alpha;
-            }
-          }
-        } catch (e) {
-          console.warn('Failed to configure Black Marble layer:', e);
-        }
+        // Black Marble overlay removed - using Sentinel-2 + Google Labels instead
 
         // Set initial camera position far out in space (no borders)
         // Respect reduced motion by skipping animation entirely on start
@@ -517,7 +598,7 @@
       const prefersReduced = performanceFlags.prefersReducedMotion;
       const entities = Object.values(entitiesRef.current);
       entities.forEach((entity, idx) => {
-        const delay = (prefersReduced || performanceFlags.isLowPower) ? 0 : Math.min(idx * 50, 800); // cap total delay
+        const delay = (prefersReduced || performanceFlags.isLowPower) ? 0 : Math.min(idx * 50, 800);
         setTimeout(() => {
           if (!entity || entity.isDestroyed && entity.isDestroyed()) return;
           entity.billboard && (entity.billboard.show = true);
@@ -560,19 +641,31 @@
       }, true);
     }
 
+    // Handle quality tier change
+    function handleQualityChange(tier) {
+      if (window.MapAppPerf && window.MapAppPerf.setQualityOverride(tier)) {
+        // Show toast/notification
+        console.log(`Quality changed to: ${tier || 'auto'}`);
+        // Reload to apply new quality settings
+        window.location.reload();
+      }
+      setQualityMenuOpen(false);
+    }
+
     // Camera animation to configured center
     function flyToBorderlands(onComplete, instantOverride) {
       const view3D = view3DRef.current;
       if (!view3D) return;
       const { lat, lon, alt } = window.CesiumConfig.camera.center;
       const prefersReduced = performanceFlags.prefersReducedMotion;
-      const duration = instantOverride || prefersReduced || performanceFlags.isLowPower ? 0 : 5.0; // slower cinematic zoom
+      const duration = instantOverride || prefersReduced || performanceFlags.isLowPower ? 0 : 5.0;
 
       const scene = view3D.scene;
       let restoreQuality;
       if (scene && scene.globe) {
         const globe = scene.globe;
         const original = globe.maximumScreenSpaceError;
+        // Temporarily reduce quality during camera movement for smoother animation
         const boosted = performanceFlags.isLowPower ? Math.max(original, 12) : Math.max(original * 1.5, original + 2);
         globe.maximumScreenSpaceError = boosted;
         restoreQuality = () => {
@@ -725,7 +818,9 @@
                 React.createElement('div', {
                   key: idx,
                   className: `progress-dot ${idx === narrativeIndex ? 'active' : ''} ${idx < narrativeIndex ? 'completed' : ''}`,
-                  'aria-label': `Narrative section ${idx + 1} of ${narrativePassages.length}`
+                  'aria-label': `Narrative section ${idx + 1} of ${narrativePassages.length}`,
+                  onClick: () => setNarrativeIndex(idx),
+                  title: `Go to section ${idx + 1}`
                 })
               )
             )
@@ -750,7 +845,36 @@
       // Floating toolbar
       React.createElement('div', { className: 'globe-toolbar' },
         React.createElement('h3', null, 'Arizona-Sonora Borderlands'),
-        React.createElement('p', null, 'Explore borderlands research projects')
+        React.createElement('p', null, 'Explore borderlands research projects'),
+
+        // Quality selector dropdown
+        React.createElement('div', { className: 'quality-selector', style: { marginTop: '0.5rem' } },
+          React.createElement('button', {
+            className: 'quality-button',
+            onClick: () => setQualityMenuOpen(!qualityMenuOpen),
+            'aria-label': 'Change quality settings',
+            'aria-expanded': qualityMenuOpen
+          }, `Quality: ${window.MapAppPerf?.qualityTier || 'auto'}`),
+
+          qualityMenuOpen && React.createElement('div', { className: 'quality-menu' },
+            React.createElement('button', {
+              onClick: () => handleQualityChange(null),
+              className: !localStorage.getItem('mapapp-quality-override') ? 'active' : ''
+            }, 'Auto (detect)'),
+            React.createElement('button', {
+              onClick: () => handleQualityChange('low'),
+              className: localStorage.getItem('mapapp-quality-override') === 'low' ? 'active' : ''
+            }, 'Low (fast)'),
+            React.createElement('button', {
+              onClick: () => handleQualityChange('medium'),
+              className: localStorage.getItem('mapapp-quality-override') === 'medium' ? 'active' : ''
+            }, 'Medium (balanced)'),
+            React.createElement('button', {
+              onClick: () => handleQualityChange('high'),
+              className: localStorage.getItem('mapapp-quality-override') === 'high' ? 'active' : ''
+            }, 'High (quality)')
+          )
+        )
       )
     );
   };

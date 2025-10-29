@@ -10,18 +10,16 @@
     narrativeIndex = 0,
     typewriterProgress = 0
   }) {
-
-    // Get featured projects from narrative config
-    const narrativeConfig = React.useMemo(() => {
-      return window.MapAppConfig?.narrative || { passages: [] };
-    }, []);
+    const narrativeConfig = React.useMemo(() => window.MapAppConfig?.narrative || { passages: [] }, []);
     const narrativePassages = narrativeConfig.passages || [];
 
-    // Build featured projects list from narrative passage featuredProjectIds
     const passageProjects = React.useMemo(() => {
-      return narrativePassages.map(passage => {
+      if (!Array.isArray(narrativePassages) || narrativePassages.length === 0) {
+        return [];
+      }
+      return narrativePassages.map((passage) => {
         if (!passage?.featuredProjectId) return null;
-        return projects.find(p => p.id === passage.featuredProjectId) || null;
+        return projects.find((project) => project.id === passage.featuredProjectId) || null;
       });
     }, [projects, narrativePassages]);
 
@@ -31,9 +29,16 @@
       : 0;
     const currentProject = passageProjects[safeIndex] || passageProjects.find(Boolean) || null;
     const progressPercent = Math.max(0, Math.min(100, (typewriterProgress || 0) * 100));
+    const currentPassage = narrativePassages[safeIndex] || null;
+
+    const heroLabel = currentPassage ? 'Narrative Highlight' : 'Featured Project';
+    const heroTitle = currentProject?.ProjectName || currentPassage?.title || 'Featured Story';
+    const heroDescription = (currentPassage?.text || currentProject?.DescriptionShort || currentProject?.Description || '').trim();
+    const heroMeta = currentProject?.Location ? `Location: ${currentProject.Location}` : '';
 
     const handleDotNavigate = (index, event) => {
       event.stopPropagation();
+      event.preventDefault();
       if (typeof onNarrativeChange === 'function') {
         onNarrativeChange(index);
       }
@@ -46,188 +51,58 @@
     };
 
     if (!currentProject) {
-      return React.createElement('section', {
-        style: {
-          width: '100%',
-          height: '100%',
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: 'white',
-          padding: '40px',
-          textAlign: 'center',
-          cursor: 'pointer'
-        },
-        onClick: handleSelectProject
-      },
-        React.createElement('div', null,
-          React.createElement('h1', {
-            style: {
-              fontSize: '3rem',
-              fontWeight: 'bold',
-              margin: 0,
-              marginBottom: '20px'
-            }
-          }, 'Welcome'),
-          React.createElement('p', {
-            style: {
-              fontSize: '1.1rem',
-              margin: 0
-            }
-          }, 'Loading featured projects...')
+      return React.createElement('section', { className: 'narrative-bar' },
+        React.createElement('div', { className: 'narrative-empty' },
+          React.createElement('h2', null, 'Welcome'),
+          React.createElement('p', null, 'Loading featured projects...')
         )
       );
     }
 
-    return React.createElement('section', {
-      style: {
-        width: '100%',
-        height: '100%',
-        position: 'relative',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: 'white',
-        padding: '40px 30px',
-        textAlign: 'center',
-        cursor: 'pointer',
-        overflow: 'hidden'
+    return React.createElement('section', { className: 'narrative-bar' },
+      React.createElement('button', {
+        type: 'button',
+        className: 'narrative-hero',
+        onClick: handleSelectProject,
+        'aria-label': currentProject.ProjectName
+          ? `View details for ${currentProject.ProjectName}`
+          : 'View featured project details'
       },
-      onClick: handleSelectProject
-    },
-      // Blurred background image
-      currentProject.ImageUrl && React.createElement('div', {
-        style: {
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundImage: `url(${currentProject.ImageUrl})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          filter: 'blur(8px) brightness(0.6)',
-          zIndex: 0
-        }
-      }),
-
-      // Dark overlay
-      React.createElement('div', {
-        style: {
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(0, 0, 0, 0.4)',
-          zIndex: 1
-        }
-      }),
-
-      // Content - positioned above background
-      React.createElement('div', {
-        style: {
-          position: 'relative',
-          zIndex: 2,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flex: 1,
-          width: '100%'
-        }
-      },
-        // Title - SYNCED with typewriter from left side (NO typewriter animation here)
-        React.createElement('h1', {
-          style: {
-            fontSize: '2.8rem',
-            fontWeight: 'bold',
-            margin: 0,
-            marginBottom: '20px',
-            lineHeight: '1.2',
-            minHeight: '140px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }
-        }, currentProject.ProjectName),
-
-        // Location
-        currentProject.Location && React.createElement('p', {
-          style: {
-            fontSize: '1rem',
-            margin: '15px 0 0 0',
-            opacity: 0.95,
-            fontWeight: '500'
-          }
-        }, `📍 ${currentProject.Location}`),
-
-        // Description
-        (currentProject.DescriptionShort || currentProject.Description) && React.createElement('p', {
-          style: {
-            fontSize: '0.95rem',
-            marginTop: '25px',
-            marginBottom: 0,
-            maxWidth: '400px',
-            lineHeight: '1.6',
-            opacity: 0.9,
-            fontWeight: '400'
-          }
-        }, currentProject.DescriptionShort || currentProject.Description)
-      ),
-
-      // Progress dots - at bottom
-      totalPassages > 0 && React.createElement('div', {
-        style: {
-          position: 'relative',
-          zIndex: 2,
-          display: 'flex',
-          gap: '10px',
-          marginTop: 'auto',
-          marginBottom: '30px',
-          justifyContent: 'center'
-        }
-      },
-        narrativePassages.map((_, idx) =>
-          React.createElement('div', {
-            key: idx,
-            style: {
-              width: '10px',
-              height: '10px',
-              borderRadius: '50%',
-              background: idx === safeIndex ? 'white' : 'rgba(255,255,255,0.4)',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease'
-            },
-            onClick: (event) => handleDotNavigate(idx, event)
-          })
+        currentProject.ImageUrl && React.createElement('div', {
+          className: 'hero-background',
+          style: { backgroundImage: `url(${currentProject.ImageUrl})` },
+          'aria-hidden': 'true'
+        }),
+        React.createElement('div', { className: 'hero-overlay', 'aria-hidden': 'true' }),
+        React.createElement('div', { className: 'hero-content' },
+          heroLabel && React.createElement('span', { className: 'hero-label' }, heroLabel),
+          React.createElement('h1', { className: 'hero-title' }, heroTitle),
+          heroMeta && React.createElement('p', { className: 'hero-meta' }, heroMeta),
+          heroDescription && React.createElement('p', { className: 'hero-description' }, heroDescription),
+          totalPassages > 0 && React.createElement('div', {
+            className: 'hero-progress',
+            role: 'group',
+            'aria-label': 'Narrative sections'
+          },
+            narrativePassages.map((_, idx) => React.createElement('button', {
+              type: 'button',
+              key: idx,
+              className: ['hero-progress-dot',
+                idx === safeIndex ? 'active' : '',
+                idx < safeIndex ? 'completed' : ''
+              ].filter(Boolean).join(' '),
+              onClick: (event) => handleDotNavigate(idx, event),
+              'aria-label': `Go to narrative section ${idx + 1} of ${totalPassages}`,
+              'aria-pressed': idx === safeIndex
+            }))
+          ),
+          React.createElement('div', { className: 'narrative-progress-track', role: 'presentation' },
+            React.createElement('span', {
+              className: 'narrative-progress-bar',
+              style: { width: `${progressPercent}%` }
+            })
+          )
         )
-      ),
-
-      // Progress bar - shows typewriter completion
-      React.createElement('div', {
-        style: {
-          position: 'relative',
-          zIndex: 2,
-          width: '100%',
-          height: '3px',
-          background: 'rgba(255, 255, 255, 0.2)',
-          marginBottom: 0,
-          borderRadius: '2px',
-          overflow: 'hidden'
-        }
-      },
-        React.createElement('div', {
-          style: {
-            height: '100%',
-            background: 'linear-gradient(90deg, #3b82f6, #2563eb)',
-            width: `${progressPercent}%`,
-            transition: 'width 0.05s linear',
-            borderRadius: '2px'
-          }
-        })
       )
     );
   };

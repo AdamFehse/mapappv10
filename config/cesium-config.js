@@ -17,7 +17,7 @@ window.CesiumConfig = {
   viewerOptions: {
     animation: false,           // Bottom-left timeline animation widget
     timeline: false,            // Bottom timeline scrubber
-    baseLayerPicker: true,      // Top-right imagery selector
+    baseLayerPicker: false,     // Top-right imagery selector (disabled for simplicity)
     geocoder: false,            // Top-right search box
     homeButton: true,           // Top-right home button
     sceneModePicker: true,      // Allow users to switch 2D/3D
@@ -26,15 +26,18 @@ window.CesiumConfig = {
     vrButton: false,            // VR mode toggle
 
     // Imagery provider options:
-    // - 'ION_WORLD_IMAGERY' (default) -> Cesium Ion World Imagery (assetId: 2)
-    // - 'ION_ASSET' -> Use a specific Cesium Ion imagery asset (set ionAssetId below)
+    // Using Google Maps 2D Satellite (asset 3830182)
     imageryProvider: 'ION_ASSET',
-    // If imageryProvider is 'ION_ASSET', set your Ion asset ID here (e.g., Earth at Night / Black Marble)
-    // Example: ionAssetId: 3812
-    ionAssetId: 3812,
+    ionAssetId: 3830182,  // Google Maps 2D Satellite
+    // Other options:
+    // 3830183: Google Maps 2D Satellite with Labels
+    // 3830184: Google Maps 2D Roadmap
+    // 3812: Earth at Night (Black Marble)
+    // 2: Bing Maps Aerial
 
     // Terrain (3D elevation)
-    terrainProvider: 'CESIUM_WORLD_TERRAIN', // or null for flat globe
+    // SIMPLIFIED: Using flat terrain for debugging
+    terrainProvider: null, // or 'CESIUM_WORLD_TERRAIN' for 3D terrain
 
     // Lighting & Time (optional)
     // enableLighting darkens the night side of the globe based on the current time
@@ -43,9 +46,8 @@ window.CesiumConfig = {
     initialTimeIso: null,
 
     // Night imagery (Black Marble) options
-    // Set to true to replace base imagery with Black Marble (ion asset 3812 by default)
+    // DISABLED FOR DEBUGGING
     nightAsBase: false,
-    // Or add as a semi-transparent overlay
     addNightOverlay: false,
     nightAssetId: 3812, // Cesium ion "Black Marble" asset id
     nightOverlayAlpha: 0.85,

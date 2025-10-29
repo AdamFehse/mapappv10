@@ -1,506 +1,172 @@
 /**
- * theme.css - Pico CSS Overrides & Custom Theme
- *
- * PHILOSOPHY:
- * - Let Pico handle 95% of styling
- * - Only override CSS custom properties
- * - Keep this file MINIMAL (<100 lines)
- * - Easy theme switching (change variables)
- *
- * STRUCTURE:
- * 1. Color palette overrides
- * 2. Component-specific variables
- * 3. Utility classes (minimal)
+ * theme.css - Unified dark/light mode theme system with nebula palette
+ * Supports narrative bar, explorer bar, and all UI components
  */
 
 :root {
-  color-scheme: light dark;
-  /* ===== BRAND COLORS ===== */
-  /* Override Pico's primary color for globe accent */
-  --pico-primary: #2196F3;       /* Blue for markers/buttons */
-  --pico-primary-hover: #1976D2; /* Darker blue on hover */
+  /* === PRIMARY / NEBULA COLORS === */
+  --primary: #ff6f91;
+  --primary-hover: #ff8a64;
+  --primary-rgb: 255, 111, 145;
+  --nebula-amber: #ff9a62;
+  --nebula-rose: #ff6f91;
+  --nebula-violet: #6d5dfc;
+  --nebula-indigo: #2f2fa2;
+  --nebula-gradient: linear-gradient(135deg, #ff9a62 0%, #ff6f91 45%, #6d5dfc 100%);
+  --nebula-gradient-soft: linear-gradient(135deg, rgba(255, 154, 98, 0.85) 0%, rgba(255, 111, 145, 0.8) 45%, rgba(109, 93, 252, 0.75) 100%);
+  --nebula-glow: 0 18px 40px rgba(38, 13, 54, 0.28);
+  --nebula-hero-focus: 0 0 0 3px rgba(255, 111, 145, 0.45);
 
-  /* ===== GLOBE-SPECIFIC ===== */
-  --globe-accent: var(--pico-primary);
-  --globe-hover: var(--pico-primary-hover);
-  --globe-selected: #FF5722; /* Orange-red for selected marker */
+  /* === LIGHT MODE (DEFAULT) === */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f6fb;
+  --bg-tertiary: #f1edf9;
+  --text-primary: #1f1b2b;
+  --text-secondary: #615a76;
+  --text-muted: #8c86a2;
+  --border-color: rgba(98, 86, 128, 0.18);
+  --border-strong: rgba(98, 86, 128, 0.32);
+  --shadow-light: rgba(27, 20, 43, 0.08);
+  --shadow-medium: rgba(27, 20, 43, 0.2);
 
-  /* ===== SIDEBAR ===== */
-  --sidebar-width: 420px;
-  --sidebar-bg: var(--pico-background-color);
-  --sidebar-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-  --sidebar-transition: transform 300ms ease-out;
+  /* === NARRATIVE/EXPLORER BAR SPECIFIC === */
+  --hero-overlay-bg: linear-gradient(135deg, rgba(22, 16, 38, 0.75) 0%, rgba(51, 16, 42, 0.72) 45%, rgba(22, 24, 54, 0.78) 100%);
+  --hero-text-color: #ffffff;
+  --hero-meta-color: rgba(255, 240, 250, 0.92);
+  --hero-label-color: rgba(255, 208, 230, 0.9);
+  --progress-bar-bg: rgba(255, 255, 255, 0.22);
+  --progress-bar-fill: linear-gradient(90deg, #ff9a62 0%, #ff6f91 50%, #6d5dfc 100%);
+  --progress-dot-inactive: rgba(255, 248, 252, 0.42);
+  --progress-dot-active: rgba(255, 255, 255, 0.92);
 
-  /* ===== PROJECT CARDS ===== */
-  --card-spacing: 1rem;
-  --card-border-left-width: 4px;
-  --card-thumbnail-size: 80px;
+  /* === SIDEBAR/RIGHT PANEL === */
+  --sidebar-bg: var(--bg-primary);
+  --panel-top-background: rgba(255, 255, 255, 0.72);
+  --panel-clear-background: rgba(255, 255, 255, 0.86);
+  --panel-clear-background-hover: rgba(255, 255, 255, 0.95);
+  --panel-clear-border: var(--border-color);
+  --detail-close-background: rgba(255, 255, 255, 0.1);
+  --detail-close-color: var(--text-primary);
+  --detail-close-background-hover: rgba(255, 255, 255, 0.25);
+  --detail-back-background: rgba(255, 255, 255, 0.2);
+  --detail-back-background-hover: rgba(255, 255, 255, 0.35);
+  --detail-image-placeholder-bg: rgba(255, 255, 255, 0.2);
+  --detail-meta-background: rgba(255, 255, 255, 0.65);
+  --badge-theme-bg: rgba(255, 111, 145, 0.12);
+  --badge-theme-text: var(--text-primary);
+  --badge-theme-border: rgba(255, 111, 145, 0.35);
+  --badge-theme-bg-hover: rgba(255, 111, 145, 0.22);
 
-  /* ===== TRANSITIONS & ANIMATIONS ===== */
-  --transition-fast: 160ms ease;
-  --transition-normal: 200ms ease;
-  --transition-smooth: 220ms ease;
-  --transition-focus: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
-  --transition-slide: 300ms ease;
+  /* === TOOLBAR/GLOBE === */
+  --toolbar-background: rgba(255, 255, 255, 0.95);
+  --toolbar-border: rgba(98, 86, 128, 0.2);
+  --toolbar-text-muted: rgba(65, 58, 102, 0.75);
 
-  /* ===== COLORS - RGBA VARIANTS ===== */
-  --primary-rgb: 33, 150, 243;
-  --primary-light: rgba(33, 150, 243, 0.08);
-  --primary-lighter: rgba(33, 150, 243, 0.02);
-  --primary-accent: rgba(33, 150, 243, 0.12);
-  --primary-focus: rgba(33, 150, 243, 0.18);
-  --primary-hover: rgba(33, 150, 243, 0.28);
-  --primary-strong: rgba(33, 150, 243, 0.45);
+  /* === TRANSITIONS === */
+  --transition-fast: 150ms ease;
+  --transition-smooth: 320ms ease;
+  --transition-focus: 200ms ease;
+  --sidebar-transition: 300ms ease;
 
-  /* ===== GRADIENTS ===== */
-  --gradient-primary-light: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-lighter) 100%);
-  --gradient-primary-accent: linear-gradient(135deg, rgba(33, 150, 243, 0.28) 0%, rgba(33, 150, 243, 0.12) 100%);
+  /* === SHADOWS === */
+  --shadow-card: 0 16px 38px rgba(31, 21, 45, 0.12);
+  --layout-sidebar-width: 360px;
 
-  /* ===== SHADOWS & EFFECTS ===== */
-  --shadow-card: 0 6px 20px rgba(15, 23, 42, 0.08);
-  --shadow-card-hover: 0 14px 28px rgba(15, 23, 42, 0.12);
-  --shadow-featured: 0 16px 30px rgba(33, 150, 243, 0.18);
-  --shadow-selected: 0 0 0 3px rgba(33, 150, 243, 0.28), 0 18px 32px rgba(33, 150, 243, 0.22);
-
-  /* ===== SURFACE TOKENS (LIGHT DEFAULTS) ===== */
-  --surface-panel: color-mix(in srgb, var(--pico-background-color) 94%, rgba(var(--primary-rgb), 0.06));
-  --surface-panel-strong: color-mix(in srgb, var(--pico-background-color) 88%, rgba(var(--primary-rgb), 0.14));
-  --surface-glass: color-mix(in srgb, var(--pico-background-color) 90%, rgba(var(--primary-rgb), 0.1));
-  --surface-glass-strong: color-mix(in srgb, var(--pico-background-color) 82%, rgba(var(--primary-rgb), 0.2));
-  --surface-overlay-soft: color-mix(in srgb, var(--pico-background-color) 80%, rgba(0, 0, 0, 0) 20%);
-  --surface-overlay-strong: color-mix(in srgb, rgba(15, 23, 42, 1) 60%, rgba(0, 0, 0, 0) 40%);
-  --surface-overlay-accent: color-mix(in srgb, var(--pico-primary) 35%, rgba(0, 0, 0, 0) 65%);
-
-  --border-soft: color-mix(in srgb, var(--pico-border-color) 85%, rgba(var(--primary-rgb), 0.12) 15%);
-  --border-strong: color-mix(in srgb, var(--pico-border-color) 65%, rgba(var(--primary-rgb), 0.32) 35%);
-  --border-glass: color-mix(in srgb, var(--pico-border-color) 78%, rgba(var(--primary-rgb), 0.22) 22%);
-
-  --text-inverse: var(--pico-contrast-color);
-  --text-inverse-muted: color-mix(in srgb, var(--text-inverse) 70%, rgba(0, 0, 0, 0) 30%);
-  --text-muted-strong: color-mix(in srgb, var(--pico-muted-color) 80%, rgba(0, 0, 0, 0) 20%);
-
-  --narrative-background: var(--surface-panel-strong);
-  --narrative-overlay-gradient: linear-gradient(180deg, color-mix(in srgb, var(--surface-overlay-strong) 40%, rgba(0, 0, 0, 0) 60%) 0%, color-mix(in srgb, var(--surface-overlay-strong) 60%, rgba(0, 0, 0, 0) 40%) 55%, color-mix(in srgb, var(--surface-overlay-strong) 75%, rgba(0, 0, 0, 0) 25%) 100%);
-  --narrative-label-color: color-mix(in srgb, var(--pico-text-color) 60%, rgba(0, 0, 0, 0) 40%);
-  --narrative-meta-color: color-mix(in srgb, var(--pico-text-color) 70%, rgba(0, 0, 0, 0) 30%);
-  --narrative-progress-passive: color-mix(in srgb, var(--pico-text-color) 25%, rgba(0, 0, 0, 0) 75%);
-  --narrative-progress-active: color-mix(in srgb, var(--pico-primary) 65%, var(--pico-text-color) 35%);
-  --narrative-progress-complete: color-mix(in srgb, var(--pico-primary) 45%, var(--pico-text-color) 55%);
-
-  --navigator-background: color-mix(in srgb, var(--pico-background-color) 92%, rgba(var(--primary-rgb), 0.08));
-  --navigator-border: var(--border-soft);
-  --navigator-slide-border: color-mix(in srgb, var(--navigator-border) 75%, rgba(0, 0, 0, 0) 25%);
-  --navigator-slide-border-hover: color-mix(in srgb, var(--navigator-border) 60%, var(--pico-primary) 40%);
-  --navigator-slide-border-active: color-mix(in srgb, var(--pico-primary) 70%, var(--pico-border-color) 30%);
-  --navigator-slide-overlay: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, color-mix(in srgb, var(--surface-overlay-strong) 70%, rgba(0, 0, 0, 0) 30%) 100%);
-  --navigator-dot: color-mix(in srgb, var(--pico-text-color) 30%, rgba(0, 0, 0, 0) 70%);
-  --navigator-dot-hover: color-mix(in srgb, var(--pico-text-color) 45%, rgba(0, 0, 0, 0) 55%);
-  --navigator-dot-active: color-mix(in srgb, var(--pico-primary) 80%, var(--pico-text-color) 20%);
-  --navigator-nav-background: color-mix(in srgb, var(--pico-background-color) 85%, rgba(var(--primary-rgb), 0.16) 15%);
-  --navigator-nav-border: color-mix(in srgb, var(--pico-border-color) 70%, rgba(var(--primary-rgb), 0.3) 30%);
-  --navigator-nav-color: color-mix(in srgb, var(--pico-text-color) 80%, rgba(0, 0, 0, 0) 20%);
-
-  --toolbar-background: color-mix(in srgb, var(--pico-background-color) 93%, rgba(var(--primary-rgb), 0.12) 7%);
-  --toolbar-border: var(--border-glass);
-  --toolbar-text-muted: color-mix(in srgb, var(--pico-muted-color) 85%, rgba(0, 0, 0, 0) 15%);
-
-  --intro-overlay-gradient: radial-gradient(ellipse at center, color-mix(in srgb, var(--surface-overlay-strong) 55%, rgba(0, 0, 0, 0) 45%) 0%, color-mix(in srgb, var(--surface-overlay-strong) 75%, rgba(0, 0, 0, 0) 25%) 100%);
-  --intro-text-color: var(--text-inverse);
-  --intro-muted-color: var(--text-inverse-muted);
-  --intro-button-background: linear-gradient(135deg, color-mix(in srgb, var(--pico-primary) 85%, rgba(255, 255, 255, 0) 15%) 0%, color-mix(in srgb, var(--pico-primary-hover) 90%, rgba(255, 255, 255, 0) 10%) 100%);
-  --intro-button-text: var(--pico-contrast-color);
-  --intro-button-shadow: 0 8px 24px color-mix(in srgb, rgba(var(--primary-rgb), 0.35) 70%, rgba(0, 0, 0, 0.12) 30%);
-  --intro-button-shadow-strong: 0 12px 32px color-mix(in srgb, rgba(var(--primary-rgb), 0.5) 75%, rgba(0, 0, 0, 0.2) 25%);
-  --intro-skip-background: color-mix(in srgb, var(--pico-background-color) 60%, rgba(var(--primary-rgb), 0.1) 40%);
-  --intro-skip-border: color-mix(in srgb, var(--pico-border-color) 75%, rgba(var(--primary-rgb), 0.25) 25%);
-
-  --badge-theme-bg: color-mix(in srgb, var(--pico-background-color) 95%, rgba(var(--primary-rgb), 0.08) 5%);
-  --badge-theme-border: color-mix(in srgb, var(--pico-border-color) 85%, rgba(var(--primary-rgb), 0.15) 15%);
-  --badge-theme-text: var(--pico-text-color);
-  --badge-theme-bg-hover: color-mix(in srgb, var(--pico-primary) 12%, var(--pico-background-color) 88%);
-
-  --badge-background: color-mix(in srgb, var(--pico-primary) 10%, var(--pico-background-color) 90%);
-  --badge-color: var(--pico-primary);
-  --badge-border: color-mix(in srgb, var(--pico-primary) 25%, var(--pico-border-color) 75%);
-
-  --panel-top-background: color-mix(in srgb, var(--pico-background-color) 96%, rgba(var(--primary-rgb), 0.06));
-  --panel-narrative-gradient: radial-gradient(circle at top right, var(--primary-focus), transparent 45%), var(--pico-background-color);
-  --panel-clear-background: color-mix(in srgb, var(--pico-primary) 10%, var(--pico-background-color) 90%);
-  --panel-clear-border: color-mix(in srgb, var(--pico-primary) 30%, var(--pico-border-color) 70%);
-  --panel-clear-background-hover: color-mix(in srgb, var(--pico-primary) 18%, var(--pico-background-color) 82%);
-
-  --card-background: var(--pico-form-element-background-color);
-  --card-border: color-mix(in srgb, var(--pico-border-color) 50%, rgba(var(--primary-rgb), 0.02) 50%);
-  --card-border-featured: color-mix(in srgb, var(--pico-primary) 45%, var(--pico-border-color) 55%);
-  --card-border-selected: var(--pico-primary);
-  --card-image-placeholder-bg: var(--surface-panel);
-  --card-view-btn-background: var(--surface-panel);
-  --card-view-btn-color: var(--pico-primary);
-  --card-view-btn-border: var(--border-soft);
-  --card-view-btn-selected: color-mix(in srgb, var(--pico-primary) 15%, var(--pico-background-color) 85%);
-  --card-view-btn-shadow-hover: 0 8px 18px color-mix(in srgb, rgba(var(--primary-rgb), 0.3) 60%, rgba(0, 0, 0, 0.05) 40%);
-
-  --detail-close-background: color-mix(in srgb, var(--pico-primary) 18%, var(--pico-background-color) 82%);
-  --detail-close-color: var(--pico-text-color);
-  --detail-close-background-hover: color-mix(in srgb, var(--pico-primary) 25%, var(--pico-background-color) 75%);
-  --detail-back-background: var(--surface-panel);
-  --detail-back-background-hover: color-mix(in srgb, var(--pico-primary) 12%, var(--pico-background-color) 88%);
-  --detail-image-placeholder-bg: var(--surface-panel);
-  --detail-meta-background: color-mix(in srgb, var(--pico-primary) 8%, var(--pico-background-color) 92%);
-
-  --navigator-image-placeholder-bg: linear-gradient(135deg, var(--surface-overlay-soft) 0%, color-mix(in srgb, var(--pico-primary) 10%, var(--pico-background-color) 90%) 100%);
-
-  --scrollbar-thumb: color-mix(in srgb, var(--pico-primary) 25%, var(--pico-border-color) 75%);
-  --scrollbar-thumb-hover: color-mix(in srgb, var(--pico-primary) 40%, var(--pico-border-color) 60%);
-
-  --text-shadow-strong: 0 2px 4px rgba(0, 0, 0, 0.5);
-  --text-shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.5);
-}
-
-/* Dark theme overrides */
-[data-theme="dark"] {
-  color-scheme: dark;
-  --globe-accent: #64B5F6; /* Lighter blue for dark mode */
-  --sidebar-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
-  --surface-panel: color-mix(in srgb, var(--pico-background-color) 82%, rgba(var(--primary-rgb), 0.22));
-  --surface-panel-strong: color-mix(in srgb, var(--pico-background-color) 72%, rgba(var(--primary-rgb), 0.32));
-  --surface-glass: color-mix(in srgb, var(--pico-background-color) 78%, rgba(var(--primary-rgb), 0.28));
-  --surface-glass-strong: color-mix(in srgb, var(--pico-background-color) 66%, rgba(var(--primary-rgb), 0.4));
-  --surface-overlay-soft: color-mix(in srgb, rgba(8, 12, 24, 0.65) 60%, rgba(0, 0, 0, 0) 40%);
-  --surface-overlay-strong: color-mix(in srgb, rgba(5, 12, 24, 0.9) 75%, rgba(0, 0, 0, 0) 25%);
-  --surface-overlay-accent: color-mix(in srgb, rgba(var(--primary-rgb), 0.55) 55%, rgba(5, 12, 24, 0.45) 45%);
-
-  --border-soft: color-mix(in srgb, rgba(148, 163, 184, 0.24) 60%, rgba(var(--primary-rgb), 0.24) 40%);
-  --border-strong: color-mix(in srgb, rgba(148, 163, 184, 0.4) 55%, rgba(var(--primary-rgb), 0.38) 45%);
-  --border-glass: color-mix(in srgb, rgba(148, 163, 184, 0.35) 55%, rgba(var(--primary-rgb), 0.45) 45%);
-
-  --text-inverse: color-mix(in srgb, #ffffff 92%, rgba(var(--primary-rgb), 0.08));
-  --text-inverse-muted: color-mix(in srgb, var(--text-inverse) 65%, rgba(0, 0, 0, 0) 35%);
-  --text-muted-strong: color-mix(in srgb, rgba(203, 213, 225, 0.75), rgba(var(--primary-rgb), 0.1));
-
-  --narrative-background: color-mix(in srgb, rgba(5, 12, 24, 1) 70%, rgba(var(--primary-rgb), 0.25));
-  --narrative-overlay-gradient: linear-gradient(180deg, rgba(5, 12, 24, 0.55) 0%, rgba(5, 12, 24, 0.78) 60%, rgba(5, 12, 24, 0.72) 100%);
-  --narrative-label-color: rgba(255, 255, 255, 0.75);
-  --narrative-meta-color: rgba(255, 255, 255, 0.82);
-  --narrative-progress-passive: rgba(255, 255, 255, 0.3);
-  --narrative-progress-active: color-mix(in srgb, rgba(var(--primary-rgb), 0.85), rgba(255, 255, 255, 0.2));
-  --narrative-progress-complete: rgba(255, 255, 255, 0.6);
-
-  --navigator-background: color-mix(in srgb, rgba(5, 12, 24, 0.85), rgba(var(--primary-rgb), 0.18));
-  --navigator-border: color-mix(in srgb, rgba(148, 163, 184, 0.25) 55%, rgba(var(--primary-rgb), 0.25) 45%);
-  --navigator-slide-border: color-mix(in srgb, rgba(255, 255, 255, 0.18) 55%, rgba(var(--primary-rgb), 0.2) 45%);
-  --navigator-slide-border-hover: color-mix(in srgb, rgba(255, 255, 255, 0.32) 55%, rgba(var(--primary-rgb), 0.38) 45%);
-  --navigator-slide-border-active: color-mix(in srgb, rgba(var(--primary-rgb), 0.8) 65%, rgba(255, 255, 255, 0.35) 35%);
-  --navigator-slide-overlay: linear-gradient(180deg, rgba(5, 12, 24, 0) 0%, rgba(5, 12, 24, 0.85) 100%);
-  --navigator-dot: rgba(255, 255, 255, 0.3);
-  --navigator-dot-hover: rgba(255, 255, 255, 0.5);
-  --navigator-dot-active: rgba(var(--primary-rgb), 0.9);
-  --navigator-nav-background: color-mix(in srgb, rgba(var(--primary-rgb), 0.22) 45%, rgba(5, 12, 24, 0.75) 55%);
-  --navigator-nav-border: color-mix(in srgb, rgba(var(--primary-rgb), 0.4) 55%, rgba(148, 163, 184, 0.28) 45%);
-  --navigator-nav-color: rgba(255, 255, 255, 0.82);
-
-  --toolbar-background: color-mix(in srgb, rgba(8, 15, 30, 0.82) 70%, rgba(var(--primary-rgb), 0.2) 30%);
-  --toolbar-border: color-mix(in srgb, rgba(148, 163, 184, 0.28) 55%, rgba(var(--primary-rgb), 0.35) 45%);
-  --toolbar-text-muted: rgba(226, 232, 240, 0.75);
-
-  --intro-overlay-gradient: radial-gradient(ellipse at center, rgba(10, 20, 40, 0.7) 0%, rgba(0, 0, 0, 0.9) 100%);
-  --intro-text-color: rgba(255, 255, 255, 0.95);
-  --intro-muted-color: rgba(255, 255, 255, 0.8);
-  --intro-button-background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.95) 0%, rgba(var(--primary-rgb), 0.8) 100%);
+  /* === GLOBE INTRO OVERLAY === */
+  --intro-overlay-gradient: linear-gradient(135deg, rgba(18, 12, 32, 0.72) 0%, rgba(52, 16, 42, 0.78) 50%, rgba(24, 20, 48, 0.85) 100%);
+  --intro-text-color: #ffffff;
+  --intro-muted-color: rgba(255, 240, 250, 0.92);
+  --intro-button-background: var(--nebula-gradient);
   --intro-button-text: #ffffff;
-  --intro-button-shadow: 0 8px 24px rgba(0, 128, 255, 0.35);
-  --intro-button-shadow-strong: 0 12px 32px rgba(0, 128, 255, 0.5);
-  --intro-skip-background: rgba(255, 255, 255, 0.05);
-  --intro-skip-border: rgba(255, 255, 255, 0.3);
+  --intro-button-shadow: 0 12px 28px rgba(111, 78, 204, 0.35);
+  --intro-button-shadow-strong: 0 18px 44px rgba(111, 78, 204, 0.45);
+  --intro-skip-background: rgba(255, 255, 255, 0.18);
+  --intro-skip-border: rgba(255, 255, 255, 0.32);
 
-  --badge-theme-bg: color-mix(in srgb, rgba(15, 23, 42, 0.3) 55%, rgba(var(--primary-rgb), 0.18) 45%);
-  --badge-theme-border: color-mix(in srgb, rgba(148, 163, 184, 0.28) 55%, rgba(var(--primary-rgb), 0.35) 45%);
-  --badge-theme-text: rgba(226, 232, 240, 0.92);
-  --badge-theme-bg-hover: color-mix(in srgb, rgba(var(--primary-rgb), 0.28) 65%, rgba(15, 23, 42, 0.5) 35%);
+  /* === PICO-STYLE VARIABLES (for compatibility) === */
+  --pico-background-color: var(--bg-primary);
+  --pico-color: var(--text-primary);
+  --pico-text-color: var(--text-primary);
+  --pico-contrast-color: var(--text-primary);
+  --pico-muted-color: var(--text-muted);
+  --pico-primary: var(--primary);
+  --pico-primary-background: rgba(255, 111, 145, 0.1);
+  --pico-secondary-background: rgba(255, 255, 255, 0.88);
+  --pico-muted-border-color: var(--border-color);
+  --primary-focus: rgba(255, 111, 145, 0.45);
 
-  --badge-background: color-mix(in srgb, rgba(var(--primary-rgb), 0.25) 55%, rgba(15, 23, 42, 0.6) 45%);
-  --badge-color: color-mix(in srgb, var(--pico-primary) 80%, rgba(255, 255, 255, 0.3) 20%);
-  --badge-border: color-mix(in srgb, rgba(var(--primary-rgb), 0.4) 65%, rgba(148, 163, 184, 0.3) 35%);
+  /* === NARRATIVE OVERLAY === */
+  --narrative-overlay-gradient: linear-gradient(135deg, rgba(18, 12, 32, 0.76) 0%, rgba(54, 18, 42, 0.68) 48%, rgba(26, 24, 60, 0.8) 100%);
 
-  --panel-top-background: color-mix(in srgb, rgba(8, 15, 30, 0.7) 65%, rgba(var(--primary-rgb), 0.15) 35%);
-  --panel-narrative-gradient: radial-gradient(circle at top right, color-mix(in srgb, rgba(var(--primary-rgb), 0.4), rgba(10, 20, 40, 0.5)), transparent 45%), var(--pico-background-color);
-  --panel-clear-background: color-mix(in srgb, rgba(var(--primary-rgb), 0.22) 55%, rgba(15, 23, 42, 0.7) 45%);
-  --panel-clear-border: color-mix(in srgb, rgba(var(--primary-rgb), 0.45) 65%, rgba(148, 163, 184, 0.3) 35%);
-  --panel-clear-background-hover: color-mix(in srgb, rgba(var(--primary-rgb), 0.32) 60%, rgba(15, 23, 42, 0.65) 40%);
-
-  --card-background: color-mix(in srgb, rgba(8, 15, 30, 0.85) 70%, rgba(var(--primary-rgb), 0.12) 30%);
-  --card-border: color-mix(in srgb, rgba(148, 163, 184, 0.15) 60%, rgba(var(--primary-rgb), 0.15) 40%);
-  --card-border-featured: color-mix(in srgb, rgba(var(--primary-rgb), 0.65) 70%, rgba(148, 163, 184, 0.3) 30%);
-  --card-border-selected: color-mix(in srgb, rgba(var(--primary-rgb), 0.85) 85%, rgba(255, 255, 255, 0.15) 15%);
-  --card-image-placeholder-bg: var(--surface-panel);
-  --card-view-btn-background: color-mix(in srgb, rgba(var(--primary-rgb), 0.15) 45%, rgba(15, 23, 42, 0.75) 55%);
-  --card-view-btn-color: color-mix(in srgb, var(--pico-primary) 85%, rgba(255, 255, 255, 0.25) 15%);
-  --card-view-btn-border: color-mix(in srgb, rgba(var(--primary-rgb), 0.35) 60%, rgba(148, 163, 184, 0.25) 40%);
-  --card-view-btn-selected: color-mix(in srgb, rgba(var(--primary-rgb), 0.28) 65%, rgba(15, 23, 42, 0.7) 35%);
-  --card-view-btn-shadow-hover: 0 8px 18px color-mix(in srgb, rgba(var(--primary-rgb), 0.4) 60%, rgba(0, 0, 0, 0.3) 40%);
-
-  --detail-close-background: color-mix(in srgb, rgba(var(--primary-rgb), 0.25) 60%, rgba(15, 23, 42, 0.75) 40%);
-  --detail-close-color: rgba(255, 255, 255, 0.92);
-  --detail-close-background-hover: color-mix(in srgb, rgba(var(--primary-rgb), 0.38) 65%, rgba(15, 23, 42, 0.65) 35%);
-  --detail-back-background: color-mix(in srgb, rgba(8, 15, 30, 0.8) 65%, rgba(var(--primary-rgb), 0.18) 35%);
-  --detail-back-background-hover: color-mix(in srgb, rgba(var(--primary-rgb), 0.22) 55%, rgba(8, 15, 30, 0.75) 45%);
-  --detail-image-placeholder-bg: var(--surface-panel);
-  --detail-meta-background: color-mix(in srgb, rgba(var(--primary-rgb), 0.18) 50%, rgba(15, 23, 42, 0.7) 50%);
-
-  --navigator-image-placeholder-bg: linear-gradient(135deg, var(--surface-overlay-soft) 0%, color-mix(in srgb, rgba(var(--primary-rgb), 0.22), rgba(15, 23, 42, 0.85)) 100%);
-
-  --scrollbar-thumb: color-mix(in srgb, rgba(var(--primary-rgb), 0.4) 65%, rgba(148, 163, 184, 0.3) 35%);
-  --scrollbar-thumb-hover: color-mix(in srgb, rgba(var(--primary-rgb), 0.6) 70%, rgba(148, 163, 184, 0.4) 30%);
+  /* === BORDERS === */
+  --border-soft: rgba(98, 86, 128, 0.22);
 }
 
+/* === DARK MODE === */
 @media (prefers-color-scheme: dark) {
   :root {
-    color-scheme: dark;
-    --globe-accent: #64B5F6;
-    --sidebar-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
-    --surface-panel: color-mix(in srgb, var(--pico-background-color) 82%, rgba(var(--primary-rgb), 0.22));
-    --surface-panel-strong: color-mix(in srgb, var(--pico-background-color) 72%, rgba(var(--primary-rgb), 0.32));
-    --surface-glass: color-mix(in srgb, var(--pico-background-color) 78%, rgba(var(--primary-rgb), 0.28));
-    --surface-glass-strong: color-mix(in srgb, var(--pico-background-color) 66%, rgba(var(--primary-rgb), 0.4));
-    --surface-overlay-soft: color-mix(in srgb, rgba(8, 12, 24, 0.65) 60%, rgba(0, 0, 0, 0) 40%);
-    --surface-overlay-strong: color-mix(in srgb, rgba(5, 12, 24, 0.9) 75%, rgba(0, 0, 0, 0) 25%);
-    --surface-overlay-accent: color-mix(in srgb, rgba(var(--primary-rgb), 0.55), rgba(5, 12, 24, 0.45));
+    /* Dark mode backgrounds */
+    --bg-primary: #12101c;
+    --bg-secondary: #191627;
+    --bg-tertiary: #211c33;
+    --text-primary: #f2ecff;
+    --text-secondary: #c1bce0;
+    --text-muted: #9691b4;
+    --border-color: rgba(184, 172, 230, 0.16);
+    --border-strong: rgba(184, 172, 230, 0.28);
+    --shadow-light: rgba(0, 0, 0, 0.3);
+    --shadow-medium: rgba(0, 0, 0, 0.5);
 
-    --border-soft: color-mix(in srgb, rgba(148, 163, 184, 0.24), rgba(var(--primary-rgb), 0.24));
-    --border-strong: color-mix(in srgb, rgba(148, 163, 184, 0.4), rgba(var(--primary-rgb), 0.38));
-    --border-glass: color-mix(in srgb, rgba(148, 163, 184, 0.35), rgba(var(--primary-rgb), 0.45));
+    /* Dark mode narrative/explorer bar */
+    --hero-overlay-bg: linear-gradient(135deg, rgba(8, 6, 20, 0.88) 0%, rgba(40, 10, 36, 0.82) 48%, rgba(11, 18, 42, 0.88) 100%);
+    --hero-text-color: #fff8ff;
+    --hero-meta-color: rgba(255, 226, 240, 0.92);
+    --hero-label-color: rgba(255, 194, 226, 0.9);
+    --progress-bar-bg: rgba(255, 255, 255, 0.16);
+    --progress-bar-fill: linear-gradient(90deg, #ff8d74 0%, #ff57a6 50%, #8c7bff 100%);
+    --progress-dot-inactive: rgba(255, 208, 236, 0.4);
+    --progress-dot-active: rgba(255, 246, 255, 0.95);
 
-    --text-inverse: color-mix(in srgb, #ffffff 92%, rgba(var(--primary-rgb), 0.08));
-    --text-inverse-muted: color-mix(in srgb, var(--text-inverse) 65%, rgba(0, 0, 0, 0) 35%);
-    --text-muted-strong: color-mix(in srgb, rgba(203, 213, 225, 0.75), rgba(var(--primary-rgb), 0.1));
+    /* Dark mode sidebar */
+    --sidebar-bg: rgba(18, 16, 28, 0.96);
+    --panel-top-background: rgba(24, 21, 36, 0.85);
+    --panel-clear-background: rgba(27, 23, 40, 0.9);
+    --panel-clear-background-hover: rgba(35, 30, 50, 0.92);
+    --panel-clear-border: var(--border-color);
+    --detail-close-background: rgba(255, 255, 255, 0.06);
+    --detail-close-color: var(--text-primary);
+    --detail-close-background-hover: rgba(255, 255, 255, 0.12);
+    --detail-back-background: rgba(32, 26, 48, 0.8);
+    --detail-back-background-hover: rgba(40, 32, 60, 0.9);
+    --detail-image-placeholder-bg: rgba(46, 40, 68, 0.85);
+    --detail-meta-background: rgba(32, 26, 48, 0.75);
+    --badge-theme-bg: rgba(255, 111, 145, 0.18);
+    --badge-theme-text: #ffd6ea;
+    --badge-theme-border: rgba(255, 111, 145, 0.42);
+    --badge-theme-bg-hover: rgba(255, 111, 145, 0.32);
 
-    --narrative-background: color-mix(in srgb, rgba(5, 12, 24, 1) 70%, rgba(var(--primary-rgb), 0.25));
-    --narrative-overlay-gradient: linear-gradient(180deg, rgba(5, 12, 24, 0.55) 0%, rgba(5, 12, 24, 0.78) 60%, rgba(5, 12, 24, 0.72) 100%);
-    --narrative-label-color: rgba(255, 255, 255, 0.75);
-    --narrative-meta-color: rgba(255, 255, 255, 0.82);
-    --narrative-progress-passive: rgba(255, 255, 255, 0.3);
-    --narrative-progress-active: color-mix(in srgb, rgba(var(--primary-rgb), 0.85), rgba(255, 255, 255, 0.2));
-    --narrative-progress-complete: rgba(255, 255, 255, 0.6);
+    /* Dark mode toolbar */
+    --toolbar-background: rgba(24, 21, 36, 0.92);
+    --toolbar-border: var(--border-color);
+    --toolbar-text-muted: rgba(193, 188, 224, 0.75);
 
-    --navigator-background: color-mix(in srgb, rgba(5, 12, 24, 0.85), rgba(var(--primary-rgb), 0.18));
-    --navigator-border: color-mix(in srgb, rgba(148, 163, 184, 0.25), rgba(var(--primary-rgb), 0.25));
-    --navigator-slide-border: color-mix(in srgb, rgba(255, 255, 255, 0.18), rgba(var(--primary-rgb), 0.2));
-    --navigator-slide-border-hover: color-mix(in srgb, rgba(255, 255, 255, 0.32), rgba(var(--primary-rgb), 0.38));
-    --navigator-slide-border-active: color-mix(in srgb, rgba(var(--primary-rgb), 0.8), rgba(255, 255, 255, 0.35));
-    --navigator-slide-overlay: linear-gradient(180deg, rgba(5, 12, 24, 0) 0%, rgba(5, 12, 24, 0.85) 100%);
-    --navigator-dot: rgba(255, 255, 255, 0.3);
-    --navigator-dot-hover: rgba(255, 255, 255, 0.5);
-    --navigator-dot-active: rgba(var(--primary-rgb), 0.9);
-    --navigator-nav-background: color-mix(in srgb, rgba(var(--primary-rgb), 0.22), rgba(5, 12, 24, 0.75));
-    --navigator-nav-border: color-mix(in srgb, rgba(var(--primary-rgb), 0.4), rgba(148, 163, 184, 0.28));
-    --navigator-nav-color: rgba(255, 255, 255, 0.82);
+    /* Dark mode intro overlay */
+    --intro-overlay-gradient: linear-gradient(135deg, rgba(6, 4, 16, 0.92) 0%, rgba(38, 10, 36, 0.9) 48%, rgba(12, 16, 40, 0.94) 100%);
+    --intro-button-shadow: 0 16px 36px rgba(113, 88, 224, 0.45);
+    --intro-button-shadow-strong: 0 22px 48px rgba(113, 88, 224, 0.6);
+    --intro-skip-background: rgba(255, 255, 255, 0.12);
+    --intro-skip-border: rgba(255, 255, 255, 0.22);
 
-    --toolbar-background: color-mix(in srgb, rgba(8, 15, 30, 0.82), rgba(var(--primary-rgb), 0.2));
-    --toolbar-border: color-mix(in srgb, rgba(148, 163, 184, 0.28), rgba(var(--primary-rgb), 0.35));
-    --toolbar-text-muted: rgba(226, 232, 240, 0.75);
+    /* Dark mode narrative overlay */
+    --narrative-overlay-gradient: linear-gradient(135deg, rgba(6, 4, 16, 0.88) 0%, rgba(40, 10, 36, 0.8) 48%, rgba(10, 14, 36, 0.9) 100%);
 
-    --intro-overlay-gradient: radial-gradient(ellipse at center, rgba(10, 20, 40, 0.7) 0%, rgba(0, 0, 0, 0.9) 100%);
-    --intro-text-color: rgba(255, 255, 255, 0.95);
-    --intro-muted-color: rgba(255, 255, 255, 0.8);
-    --intro-button-background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.95) 0%, rgba(var(--primary-rgb), 0.8) 100%);
-    --intro-button-text: #ffffff;
-    --intro-button-shadow: 0 8px 24px rgba(0, 128, 255, 0.35);
-    --intro-button-shadow-strong: 0 12px 32px rgba(0, 128, 255, 0.5);
-    --intro-skip-background: rgba(255, 255, 255, 0.05);
-    --intro-skip-border: rgba(255, 255, 255, 0.3);
-
-    --badge-theme-bg: color-mix(in srgb, rgba(15, 23, 42, 0.3), rgba(var(--primary-rgb), 0.18));
-    --badge-theme-border: color-mix(in srgb, rgba(148, 163, 184, 0.28), rgba(var(--primary-rgb), 0.35));
-    --badge-theme-text: rgba(226, 232, 240, 0.92);
-    --badge-theme-bg-hover: color-mix(in srgb, rgba(var(--primary-rgb), 0.28), rgba(15, 23, 42, 0.5));
-
-    --badge-background: color-mix(in srgb, rgba(var(--primary-rgb), 0.25), rgba(15, 23, 42, 0.6));
-    --badge-color: color-mix(in srgb, var(--pico-primary) 80%, rgba(255, 255, 255, 0.3) 20%);
-    --badge-border: color-mix(in srgb, rgba(var(--primary-rgb), 0.4), rgba(148, 163, 184, 0.3));
-
-    --panel-top-background: color-mix(in srgb, rgba(8, 15, 30, 0.7), rgba(var(--primary-rgb), 0.15));
-    --panel-narrative-gradient: radial-gradient(circle at top right, color-mix(in srgb, rgba(var(--primary-rgb), 0.4), rgba(10, 20, 40, 0.5)), transparent 45%), var(--pico-background-color);
-    --panel-clear-background: color-mix(in srgb, rgba(var(--primary-rgb), 0.22), rgba(15, 23, 42, 0.7));
-    --panel-clear-border: color-mix(in srgb, rgba(var(--primary-rgb), 0.45), rgba(148, 163, 184, 0.3));
-    --panel-clear-background-hover: color-mix(in srgb, rgba(var(--primary-rgb), 0.32), rgba(15, 23, 42, 0.65));
-
-    --card-background: color-mix(in srgb, rgba(8, 15, 30, 0.85), rgba(var(--primary-rgb), 0.12));
-    --card-border: color-mix(in srgb, rgba(148, 163, 184, 0.15), rgba(var(--primary-rgb), 0.15));
-    --card-border-featured: color-mix(in srgb, rgba(var(--primary-rgb), 0.65), rgba(148, 163, 184, 0.3));
-    --card-border-selected: color-mix(in srgb, rgba(var(--primary-rgb), 0.85), rgba(255, 255, 255, 0.15));
-    --card-image-placeholder-bg: var(--surface-panel);
-    --card-view-btn-background: color-mix(in srgb, rgba(var(--primary-rgb), 0.15), rgba(15, 23, 42, 0.75));
-    --card-view-btn-color: color-mix(in srgb, var(--pico-primary) 85%, rgba(255, 255, 255, 0.25) 15%);
-    --card-view-btn-border: color-mix(in srgb, rgba(var(--primary-rgb), 0.35), rgba(148, 163, 184, 0.25));
-    --card-view-btn-selected: color-mix(in srgb, rgba(var(--primary-rgb), 0.28), rgba(15, 23, 42, 0.7));
-    --card-view-btn-shadow-hover: 0 8px 18px color-mix(in srgb, rgba(var(--primary-rgb), 0.4), rgba(0, 0, 0, 0.3));
-
-    --detail-close-background: color-mix(in srgb, rgba(var(--primary-rgb), 0.25), rgba(15, 23, 42, 0.75));
-    --detail-close-color: rgba(255, 255, 255, 0.92);
-    --detail-close-background-hover: color-mix(in srgb, rgba(var(--primary-rgb), 0.38), rgba(15, 23, 42, 0.65));
-    --detail-back-background: color-mix(in srgb, rgba(8, 15, 30, 0.8), rgba(var(--primary-rgb), 0.18));
-    --detail-back-background-hover: color-mix(in srgb, rgba(var(--primary-rgb), 0.22), rgba(8, 15, 30, 0.75));
-    --detail-image-placeholder-bg: var(--surface-panel);
-    --detail-meta-background: color-mix(in srgb, rgba(var(--primary-rgb), 0.18), rgba(15, 23, 42, 0.7));
-
-    --navigator-image-placeholder-bg: linear-gradient(135deg, var(--surface-overlay-soft) 0%, color-mix(in srgb, rgba(var(--primary-rgb), 0.22), rgba(15, 23, 42, 0.85)) 100%);
-
-    --scrollbar-thumb: color-mix(in srgb, rgba(var(--primary-rgb), 0.4), rgba(148, 163, 184, 0.3));
-    --scrollbar-thumb-hover: color-mix(in srgb, rgba(var(--primary-rgb), 0.6), rgba(148, 163, 184, 0.4));
-  }
-}
-
-/* ===== LAYOUT UTILITIES ===== */
-
-/* Full-height app container */
-.app-container {
-  height: 100vh;
-  overflow: hidden;
-  position: relative;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(320px, var(--sidebar-width));
-  gap: 0;
-  transition: grid-template-columns var(--sidebar-transition, 300ms ease);
-}
-
-.app-container.sidebar-open {
-  grid-template-columns: minmax(0, 1fr) minmax(320px, var(--sidebar-width));
-}
-
-.app-container.sidebar-collapsed {
-  grid-template-columns: minmax(0, 1fr) 0px;
-}
-
-.sidebar-toggle {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  z-index: 250;
-  border: none;
-  background: var(--panel-clear-background, color-mix(in srgb, var(--pico-primary) 20%, var(--pico-background-color) 80%));
-  color: var(--pico-contrast-color);
-  padding: 0.6rem 1.25rem;
-  border-radius: 999px;
-  font-weight: 600;
-  font-size: 0.9rem;
-  cursor: pointer;
-  box-shadow: var(--shadow-card);
-  transition: var(--transition-focus, transform 180ms ease, box-shadow 180ms ease, opacity var(--sidebar-transition, 300ms ease));
-}
-
-.sidebar-toggle:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-card-hover);
-}
-
-.sidebar-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(10, 18, 32, 0.55);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity var(--transition-fast);
-  z-index: 200;
-}
-
-.sidebar-overlay.visible {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-/* Loading state */
-.app-loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  font-size: 1.5rem;
-}
-
-/* Screen-reader only (for ARIA announcements) */
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-/* ===== RESPONSIVE ===== */
-
-@media (max-width: 1024px) {
-  .app-container {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: minmax(0, 1fr);
-  }
-
-  .right-panel {
-    position: fixed;
-    top: 0;
-    right: 0;
-    height: 100%;
-    width: min(100%, var(--sidebar-width));
-    max-width: 420px;
-    border-left: none;
-    border-top: none;
-    box-shadow: var(--sidebar-shadow);
-    background: var(--sidebar-bg);
-    z-index: 260;
-  }
-
-  .right-panel.sidebar-visible {
-    transform: translateX(0);
-  }
-
-  .right-panel.sidebar-hidden {
-    transform: translateX(110%);
-  }
-
-  .sidebar-toggle {
-    bottom: 1rem;
-    top: auto;
-  }
-
-}
-
-@media (max-width: 768px) {
-  :root {
-    --sidebar-width: 360px;
-  }
-}
-
-@media (max-width: 600px) {
-  :root {
-    --sidebar-width: 100%;
-  }
-
-  .right-panel {
-    width: 100%;
-    max-width: 100%;
-  }
-}
-
-@media (min-width: 1025px) {
-  .sidebar-overlay {
-    display: none;
-  }
-}
-
-/* ===== REDUCED MOTION ===== */
-@media (prefers-reduced-motion: reduce) {
-  :root {
-    --sidebar-transition: none;
-  }
-
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    /* Pico variables in dark mode */
+    --pico-background-color: var(--bg-primary);
+    --pico-color: var(--text-primary);
+    --pico-text-color: var(--text-primary);
+    --pico-contrast-color: var(--text-primary);
+    --pico-muted-color: var(--text-muted);
+    --pico-secondary-background: rgba(27, 23, 40, 0.9);
+    --pico-muted-border-color: var(--border-color);
   }
 }
