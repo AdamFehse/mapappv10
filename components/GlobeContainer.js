@@ -242,20 +242,76 @@
           ? Cesium.Terrain.fromWorldTerrain()
           : undefined; // undefined => default flat terrain
 
-        // Don't specify imagery provider - will add after viewer creation
-        // This avoids the broken Bing Maps default
-        let imageryOpt = undefined;
-        console.log('No imagery provider set - will add Sentinel-2 + Labels after viewer creation');
+        // Create free imagery provider view models for the base layer picker
+        const imageryViewModels = [];
+        
+        // OpenStreetMap
+        imageryViewModels.push(new Cesium.ProviderViewModel({
+          name: 'OpenStreetMap',
+          iconUrl: Cesium.buildModuleUrl('Widgets/Images/ImageryProviders/openStreetMap.png'),
+          tooltip: 'OpenStreetMap - Free, collaborative street map',
+          creationFunction: function() {
+            return new Cesium.UrlTemplateImageryProvider({
+              url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+              subdomains: ['a', 'b', 'c'],
+              credit: new Cesium.Credit('© OpenStreetMap contributors')
+            });
+          }
+        }));
+
+        // CartoDB Dark Matter
+        imageryViewModels.push(new Cesium.ProviderViewModel({
+          name: 'CartoDB Dark',
+          iconUrl: Cesium.buildModuleUrl('Widgets/Images/ImageryProviders/mapboxSatellite.png'),
+          tooltip: 'CartoDB Dark Matter - Beautiful dark theme',
+          creationFunction: function() {
+            return new Cesium.UrlTemplateImageryProvider({
+              url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
+              subdomains: ['a', 'b', 'c', 'd'],
+              credit: new Cesium.Credit('© CartoDB © OpenStreetMap contributors')
+            });
+          }
+        }));
+
+        // CartoDB Voyager
+        imageryViewModels.push(new Cesium.ProviderViewModel({
+          name: 'CartoDB Voyager',
+          iconUrl: Cesium.buildModuleUrl('Widgets/Images/ImageryProviders/openStreetMap.png'),
+          tooltip: 'CartoDB Voyager - Clean, modern design',
+          creationFunction: function() {
+            return new Cesium.UrlTemplateImageryProvider({
+              url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
+              subdomains: ['a', 'b', 'c', 'd'],
+              credit: new Cesium.Credit('© CartoDB © OpenStreetMap contributors')
+            });
+          }
+        }));
+
+        // ESRI World Imagery (Satellite) - needs async
+        imageryViewModels.push(new Cesium.ProviderViewModel({
+          name: 'ESRI Satellite',
+          iconUrl: Cesium.buildModuleUrl('Widgets/Images/ImageryProviders/esriWorldImagery.png'),
+          tooltip: 'ESRI World Imagery - Free satellite view',
+          creationFunction: async function() {
+            return await Cesium.ArcGisMapServerImageryProvider.fromUrl(
+              'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer',
+              {
+                credit: new Cesium.Credit('© Esri, Maxar, Earthstar Geographics')
+              }
+            );
+          }
+        }));
 
         const options3D = {
-          // Simplified options to avoid Bing Maps
           animation: false,
           timeline: false,
-          baseLayerPicker: false,  // Disabled to avoid Bing Maps
-          geocoder: false,         // Disabled to avoid Bing Maps
+          baseLayerPicker: true,  // ✅ ENABLED - dropdown to switch maps!
+          imageryProviderViewModels: imageryViewModels,  // Use our free providers
+          selectedImageryProviderViewModel: imageryViewModels[2],  // Start with CartoDB Voyager (has labels)
+          geocoder: false,
           homeButton: true,
           sceneModePicker: true,
-          navigationHelpButton: false,
+          navigationHelpButton: true,  // ✅ ENABLED - shows mouse controls!
           fullscreenButton: true,
           vrButton: false,
 
@@ -263,8 +319,7 @@
           requestRenderMode: true,  // Only render when needed (HUGE perf boost)
           maximumRenderTimeChange: Infinity,
 
-          // Use low-res imagery on low-power devices
-          imageryProvider: imageryOpt,
+          // Terrain and clock
           terrain: terrainOpt,
           clockViewModel: clockViewModel,
 
@@ -355,43 +410,49 @@
           });
         }
 
-        // Remove default imagery (broken Bing Maps)
-        console.log('Initial imagery layers:', view3D.imageryLayers.length);
-        view3D.imageryLayers.removeAll();
-        console.log('Removed default Bing imagery');
+        // baseLayerPicker now handles imagery - all FREE providers set up above!
+        console.log('✅ Base layer picker enabled with 4 FREE map options!');
+        console.log('No Cesium Ion subscription needed - using open-source tiles');
+        
+        // Remove old CartoDB labels - we'll use 3D floating labels instead
+        // This is an overlay that stays on all basemaps
+        
+        // Add 3D floating labels for major cities/regions (Cesium entities)
+        // These stay upright and rotate with the camera for better readability
+        const geoLabels = [
+          { name: 'Arizona', lon: -111.5, lat: 34.5 },
+          { name: 'Sonora', lon: -110.5, lat: 29.5 },
+          { name: 'Phoenix', lon: -112.07, lat: 33.45 },
+          { name: 'Tucson', lon: -110.97, lat: 32.22 },
+          { name: 'Hermosillo', lon: -110.97, lat: 29.10 },
+          { name: 'Nogales', lon: -110.94, lat: 31.34 },
+          { name: 'Bisbee', lon: -109.90, lat: 31.45 }
+        ];
 
-        // Add imagery with performance optimizations
-        (async () => {
-          try {
-            console.log('Loading Sentinel-2 base imagery (asset 3954)...');
-            const baseLayer = view3D.imageryLayers.addImageryProvider(
-              await Cesium.IonImageryProvider.fromAssetId(3954)
-            );
-
-            // Dynamic texture filtering quality
-            baseLayer.maximumAnisotropy = qualitySettings.maximumAnisotropy;
-
-            console.log('Sentinel-2 loaded successfully with quality tier:', window.MapAppPerf?.qualityTier || 'unknown');
-
-            // SKIP LABELS FOR BETTER PERFORMANCE
-            // Labels layer adds significant overhead - disable for now
-            console.log('Skipping labels layer for better performance');
-
-            // If you want labels back, uncomment this:
-            /*
-            console.log('Adding Google Maps Labels (asset 3830185)...');
-            const labelsLayer = view3D.imageryLayers.addImageryProvider(
-              await Cesium.IonImageryProvider.fromAssetId(3830185)
-            );
-            labelsLayer.maximumAnisotropy = 1;
-            console.log('Labels layer added!');
-            */
-
-            console.log('Total imagery layers:', view3D.imageryLayers.length);
-          } catch (e) {
-            console.error('Failed to load imagery:', e);
-          }
-        })();
+        geoLabels.forEach(label => {
+          view3D.entities.add({
+            position: Cesium.Cartesian3.fromDegrees(label.lon, label.lat, 0),
+            label: {
+              text: label.name,
+              font: 'bold 18px Arial',
+              fillColor: Cesium.Color.WHITE,
+              outlineColor: Cesium.Color.BLACK,
+              outlineWidth: 3,
+              style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+              pixelOffset: new Cesium.Cartesian2(0, -10),
+              translucencyByDistance: new Cesium.NearFarScalar(1000000, 1.0, 3000000, 0.0),
+              scale: 1.0,
+              disableDepthTestDistance: Number.POSITIVE_INFINITY
+            }
+          });
+        });
+        console.log('✅ 3D floating location labels added - visible on all maps!');
+        
+        // Remove terrain options from the picker (to avoid Cesium Ion terrain)
+        if (view3D.baseLayerPicker) {
+          view3D.baseLayerPicker.viewModel.terrainProviderViewModels.removeAll();
+          console.log('Terrain picker cleared (using flat terrain)');
+        }
 
         // Optional globe lighting (for day/night shading) from config
         if (typeof cfg.enableLighting === 'boolean') {
@@ -846,6 +907,19 @@
       React.createElement('div', { className: 'globe-toolbar' },
         React.createElement('h3', null, 'Arizona-Sonora Borderlands'),
         React.createElement('p', null, 'Explore borderlands research projects'),
+
+        // Share button
+        React.createElement('button', {
+          className: 'toolbar-share-btn',
+          onClick: () => {
+            if (window.MapAppUtils && window.MapAppUtils.Share) {
+              window.MapAppUtils.Share.sharePage();
+            }
+          },
+          'aria-label': 'Share this map',
+          title: 'Share this map',
+          style: { marginTop: '0.5rem', width: '100%' }
+        }, '🔗 Share Map'),
 
         // Quality selector dropdown
         React.createElement('div', { className: 'quality-selector', style: { marginTop: '0.5rem' } },
