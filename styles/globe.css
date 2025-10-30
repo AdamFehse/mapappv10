@@ -53,6 +53,7 @@
   border: 1px solid var(--toolbar-border);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(10px);
+  transition: opacity 200ms ease, transform 200ms ease;
 }
 
 .globe-toolbar h3 {
@@ -65,6 +66,31 @@
   margin: 0.25rem 0;
   font-size: 0.85rem;
   color: var(--toolbar-text-muted);
+}
+
+.toolbar-homage {
+  margin: 0.75rem 0 0;
+  font-size: 0.75rem;
+  color: var(--toolbar-text-muted);
+  text-align: center;
+}
+
+.globe-container.narrative-active .globe-toolbar {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-12px);
+}
+
+.globe-container.narrative-active .cesium-viewer-toolbar,
+.globe-container.narrative-active .cesium-viewer-bottom {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.cesium-viewer-toolbar,
+.cesium-viewer-bottom {
+  transition: opacity 200ms ease;
 }
 
 /* Quality selector */
@@ -153,11 +179,6 @@
   background: var(--pico-primary-background);
   color: var(--pico-primary);
   font-weight: 600;
-}
-
-.quality-menu button.active::after {
-  content: ' ✓';
-  float: right;
 }
 
 /* Share button in toolbar */

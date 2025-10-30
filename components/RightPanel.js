@@ -151,7 +151,7 @@
           title: 'Close details',
           'aria-label': 'Close project detail view',
           type: 'button'
-        }, '✕'),
+        }, 'Close'),
         React.createElement('button', {
           className: 'detail-back-btn',
           onClick: closeDetail,
@@ -171,7 +171,7 @@
             type: 'button',
             'aria-label': 'Share this project',
             title: 'Share this project'
-          }, '🔗 Share Project'),
+          }, 'Copy share link'),
           metaItems.length > 0 && React.createElement('div', { className: 'detail-meta' }, metaItems),
           description && React.createElement('div', { className: 'detail-section' },
             React.createElement('h3', null, 'About'),
@@ -216,7 +216,7 @@
       panelClasses.push('sidebar-hidden');
     }
 
-    const modeLabel = isNarrativeIntro ? 'Narrative Mode' : 'Explorer Mode';
+    const modeLabel = isNarrativeIntro ? 'Narrative journey' : 'Project explorer';
 
     return React.createElement('div', {
       className: panelClasses.join(' '),
@@ -266,7 +266,7 @@
                   onClick: () => setSearchQuery(''),
                   'aria-label': 'Clear search',
                   type: 'button'
-                }, '✕')
+                }, 'Clear')
               ),
               
               // Tag filters
@@ -295,14 +295,14 @@
 
             // Projects heading with count
             React.createElement('div', { className: 'panel-projects-heading' }, 
-              `Projects (${filteredProjects.length})`
+              `${filteredProjects.length} projects`
             ),
 
             // Projects list - CLICKABLE
             React.createElement('div', { className: 'panel-projects-scroll' },
               filteredProjects.length === 0 
                 ? React.createElement('div', { className: 'panel-projects-empty' },
-                    React.createElement('p', null, '😔 No projects match your search'),
+                    React.createElement('p', null, 'No projects match your search'),
                     React.createElement('button', {
                       className: 'filter-clear-btn',
                       onClick: clearFilters,
@@ -321,7 +321,7 @@
                           project.ProjectName || `Project ${index + 1}`
                         ),
                         project.Location && React.createElement('p', { className: 'project-card-location' }, 
-                          `📍 ${project.Location}`
+                          `Location: ${project.Location}`
                         ),
                         project.Theme && React.createElement('div', { className: 'project-card-tags' },
                           project.Theme.split(',').slice(0, 2).map((theme, idx) =>

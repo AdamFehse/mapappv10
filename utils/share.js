@@ -57,7 +57,7 @@
           text: text,
           url: url
         });
-        console.log('✅ Shared via Web Share API');
+        console.log('Shared via Web Share API');
         return true;
       } catch (error) {
         // User cancelled or error occurred
@@ -81,7 +81,7 @@
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
         await navigator.clipboard.writeText(url);
-        console.log('✅ Copied to clipboard:', url);
+        console.log('Copied to clipboard:', url);
         // TODO: Show toast notification
         alert('Link copied to clipboard!');
         return true;
@@ -97,7 +97,7 @@
         document.body.removeChild(textArea);
         
         if (success) {
-          console.log('✅ Copied to clipboard (fallback):', url);
+          console.log('Copied to clipboard (fallback):', url);
           alert('Link copied to clipboard!');
           return true;
         }
@@ -153,7 +153,7 @@
       window.location.href = shareUrl;
     }
     
-    console.log(`✅ Shared to ${platform}`);
+    console.log(`Shared to ${platform}`);
   }
 
   /**
@@ -197,5 +197,5 @@
     canUseNativeShare
   };
 
-  console.log('✅ Share utilities loaded');
+  console.log('Share utilities loaded');
 })();
