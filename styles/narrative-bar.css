@@ -9,6 +9,38 @@
   position: relative;
 }
 
+@keyframes narrative-bg-fade {
+  0% {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes narrative-content-fade {
+  0% {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.narrative-fade-bg {
+  animation: narrative-bg-fade 420ms ease both;
+  will-change: opacity, transform;
+}
+
+.narrative-fade-content {
+  animation: narrative-content-fade 360ms ease both;
+  will-change: opacity, transform;
+}
+
 .narrative-hero {
   position: relative;
   flex: 1 1 auto;
@@ -45,6 +77,10 @@
   filter: blur(8px) saturate(1.08) brightness(1.05);
   transform: scale(1.04);
   opacity: 0.94;
+}
+
+.narrative-bar.low-power .hero-background {
+  filter: none;
 }
 
 .hero-overlay {

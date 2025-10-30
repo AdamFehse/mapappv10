@@ -22,8 +22,7 @@
    */
   window.MapApp.App = function App() {
     function getDefaultSidebarState() {
-      if (typeof window === 'undefined') return true;
-      return window.matchMedia('(min-width: 1024px)').matches;
+      return false;
     }
 
     // State
@@ -115,10 +114,10 @@
     }, [Router, selectedProject]);
 
     useEffect(() => {
-      if (showNarrativeIntro) {
+      if (selectedProject) {
         setIsSidebarOpen(true);
       }
-    }, [showNarrativeIntro]);
+    }, [selectedProject]);
 
     // Event Handlers
     function handleSelectProject(project) {

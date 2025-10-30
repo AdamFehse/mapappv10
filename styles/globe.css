@@ -56,6 +56,12 @@
   transition: opacity 200ms ease, transform 200ms ease;
 }
 
+.globe-container.low-power .globe-toolbar {
+  backdrop-filter: none;
+  background: color-mix(in srgb, var(--toolbar-background) 85%, rgba(0, 0, 0, 0.08));
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.18);
+}
+
 .globe-toolbar h3 {
   margin: 0 0 0.5rem 0;
   font-size: 0.95rem;
@@ -382,6 +388,10 @@
   animation: shimmer 3s infinite;
 }
 
+.globe-container.low-power .intro-button::before {
+  animation: none;
+}
+
 @keyframes shimmer {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
@@ -408,6 +418,14 @@
   cursor: pointer;
   transition: all 300ms ease;
   backdrop-filter: blur(4px);
+}
+
+.globe-container.low-power .intro-button {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+}
+
+.globe-container.low-power .intro-skip {
+  backdrop-filter: none;
 }
 
 .intro-skip:hover,

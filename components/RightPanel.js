@@ -23,20 +23,47 @@
     const [selectedTags, setSelectedTags] = useState([]);
     const isNarrativeIntro = !!showNarrativeIntro;
 
+    // Precompute tags for each project
+    const projectTagsMap = React.useMemo(() => {
+      const map = new Map();
+      projects.forEach(project => {
+        if (!project) return;
+        const key = project.id !== undefined && project.id !== null
+          ? String(project.id)
+          : project;
+
+        const themeTokens = [];
+        if (typeof project.Theme === 'string') {
+          project.Theme.split(',').forEach(theme => {
+            const trimmed = theme.trim();
+            if (trimmed) {
+              themeTokens.push(trimmed);
+            }
+          });
+        }
+        const uniqueThemes = Array.from(new Set(themeTokens));
+        const tags = uniqueThemes.slice();
+        const categoryRaw = project.ProjectCategory;
+        if (categoryRaw) {
+          const category = String(categoryRaw).trim();
+          if (category) {
+            tags.push(category);
+          }
+        }
+        const uniqueTags = Array.from(new Set(tags));
+        map.set(key, { tags: uniqueTags, themes: uniqueThemes });
+      });
+      return map;
+    }, [projects]);
+
     // Extract unique tags from all projects
     const allTags = React.useMemo(() => {
       const tagSet = new Set();
-      projects.forEach(project => {
-        if (project.Theme) {
-          project.Theme.split(',').forEach(theme => {
-            const tag = theme.trim();
-            if (tag) tagSet.add(tag);
-          });
-        }
-        if (project.ProjectCategory) tagSet.add(project.ProjectCategory);
+      projectTagsMap.forEach(info => {
+        info.tags.forEach(tag => tagSet.add(tag));
       });
       return Array.from(tagSet).sort();
-    }, [projects]);
+    }, [projectTagsMap]);
 
     // Filter projects based on search and tags
     const filteredProjects = React.useMemo(() => {
@@ -52,18 +79,16 @@
 
         // Tag filter
         if (selectedTags.length > 0) {
-          const projectTags = [];
-          if (project.Theme) {
-            project.Theme.split(',').forEach(t => projectTags.push(t.trim()));
-          }
-          if (project.ProjectCategory) projectTags.push(project.ProjectCategory);
+          const key = project.id !== undefined && project.id !== null ? String(project.id) : project;
+          const tagInfo = projectTagsMap.get(key);
+          const projectTags = tagInfo ? tagInfo.tags : [];
           const hasSelectedTag = selectedTags.some(tag => projectTags.includes(tag));
           if (!hasSelectedTag) return false;
         }
 
         return true;
       });
-    }, [projects, searchQuery, selectedTags]);
+    }, [projects, projectTagsMap, searchQuery, selectedTags]);
 
     // Toggle tag selection
     const toggleTag = (tag) => {
@@ -119,10 +144,9 @@
 
     const renderCardDetails = (project) => {
       const description = project.DescriptionLong || project.DescriptionShort || project.Description;
-      const themeTokens = (project.Theme || '')
-        .split(',')
-        .map(theme => theme.trim())
-        .filter(Boolean);
+      const tagKey = project.id !== undefined && project.id !== null ? String(project.id) : project;
+      const tagInfo = projectTagsMap.get(tagKey) || { tags: [], themes: [] };
+      const themeTokens = tagInfo.themes;
 
       const metaItems = [];
       if (project.Location) {
@@ -217,27 +241,52 @@
     }
 
     const modeLabel = isNarrativeIntro ? 'Narrative journey' : 'Project explorer';
+    const panelContentId = 'right-panel-content';
+    const toggleLabel = isSidebarOpen ? 'Collapse project explorer' : 'Expand project explorer';
 
-    return React.createElement('div', {
+    const toggleButton = React.createElement('button', {
+      type: 'button',
+      className: `panel-toggle-tab ${isSidebarOpen ? 'open' : 'collapsed'}`,
+      onClick: onToggleSidebar,
+      'aria-label': toggleLabel,
+      'aria-expanded': isSidebarOpen,
+      'aria-controls': panelContentId,
+      title: toggleLabel
+    },
+      React.createElement('span', { className: 'panel-toggle-icon', 'aria-hidden': 'true' }, isSidebarOpen ? '>' : '<'),
+      React.createElement('span', { className: 'panel-toggle-text' }, isSidebarOpen ? 'Hide Projects' : 'Show Projects')
+    );
+
+    const panelElement = React.createElement('aside', {
       className: panelClasses.join(' '),
       id: 'right-panel',
       role: 'complementary',
       'aria-label': 'Featured projects panel',
-      'aria-hidden': isSidebarOpen ? 'false' : 'true'
+      'aria-hidden': isSidebarOpen ? undefined : 'true'
     },
-      React.createElement('button', {
-        type: 'button',
-        className: `panel-edge-tab ${isSidebarOpen ? 'open' : 'collapsed'}`,
-        onClick: onToggleSidebar,
-        'aria-label': isSidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'
+      React.createElement('div', {
+        className: 'panel-toolbar',
+        hidden: !isSidebarOpen,
+        'aria-hidden': isSidebarOpen ? undefined : 'true'
       },
-        React.createElement('span', { className: 'panel-edge-icon' }, isSidebarOpen ? '<' : '>'),
-        React.createElement('span', { className: 'panel-edge-label' }, isSidebarOpen ? 'Hide' : 'Show')
+        React.createElement('div', { className: 'panel-mode-label' }, modeLabel),
+        React.createElement('button', {
+          type: 'button',
+          className: 'panel-close-btn',
+          onClick: () => {
+            if (isSidebarOpen) {
+              onToggleSidebar();
+            }
+          },
+          'aria-label': 'Close project explorer'
+        }, 'Close')
       ),
-      React.createElement('div', { className: 'panel-toolbar' },
-        React.createElement('div', { className: 'panel-mode-label' }, modeLabel)
-      ),
-      React.createElement('div', { className: 'panel-content' },
+      React.createElement('div', {
+        className: 'panel-content',
+        id: panelContentId,
+        hidden: !isSidebarOpen,
+        'aria-hidden': isSidebarOpen ? undefined : 'true'
+      },
         isNarrativeIntro
           ? React.createElement(window.MapApp.NarrativeBar, {
             projects: projects,
@@ -309,8 +358,11 @@
                       type: 'button'
                     }, 'Clear filters')
                   )
-                : filteredProjects.map((project, index) =>
-                    React.createElement('button', {
+                : filteredProjects.map((project, index) => {
+                    const tagKey = project.id !== undefined && project.id !== null ? String(project.id) : project;
+                    const tagInfo = projectTagsMap.get(tagKey) || { tags: [], themes: [] };
+                    const previewThemes = tagInfo.themes.slice(0, 2);
+                    return React.createElement('button', {
                       key: project.id || index,
                       className: 'panel-project-card',
                       onClick: () => handleExpandProject(project),
@@ -323,23 +375,25 @@
                         project.Location && React.createElement('p', { className: 'project-card-location' }, 
                           `Location: ${project.Location}`
                         ),
-                        project.Theme && React.createElement('div', { className: 'project-card-tags' },
-                          project.Theme.split(',').slice(0, 2).map((theme, idx) =>
+                        previewThemes.length > 0 && React.createElement('div', { className: 'project-card-tags' },
+                          previewThemes.map((theme, idx) =>
                             React.createElement('span', { 
                               key: idx, 
                               className: 'project-card-tag' 
-                            }, theme.trim())
+                            }, theme)
                           )
                         )
                       )
-                    )
-                  )
-            )
+                    );
+                  })
+              )
           )
       ),
-      expandedProject && React.createElement('div', { className: 'project-detail-modal' },
+      isSidebarOpen && expandedProject && React.createElement('div', { className: 'project-detail-modal' },
         renderCardDetails(expandedProject)
       )
     );
+
+    return React.createElement(React.Fragment, null, toggleButton, panelElement);
   };
 })();

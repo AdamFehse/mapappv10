@@ -78,6 +78,7 @@ button:disabled {
   height: 100vh;
   width: 100vw;
   overflow: hidden;
+  position: relative;
 }
 
 .app-container > * {
@@ -90,9 +91,10 @@ button:disabled {
 }
 
 .app-container > .right-panel {
-  flex: 0 0 var(--layout-sidebar-width);
-  width: var(--layout-sidebar-width);
-  overflow-y: auto;
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100vh;
 }
 
 .visually-hidden {

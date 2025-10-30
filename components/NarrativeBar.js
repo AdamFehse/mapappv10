@@ -12,6 +12,11 @@
   }) {
     const narrativeConfig = React.useMemo(() => window.MapAppConfig?.narrative || { passages: [] }, []);
     const narrativePassages = narrativeConfig.passages || [];
+    const isLowPowerMode = !!(window.MapAppPerf?.isLowPower || window.MapAppPerf?.prefersReducedMotion);
+    const sectionClasses = ['narrative-bar'];
+    if (isLowPowerMode) {
+      sectionClasses.push('low-power');
+    }
 
     const passageProjects = React.useMemo(() => {
       if (!Array.isArray(narrativePassages) || narrativePassages.length === 0) {
@@ -51,7 +56,7 @@
     };
 
     if (!currentProject) {
-      return React.createElement('section', { className: 'narrative-bar' },
+      return React.createElement('section', { className: sectionClasses.join(' ') },
         React.createElement('div', { className: 'narrative-empty' },
           React.createElement('h2', null, 'Welcome'),
           React.createElement('p', null, 'Loading featured projects...')
@@ -59,7 +64,7 @@
       );
     }
 
-    return React.createElement('section', { className: 'narrative-bar' },
+    return React.createElement('section', { className: sectionClasses.join(' ') },
       React.createElement('button', {
         type: 'button',
         className: 'narrative-hero',
@@ -69,12 +74,13 @@
           : 'View featured project details'
       },
         currentProject.ImageUrl && React.createElement('div', {
-          className: 'hero-background',
+          className: 'hero-background narrative-fade-bg',
           style: { backgroundImage: `url(${currentProject.ImageUrl})` },
-          'aria-hidden': 'true'
+          'aria-hidden': 'true',
+          key: `bg-${safeIndex}`
         }),
         React.createElement('div', { className: 'hero-overlay', 'aria-hidden': 'true' }),
-        React.createElement('div', { className: 'hero-content' },
+        React.createElement('div', { className: 'hero-content narrative-fade-content', key: `content-${safeIndex}` },
           heroLabel && React.createElement('span', { className: 'hero-label' }, heroLabel),
           React.createElement('h1', { className: 'hero-title' }, heroTitle),
           heroMeta && React.createElement('p', { className: 'hero-meta' }, heroMeta),
