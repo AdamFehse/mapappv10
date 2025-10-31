@@ -662,7 +662,7 @@
       } else if (markersRevealed) {
         setMarkersRevealed(false);
       }
-    }, [projects, showIntro, markerOptions]);
+    }, [projects, showIntro, markerOptions, selectedProject]);
 
     // Typewriter effect for narrative text with progress tracking
     useEffect(() => {
@@ -740,12 +740,23 @@
     }, [selectedProject]);
 
     useEffect(() => {
+      const view3D = view3DRef.current;
       Object.values(entitiesRef.current).forEach(entity => {
         if (!entity || !entity.projectData) return;
         const isSelected = !!(selectedProject && entity.projectData.id === selectedProject.id);
         updateMarkerGraphics(entity, markerOptions, isSelected);
+
+        // Update Cesium's selected entity for the green bracket highlight
+        if (isSelected && view3D) {
+          view3D.selectedEntity = entity;
+        }
       });
-    }, [selectedProject]);
+
+      // Clear selection if no project is selected
+      if (!selectedProject && view3D) {
+        view3D.selectedEntity = undefined;
+      }
+    }, [selectedProject, markerOptions]);
 
     function clearRevealTimeouts() {
       if (!Array.isArray(revealTimeoutsRef.current)) {

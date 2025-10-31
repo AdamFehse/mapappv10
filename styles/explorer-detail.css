@@ -1,0 +1,271 @@
+/**
+ * explorer-detail.css - Project detail modal styles split from explorer-bar.css
+ */
+
+/* ===== DETAIL VIEW MODAL OVERLAY ===== */
+
+.project-detail-modal {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--sidebar-bg) 88%, rgba(12, 8, 24, 0.35) 12%);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  animation: slideInUp 300ms ease-out;
+  backdrop-filter: blur(14px);
+}
+
+.right-panel.sidebar-hidden .project-detail-modal {
+  opacity: 0;
+  visibility: hidden;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Detail view container */
+
+.project-detail {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0;
+}
+
+/* Back button - single consolidated navigation */
+
+.detail-back-btn {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  padding: 0.9rem 1.2rem;
+  background: var(--detail-back-background);
+  border: none;
+  border-bottom: 2px solid var(--primary);
+  color: var(--primary);
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.95rem;
+  transition: background-color 180ms ease, color 180ms ease, transform 180ms ease;
+  text-align: left;
+  z-index: 5;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.detail-back-btn:hover {
+  background: var(--detail-back-background-hover);
+  transform: translateX(-2px);
+}
+
+.detail-back-btn:active {
+  transform: translateX(-1px);
+}
+
+.detail-back-btn:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: -3px;
+}
+
+/* Detail image */
+
+.detail-image-wrapper {
+  width: 100%;
+  height: 300px;
+  overflow: hidden;
+  background: var(--detail-image-placeholder-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.detail-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.detail-image-placeholder {
+  font-size: 4.5rem;
+  opacity: 0.3;
+}
+
+/* Detail body */
+
+.detail-body {
+  flex: 1;
+  padding: 2rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.detail-title {
+  margin: 0;
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: var(--pico-text-color);
+  line-height: 1.25;
+}
+
+/* Share button */
+
+.detail-share-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  margin-top: 0.75rem;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 250ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);
+  user-select: none;
+}
+
+.detail-share-btn:hover,
+.detail-share-btn:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(var(--primary-rgb), 0.5);
+}
+
+.detail-share-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(var(--primary-rgb), 0.4);
+}
+
+/* Metadata section */
+
+.detail-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1.1rem;
+  background: var(--detail-meta-background);
+  border-radius: 10px;
+  border-left: 4px solid var(--pico-primary);
+}
+
+.detail-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.95rem;
+}
+
+.detail-meta-item strong {
+  color: var(--pico-muted-color);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.detail-meta-item span {
+  color: var(--pico-text-color);
+  font-weight: 500;
+}
+
+/* Content sections */
+
+.detail-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Detail section text resets */
+.detail-section h3,
+.detail-section p,
+.detail-section ul,
+.detail-section li {
+  margin: 0;
+  color: var(--pico-text-color);
+}
+
+.detail-section h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  padding-bottom: 0.45rem;
+  border-bottom: 2px solid var(--border-strong);
+}
+
+.detail-section p {
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+.detail-section ul {
+  padding-left: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.detail-section li {
+  font-size: 0.95rem;
+}
+
+/* Badges */
+
+.detail-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.detail-badge {
+  display: inline-block;
+  padding: 0.45rem 0.95rem;
+  background: var(--badge-theme-bg);
+  color: var(--badge-theme-text);
+  border: 1px solid var(--badge-theme-border);
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: background 180ms ease, border-color 180ms ease;
+}
+
+.detail-badge:is(:hover, .active) {
+  background: var(--badge-theme-bg-hover);
+  border-color: var(--pico-primary);
+}
+
+/* ===== REDUCED MOTION ===== */
+
+@media (prefers-reduced-motion: reduce) {
+  .project-detail-modal {
+    animation: none;
+  }
+
+  .detail-back-btn,
+  .detail-badge,
+  .detail-share-btn {
+    transition: none;
+  }
+
+  .detail-share-btn:hover {
+    transform: none;
+  }
+}

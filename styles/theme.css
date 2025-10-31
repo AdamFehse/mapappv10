@@ -60,6 +60,7 @@
   /* === TOOLBAR/GLOBE === */
   --toolbar-background: rgba(255, 255, 255, 0.95);
   --toolbar-border: rgba(98, 86, 128, 0.2);
+  --toolbar-text: var(--text-primary);
   --toolbar-text-muted: rgba(65, 58, 102, 0.75);
 
   /* === TRANSITIONS === */
@@ -136,19 +137,20 @@
     --detail-close-background: rgba(255, 255, 255, 0.06);
     --detail-close-color: var(--text-primary);
     --detail-close-background-hover: rgba(255, 255, 255, 0.12);
-    --detail-back-background: rgba(32, 26, 48, 0.8);
-    --detail-back-background-hover: rgba(40, 32, 60, 0.9);
-    --detail-image-placeholder-bg: rgba(46, 40, 68, 0.85);
-    --detail-meta-background: rgba(32, 26, 48, 0.75);
+    --detail-back-background: rgba(255, 111, 145, 0.12);
+    --detail-back-background-hover: rgba(255, 111, 145, 0.2);
+    --detail-image-placeholder-bg: rgba(65, 55, 100, 0.4);
+    --detail-meta-background: rgba(65, 55, 100, 0.35);
     --badge-theme-bg: rgba(255, 111, 145, 0.18);
     --badge-theme-text: #ffd6ea;
     --badge-theme-border: rgba(255, 111, 145, 0.42);
     --badge-theme-bg-hover: rgba(255, 111, 145, 0.32);
 
     /* Dark mode toolbar */
-    --toolbar-background: rgba(24, 21, 36, 0.92);
-    --toolbar-border: var(--border-color);
-    --toolbar-text-muted: rgba(193, 188, 224, 0.75);
+    --toolbar-background: rgba(18, 16, 28, 0.88);
+    --toolbar-border: rgba(255, 111, 145, 0.25);
+    --toolbar-text: #f2ecff;
+    --toolbar-text-muted: rgba(255, 226, 240, 0.85);
 
     /* Dark mode intro overlay */
     --intro-overlay-gradient: linear-gradient(135deg, rgba(6, 4, 16, 0.92) 0%, rgba(38, 10, 36, 0.9) 48%, rgba(12, 16, 40, 0.94) 100%);

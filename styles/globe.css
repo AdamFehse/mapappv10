@@ -66,6 +66,7 @@
   margin: 0 0 0.5rem 0;
   font-size: 0.95rem;
   font-weight: 600;
+  color: var(--toolbar-text);
 }
 
 .globe-toolbar p {
@@ -107,23 +108,21 @@
 .quality-button {
   width: 100%;
   padding: 0.5rem 0.75rem;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 245, 252, 0.85) 100%);
+  background: var(--toolbar-background);
   color: var(--text-primary);
-  border: 1px solid rgba(var(--primary-rgb), 0.28);
+  border: 1px solid var(--toolbar-border);
   border-radius: 6px;
   font-size: 0.85rem;
   cursor: pointer;
   transition: all 200ms ease;
   text-align: left;
-  box-shadow: 0 10px 24px rgba(24, 18, 43, 0.12);
 }
 
 .quality-button:hover,
 .quality-button:focus-visible {
-  background: linear-gradient(135deg, rgba(255, 154, 98, 0.35) 0%, rgba(255, 111, 145, 0.25) 100%);
+  background: var(--panel-clear-background-hover);
   border-color: rgba(var(--primary-rgb), 0.55);
   color: var(--text-primary);
-  box-shadow: 0 14px 28px rgba(24, 18, 60, 0.22);
 }
 
 .quality-menu {

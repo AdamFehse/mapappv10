@@ -21,6 +21,15 @@
     const [expandedProject, setExpandedProject] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedTags, setSelectedTags] = useState([]);
+    const [selectedCategories, setSelectedCategories] = useState([]);
+    const [selectedYears, setSelectedYears] = useState([]);
+    const [selectedProducts, setSelectedProducts] = useState([]);
+    const [expandedFilters, setExpandedFilters] = useState({
+      themes: false,
+      categories: false,
+      years: false,
+      products: false
+    });
     const isNarrativeIntro = !!showNarrativeIntro;
 
     // Precompute tags for each project
@@ -56,7 +65,7 @@
       return map;
     }, [projects]);
 
-    // Extract unique tags from all projects
+    // Extract unique tags and other filter categories
     const allTags = React.useMemo(() => {
       const tagSet = new Set();
       projectTagsMap.forEach(info => {
@@ -65,7 +74,40 @@
       return Array.from(tagSet).sort();
     }, [projectTagsMap]);
 
-    // Filter projects based on search and tags
+    // Extract project categories
+    const allCategories = React.useMemo(() => {
+      const catSet = new Set();
+      projects.forEach(project => {
+        if (project.ProjectCategory) {
+          catSet.add(String(project.ProjectCategory).trim());
+        }
+      });
+      return Array.from(catSet).sort();
+    }, [projects]);
+
+    // Extract years
+    const allYears = React.useMemo(() => {
+      const yearSet = new Set();
+      projects.forEach(project => {
+        if (project.Year) {
+          yearSet.add(project.Year);
+        }
+      });
+      return Array.from(yearSet).sort((a, b) => b - a); // Newest first
+    }, [projects]);
+
+    // Extract products/types
+    const allProducts = React.useMemo(() => {
+      const prodSet = new Set();
+      projects.forEach(project => {
+        if (project.Product) {
+          prodSet.add(String(project.Product).trim());
+        }
+      });
+      return Array.from(prodSet).sort();
+    }, [projects]);
+
+    // Filter projects based on search and all filter categories
     const filteredProjects = React.useMemo(() => {
       return projects.filter(project => {
         // Search filter
@@ -77,7 +119,7 @@
           if (!matchesName && !matchesDesc && !matchesLocation) return false;
         }
 
-        // Tag filter
+        // Theme filter
         if (selectedTags.length > 0) {
           const key = project.id !== undefined && project.id !== null ? String(project.id) : project;
           const tagInfo = projectTagsMap.get(key);
@@ -86,14 +128,49 @@
           if (!hasSelectedTag) return false;
         }
 
+        // Category filter
+        if (selectedCategories.length > 0) {
+          const projectCat = String(project.ProjectCategory || '').trim();
+          if (!selectedCategories.includes(projectCat)) return false;
+        }
+
+        // Year filter
+        if (selectedYears.length > 0) {
+          if (!selectedYears.includes(project.Year)) return false;
+        }
+
+        // Product filter
+        if (selectedProducts.length > 0) {
+          const projectProd = String(project.Product || '').trim();
+          if (!selectedProducts.includes(projectProd)) return false;
+        }
+
         return true;
       });
-    }, [projects, projectTagsMap, searchQuery, selectedTags]);
+    }, [projects, projectTagsMap, searchQuery, selectedTags, selectedCategories, selectedYears, selectedProducts]);
 
-    // Toggle tag selection
+    // Toggle selections for each filter type
     const toggleTag = (tag) => {
-      setSelectedTags(prev => 
+      setSelectedTags(prev =>
         prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
+      );
+    };
+
+    const toggleCategory = (cat) => {
+      setSelectedCategories(prev =>
+        prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
+      );
+    };
+
+    const toggleYear = (year) => {
+      setSelectedYears(prev =>
+        prev.includes(year) ? prev.filter(y => y !== year) : [...prev, year]
+      );
+    };
+
+    const toggleProduct = (prod) => {
+      setSelectedProducts(prev =>
+        prev.includes(prod) ? prev.filter(p => p !== prod) : [...prev, prod]
       );
     };
 
@@ -101,6 +178,17 @@
     const clearFilters = () => {
       setSearchQuery('');
       setSelectedTags([]);
+      setSelectedCategories([]);
+      setSelectedYears([]);
+      setSelectedProducts([]);
+    };
+
+    // Helper to toggle individual filter section
+    const toggleFilterSection = (section) => {
+      setExpandedFilters(prev => ({
+        ...prev,
+        [section]: !prev[section]
+      }));
     };
 
     // Close detail view
@@ -170,18 +258,11 @@
 
       return React.createElement('div', { className: 'project-detail' },
         React.createElement('button', {
-          className: 'detail-close-btn',
-          onClick: closeDetail,
-          title: 'Close details',
-          'aria-label': 'Close project detail view',
-          type: 'button'
-        }, 'Close'),
-        React.createElement('button', {
           className: 'detail-back-btn',
           onClick: closeDetail,
           type: 'button',
           'aria-label': 'Return to project list'
-        }, 'Back to Projects'),
+        }, '← Back to Projects'),
         React.createElement('div', { className: 'detail-image-wrapper' },
           project.ImageUrl ?
             React.createElement('img', { src: project.ImageUrl, alt: project.ProjectName || 'Project image', className: 'detail-image' }) :
@@ -300,51 +381,136 @@
           React.createElement('div', { className: 'panel-projects-list' },
             // Search and filter controls
             React.createElement('div', { className: 'panel-filters' },
-              // Search input
-              React.createElement('div', { className: 'filter-search' },
-                React.createElement('input', {
-                  type: 'text',
-                  className: 'search-input',
-                  placeholder: 'Search projects...',
-                  value: searchQuery,
-                  onChange: (e) => setSearchQuery(e.target.value),
-                  'aria-label': 'Search projects'
-                }),
-                searchQuery && React.createElement('button', {
-                  className: 'search-clear',
-                  onClick: () => setSearchQuery(''),
-                  'aria-label': 'Clear search',
-                  type: 'button'
-                }, 'Clear')
-              ),
-              
-              // Tag filters
-              allTags.length > 0 && React.createElement('div', { className: 'filter-tags' },
-                React.createElement('div', { className: 'filter-tags-label' }, 
-                  'Filter by theme:',
-                  selectedTags.length > 0 && React.createElement('button', {
-                    className: 'filter-clear-btn',
-                    onClick: clearFilters,
+              // Search input with project count
+              React.createElement('div', { className: 'filter-search-section' },
+                React.createElement('div', { className: 'filter-search' },
+                  React.createElement('input', {
+                    type: 'text',
+                    className: 'search-input',
+                    placeholder: 'Search projects...',
+                    value: searchQuery,
+                    onChange: (e) => setSearchQuery(e.target.value),
+                    'aria-label': 'Search projects'
+                  }),
+                  searchQuery && React.createElement('button', {
+                    className: 'search-clear',
+                    onClick: () => setSearchQuery(''),
+                    'aria-label': 'Clear search',
                     type: 'button'
-                  }, 'Clear all')
+                  }, '✕')
                 ),
-                React.createElement('div', { className: 'filter-tags-list' },
-                  allTags.slice(0, 8).map(tag => 
-                    React.createElement('button', {
-                      key: tag,
-                      className: `filter-tag ${selectedTags.includes(tag) ? 'active' : ''}`,
-                      onClick: () => toggleTag(tag),
-                      type: 'button',
-                      'aria-pressed': selectedTags.includes(tag)
-                    }, tag)
-                  )
+                React.createElement('div', { className: 'filter-count-badge' },
+                  `${filteredProjects.length} Projects`
                 )
-              )
-            ),
+              ),
 
-            // Projects heading with count
-            React.createElement('div', { className: 'panel-projects-heading' }, 
-              `${filteredProjects.length} projects`
+              // Collapsible filter categories in a row
+              React.createElement('div', { className: 'filter-categories-row' },
+                // Themes filter
+                allTags.length > 0 && React.createElement('div', { className: 'filter-category' },
+                  React.createElement('button', {
+                    className: `filter-category-toggle ${expandedFilters.themes ? 'expanded' : ''}`,
+                    onClick: () => toggleFilterSection('themes'),
+                    type: 'button',
+                    'aria-expanded': expandedFilters.themes,
+                    'aria-controls': 'filter-themes-section'
+                  },
+                    `▼ Themes ${selectedTags.length > 0 ? `(${selectedTags.length})` : ''}`
+                  ),
+                  expandedFilters.themes && React.createElement('div', { className: 'filter-items', id: 'filter-themes-section' },
+                    allTags.map(tag =>
+                      React.createElement('button', {
+                        key: tag,
+                        className: `filter-item ${selectedTags.includes(tag) ? 'active' : ''}`,
+                        onClick: () => toggleTag(tag),
+                        type: 'button',
+                        'aria-pressed': selectedTags.includes(tag)
+                      }, tag)
+                    )
+                  )
+                ),
+
+                // Category filter
+                allCategories.length > 0 && React.createElement('div', { className: 'filter-category' },
+                  React.createElement('button', {
+                    className: `filter-category-toggle ${expandedFilters.categories ? 'expanded' : ''}`,
+                    onClick: () => toggleFilterSection('categories'),
+                    type: 'button',
+                    'aria-expanded': expandedFilters.categories,
+                    'aria-controls': 'filter-categories-section'
+                  },
+                    `▼ Type ${selectedCategories.length > 0 ? `(${selectedCategories.length})` : ''}`
+                  ),
+                  expandedFilters.categories && React.createElement('div', { className: 'filter-items', id: 'filter-categories-section' },
+                    allCategories.map(cat =>
+                      React.createElement('button', {
+                        key: cat,
+                        className: `filter-item ${selectedCategories.includes(cat) ? 'active' : ''}`,
+                        onClick: () => toggleCategory(cat),
+                        type: 'button',
+                        'aria-pressed': selectedCategories.includes(cat)
+                      }, cat)
+                    )
+                  )
+                ),
+
+                // Year filter
+                allYears.length > 0 && React.createElement('div', { className: 'filter-category' },
+                  React.createElement('button', {
+                    className: `filter-category-toggle ${expandedFilters.years ? 'expanded' : ''}`,
+                    onClick: () => toggleFilterSection('years'),
+                    type: 'button',
+                    'aria-expanded': expandedFilters.years,
+                    'aria-controls': 'filter-years-section'
+                  },
+                    `▼ Year ${selectedYears.length > 0 ? `(${selectedYears.length})` : ''}`
+                  ),
+                  expandedFilters.years && React.createElement('div', { className: 'filter-items', id: 'filter-years-section' },
+                    allYears.map(year =>
+                      React.createElement('button', {
+                        key: year,
+                        className: `filter-item ${selectedYears.includes(year) ? 'active' : ''}`,
+                        onClick: () => toggleYear(year),
+                        type: 'button',
+                        'aria-pressed': selectedYears.includes(year)
+                      }, year)
+                    )
+                  )
+                ),
+
+                // Product filter
+                allProducts.length > 0 && React.createElement('div', { className: 'filter-category' },
+                  React.createElement('button', {
+                    className: `filter-category-toggle ${expandedFilters.products ? 'expanded' : ''}`,
+                    onClick: () => toggleFilterSection('products'),
+                    type: 'button',
+                    'aria-expanded': expandedFilters.products,
+                    'aria-controls': 'filter-products-section'
+                  },
+                    `▼ Medium ${selectedProducts.length > 0 ? `(${selectedProducts.length})` : ''}`
+                  ),
+                  expandedFilters.products && React.createElement('div', { className: 'filter-items', id: 'filter-products-section' },
+                    allProducts.map(prod =>
+                      React.createElement('button', {
+                        key: prod,
+                        className: `filter-item ${selectedProducts.includes(prod) ? 'active' : ''}`,
+                        onClick: () => toggleProduct(prod),
+                        type: 'button',
+                        'aria-pressed': selectedProducts.includes(prod)
+                      }, prod)
+                    )
+                  )
+                ),
+
+              ),
+
+              // Clear all button if any filters are active (outside the row)
+              (selectedTags.length > 0 || selectedCategories.length > 0 || selectedYears.length > 0 || selectedProducts.length > 0) &&
+              React.createElement('button', {
+                className: 'filter-clear-all-btn',
+                onClick: clearFilters,
+                type: 'button'
+              }, '✕ Clear all filters')
             ),
 
             // Projects list - CLICKABLE
