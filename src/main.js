@@ -33,6 +33,12 @@ function initializeApp() {
     return;
   }
 
+  // Hide loading skeleton
+  const loadingSkeleton = document.getElementById('loading-skeleton');
+  if (loadingSkeleton) {
+    loadingSkeleton.style.display = 'none';
+  }
+
   // All dependencies loaded - render app
   console.log('Initializing MapApp V10');
   ReactDOM.createRoot(document.getElementById('root')).render(
