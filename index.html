@@ -3,82 +3,56 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Interactive 3D globe exploring Arizona-Sonora borderlands research projects" />
+  <meta name="theme-color" content="#05030c" />
   <title>3D Globe Story Map - Arizona-Sonora Borderlands</title>
 
-  <!-- Cesium CSS - Latest version for Google Maps support -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cesium@latest/Build/Cesium/Widgets/widgets.css" />
+  <!-- DNS Prefetch for fastest connection -->
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+  <link rel="dns-prefetch" href="https://unpkg.com" />
 
-  <!-- Custom Styles (No Pico - full control!) -->
-  <link rel="stylesheet" href="./styles/reset.css" />
-  <link rel="stylesheet" href="./styles/theme.css" />
-  <link rel="stylesheet" href="./styles/globe.css" />
-  <link rel="stylesheet" href="./styles/narrative-bar.css" />
-  <link rel="stylesheet" href="./styles/explorer-bar.css" />
-  <link rel="stylesheet" href="./styles/explorer-detail.css" />
+  <!-- Preconnect to critical third-party origins -->
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+  <link rel="preconnect" href="https://unpkg.com" crossorigin />
 
-  <!-- Cesium.js (3D Globe Engine) - Latest version -->
-  <script src="https://cdn.jsdelivr.net/npm/cesium@latest/Build/Cesium/Cesium.js"></script>
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="./styles/critical.css" />
+  <link rel="stylesheet" href="./styles/main.css" />
+  <!-- Cesium CSS deferred -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cesium@latest/Build/Cesium/Widgets/widgets.css" media="print" onload="this.media='all'" />
 
-  <!-- Cesium Ion Token - NOT NEEDED for free OpenStreetMap tiles! -->
-  <!-- Keeping token for now in case you want to test Ion assets later -->
-  <script>
-    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2NDcyMjhhMy0yMjFhLTRmOWYtYmE5YS1mM2JiZWJiODJhNTMiLCJpZCI6MzUzNTQ5LCJpYXQiOjE3NjEyNzUyODN9.Q2XPrnYFJemqZ2XkHwp543O3UV0vFELSk7lHemqB6FM';
-  </script>
-
-  <!-- React (Component framework) -->
+  <!-- Global dependencies (loaded as UMD for React/ReactDOM) -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+  <!-- Cesium JS -->
+  <script src="https://cdn.jsdelivr.net/npm/cesium@latest/Build/Cesium/Cesium.js"></script>
 
   <!-- Configuration -->
   <script src="./config/cesium-config.js"></script>
   <script src="./config/narrative-config.js"></script>
   <script src="./data/border-wall-path.js"></script>
 
-  <!-- Utilities -->
+  <!-- Utilities (will become ES modules) -->
   <script src="./utils/routing.js"></script>
   <script src="./utils/perf.js"></script>
   <script src="./utils/share.js"></script>
 
-  <!-- Components -->
-  <script src="./components/NarrativeBar.js"></script>
-  <script src="./components/RightPanel.js"></script>
-  <script src="./components/GlobeContainer.js"></script>
-  <script src="./components/App.js"></script>
+  <!-- App entry point (ES module) -->
+  <script type="module" src="./src/main.js"></script>
 </head>
 
 <body>
-  <!-- Root container -->
+  <!-- Loading skeleton -->
+  <div class="loading-skeleton" id="loading-skeleton">
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">Loading 3D Globe</div>
+      <div class="loading-subtext">Arizona-Sonora Borderlands</div>
+    </div>
+  </div>
+
+  <!-- Root container for React app -->
   <div id="root"></div>
-
-  <script>
-    // Initialize app once all components are loaded
-    function initializeApp() {
-      // Check if all required components are loaded
-      if (
-        !window.MapApp?.App ||
-        !window.MapApp?.GlobeContainer ||
-        !window.MapApp?.RightPanel ||
-        !window.CesiumConfig ||
-        !window.Cesium
-      ) {
-        // Not ready yet, retry
-        setTimeout(initializeApp, 50);
-        return;
-      }
-
-      // All dependencies loaded - render app
-      console.log('Initializing MapApp V10');
-      ReactDOM.createRoot(document.getElementById('root')).render(
-        React.createElement(window.MapApp.App)
-      );
-    }
-
-    // Start initialization after DOM ready
-    if (document.readyState === 'loading') {
-      window.addEventListener('DOMContentLoaded', initializeApp);
-    } else {
-      initializeApp();
-    }
-  </script>
 </body>
 </html>
