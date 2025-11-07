@@ -1,7 +1,9 @@
 /**
  * GlobeContainer.js - Cesium 3D Globe viewer with markers and narrative intro
- * ES module version
+ * ES module version - simplified with CSS-animated intro overlay
  */
+
+import { IntroOverlay } from './globe/IntroOverlay.js';
 
 const MARKER_PALETTE_FALLBACK = ['#4fc3f7', '#ff8a65', '#66bb6a', '#ffd54f', '#ba68c8'];
 
@@ -19,12 +21,12 @@ function getMarkerLabelText(project, maxChars) {
  * - Initialize and manage Cesium 3D viewer
  * - Render project markers (via MarkerManager)
  * - Handle camera movements and animations
- * - Display narrative intro (via IntroOverlay)
+ * - Display narrative intro (via IntroOverlay with CSS animations)
  * - Dispatch click events to parent
  *
  * Uses modular components:
  * - MarkerManager: for marker visuals and updates
- * - IntroOverlay: for narrative intro UI
+ * - IntroOverlay: for narrative intro UI (CSS-animated)
  *
  * PROPS:
  * - projects: Array of project objects
@@ -32,7 +34,6 @@ function getMarkerLabelText(project, maxChars) {
  * - onProjectClick: Callback when marker clicked
  * - narrativeIndex: Current narrative passage index
  * - onNarrativeChange: Callback for passage navigation
- * - onTypewriterProgress: Typewriter progress callback
  * - onIntroComplete: Intro completion callback
  */
 export function GlobeContainer({
@@ -42,7 +43,6 @@ export function GlobeContainer({
   onGlobeReady,
   narrativeIndex = 0,
   onNarrativeChange,
-  onTypewriterProgress,
   onIntroComplete
 }) {
   const { useEffect, useRef, useState } = React;
@@ -54,7 +54,6 @@ export function GlobeContainer({
     return Array.isArray(passages) && passages.length > 0;
   });
   const [markersRevealed, setMarkersRevealed] = useState(false);
-  const [displayedText, setDisplayedText] = useState('');
   const [viewerReady, setViewerReady] = useState(false);
   const [qualityMenuOpen, setQualityMenuOpen] = useState(false);
   const [qualityOverride, setQualityOverrideState] = useState(() => {
@@ -82,10 +81,9 @@ export function GlobeContainer({
     }
 
     setShowIntro(false);
-    onTypewriterProgress && onTypewriterProgress(0);
     onIntroComplete && onIntroComplete(false);
     revealMarkers();
-  }, [showIntro, selectedProject, onTypewriterProgress, onIntroComplete]);
+  }, [showIntro, selectedProject, onIntroComplete]);
 
   const markerOptions = React.useMemo(() => {
     const config = window.CesiumConfig?.markers || {};
@@ -105,7 +103,7 @@ export function GlobeContainer({
     };
   }, []);
 
-  // PERFORMANCE FLAGS RE-ENABLED
+  // PERFORMANCE FLAGS
   const performanceFlags = React.useMemo(() => {
     return {
       isLowPower: !!window.MapAppPerf?.isLowPower,
@@ -114,10 +112,9 @@ export function GlobeContainer({
   }, []);
 
   const narrativeConfig = React.useMemo(() => {
-    return window.MapAppConfig?.narrative || { passages: [], characterIntervalMs: 50 };
+    return window.MapAppConfig?.narrative || { passages: [] };
   }, []);
   const narrativePassages = narrativeConfig.passages || [];
-  const characterInterval = narrativeConfig.characterIntervalMs ?? 50;
 
   // Initialize 3D viewer
   useEffect(() => {
@@ -209,36 +206,22 @@ export function GlobeContainer({
       const options3D = {
         animation: false,
         timeline: false,
-        baseLayerPicker: true,  //  ENABLED - dropdown to switch maps!
-        imageryProviderViewModels: imageryViewModels,  // Use our free providers
-        selectedImageryProviderViewModel: imageryViewModels[2],  // Start with CartoDB Voyager (has labels)
+        baseLayerPicker: true,
+        imageryProviderViewModels: imageryViewModels,
+        selectedImageryProviderViewModel: imageryViewModels[2],
         geocoder: false,
         homeButton: true,
         sceneModePicker: true,
-        navigationHelpButton: true,  //  ENABLED - shows mouse controls!
+        navigationHelpButton: true,
         fullscreenButton: true,
         vrButton: false,
-
-        // DYNAMIC PERFORMANCE SETTINGS (based on device capabilities)
-        requestRenderMode: true,  // Only render when needed (HUGE perf boost)
+        requestRenderMode: true,
         maximumRenderTimeChange: Infinity,
-
-        // Terrain and clock
         terrain: terrainOpt,
-
-        // Disable ALL shadows
         shadows: false,
-
-        // No terrain exaggeration
         terrainExaggeration: 1.0,
-
-        // Dynamic anti-aliasing based on device tier
         msaaSamples: qualitySettings.msaaSamples,
-
-        // Use simple rendering mode
         orderIndependentTranslucency: false,
-
-        // Dynamic WebGL context quality
         contextOptions: {
           webgl: {
             alpha: false,
@@ -258,39 +241,19 @@ export function GlobeContainer({
 
       const scene = view3D.scene;
       if (scene && scene.globe) {
-        // Ensure globe is visible
         scene.globe.show = true;
         console.log('Globe visibility:', scene.globe.show);
 
-        // DYNAMIC QUALITY OPTIMIZATIONS (based on device tier)
         const globe = scene.globe;
-
-        // Disable depth testing for better occlusion
         globe.depthTestAgainstTerrain = false;
-
-        // Disable ALL lighting
         globe.enableLighting = false;
-
-        // Disable water effects
         globe.showWaterEffect = false;
-
-        // Disable atmosphere (saves GPU cycles)
         scene.skyAtmosphere.show = false;
-
-        // Disable fog
         scene.fog.enabled = false;
-
-        // Disable ground atmosphere
         scene.globe.showGroundAtmosphere = false;
-
-        // Disable scene lighting
         scene.sun.show = false;
         scene.moon.show = false;
-
-        // Target 60 FPS by skipping frames if needed
         view3D.targetFrameRate = 60;
-
-        // Reduce LOD (Level of Detail) aggressiveness
         scene.screenSpaceCameraController.minimumZoomDistance = 100;
 
         console.log('Dynamic quality settings applied:', {
@@ -304,12 +267,10 @@ export function GlobeContainer({
         });
       }
 
-      // baseLayerPicker now handles imagery - all FREE providers set up above!
       console.log(' Base layer picker enabled with 4 FREE map options!');
       console.log('No Cesium Ion subscription needed - using open-source tiles');
 
-      // Add 3D floating labels for major cities/regions (Cesium entities)
-      // These stay upright and rotate with the camera for better readability
+      // Add 3D floating labels for major cities/regions
       const geoLabels = [
         { name: 'Arizona', lon: -111.5, lat: 34.5 },
         { name: 'Sonora', lon: -110.5, lat: 29.5 },
@@ -339,13 +300,13 @@ export function GlobeContainer({
       });
       console.log(' 3D floating location labels added - visible on all maps!');
 
-      // Remove terrain options from the picker (to avoid Cesium Ion terrain)
+      // Remove terrain options from the picker
       if (view3D.baseLayerPicker) {
         view3D.baseLayerPicker.viewModel.terrainProviderViewModels.removeAll();
         console.log('Terrain picker cleared (using flat terrain)');
       }
 
-      // Optional globe lighting (for day/night shading) from config
+      // Optional globe lighting
       if (typeof cfg.enableLighting === 'boolean') {
         view3D.scene.globe.enableLighting = cfg.enableLighting;
       }
@@ -358,11 +319,10 @@ export function GlobeContainer({
         }
       }
 
-      // Set initial camera position far out in space (no borders)
-      // Respect reduced motion by skipping animation entirely on start
+      // Set initial camera position far out in space
       const prefersReduced = !!(window.CesiumConfig && window.CesiumConfig.accessibility && window.CesiumConfig.accessibility.reducedMotion);
       const spaceAltitude = 3.0e7; // 30,000 km
-      const startLon = -110.0; // Center roughly over Americas
+      const startLon = -110.0;
       const startLat = 10.0;
       view3D.camera.setView({
         destination: Cesium.Cartesian3.fromDegrees(startLon, startLat, spaceAltitude),
@@ -508,58 +468,6 @@ export function GlobeContainer({
     }
   }, [projects, showIntro, markerOptions, selectedProject]);
 
-  // Typewriter effect for narrative text with progress tracking
-  useEffect(() => {
-    if (!showIntro || narrativeIndex >= narrativePassages.length || narrativePassages.length === 0) return;
-
-    const passage = narrativePassages[narrativeIndex];
-    let charIndex = 0;
-    let timeoutId;
-    const holdDuration = passage.holdDurationMs ?? 0;
-    const typingDuration = passage.text.length * characterInterval;
-    const totalDuration = typingDuration + holdDuration;
-
-    const typeCharacter = () => {
-      if (charIndex <= passage.text.length) {
-        setDisplayedText(passage.text.substring(0, charIndex));
-        const elapsedTime = charIndex * characterInterval;
-        const progress = Math.min(1, elapsedTime / totalDuration);
-        onTypewriterProgress && onTypewriterProgress(progress);
-        charIndex++;
-        timeoutId = setTimeout(typeCharacter, characterInterval); // configurable delay between characters
-      } else {
-        // Text finished typing, now in wait phase
-        const startWaitTime = Date.now();
-        const waitStart = typingDuration;
-
-        const updateWaitProgress = () => {
-          const elapsed = Date.now() - startWaitTime;
-          const progress = Math.min(1, (waitStart + elapsed) / totalDuration);
-          onTypewriterProgress && onTypewriterProgress(progress);
-
-          if (elapsed < holdDuration) {
-            timeoutId = setTimeout(updateWaitProgress, 16); // ~60fps progress updates
-          } else {
-            // Wait phase complete, advance to next passage
-            if (narrativeIndex < narrativePassages.length - 1) {
-              const nextIndex = narrativeIndex + 1;
-              onNarrativeChange && onNarrativeChange(nextIndex);
-              setDisplayedText('');
-              onTypewriterProgress && onTypewriterProgress(0);
-            }
-          }
-        };
-
-        updateWaitProgress();
-      }
-    };
-
-    // Start typing immediately
-    typeCharacter();
-
-    return () => clearTimeout(timeoutId);
-  }, [showIntro, narrativeIndex, narrativePassages, onTypewriterProgress, characterInterval]);
-
   // Fly to selected project
   useEffect(() => {
     const view3D = view3DRef.current;
@@ -590,13 +498,11 @@ export function GlobeContainer({
       const isSelected = !!(selectedProject && entity.projectData.id === selectedProject.id);
       window.MapApp.MarkerManager.updateMarkerGraphics(entity, markerOptions, isSelected);
 
-      // Update Cesium's selected entity for the green bracket highlight
       if (isSelected && view3D) {
         view3D.selectedEntity = entity;
       }
     });
 
-    // Clear selection if no project is selected
     if (!selectedProject && view3D) {
       view3D.selectedEntity = undefined;
     }
@@ -686,15 +592,16 @@ export function GlobeContainer({
     setMarkersRevealed(true);
   }
 
+  function handleNarrativeNavigate(index) {
+    const boundedIndex = Math.max(0, Math.min(index, narrativePassages.length - 1));
+    onNarrativeChange && onNarrativeChange(boundedIndex);
+  }
+
   // Handle continue: advance to next narrative passage (or begin journey if on last passage)
   function continueNarrative() {
     if (narrativeIndex < narrativePassages.length - 1) {
-      // Advance to next passage
-      const nextIndex = narrativeIndex + 1;
-      onNarrativeChange && onNarrativeChange(nextIndex);
-      setDisplayedText('');
+      handleNarrativeNavigate(narrativeIndex + 1);
     } else {
-      // Last passage - begin the journey
       beginJourney();
     }
   }
@@ -702,7 +609,6 @@ export function GlobeContainer({
   // Handle intro begin: fly to Arizona-Sonora and then reveal markers
   function beginJourney() {
     setShowIntro(false);
-    onTypewriterProgress && onTypewriterProgress(0);
     onIntroComplete && onIntroComplete(false);
     flyToBorderlands(() => {
       revealMarkers();
@@ -712,7 +618,6 @@ export function GlobeContainer({
   // Handle skip: jump to region immediately and reveal markers
   function skipIntro() {
     setShowIntro(false);
-    onTypewriterProgress && onTypewriterProgress(0);
     onIntroComplete && onIntroComplete(false);
     flyToBorderlands(() => {
       revealMarkers();
@@ -758,7 +663,6 @@ export function GlobeContainer({
     if (scene && scene.globe) {
       const globe = scene.globe;
       const original = globe.maximumScreenSpaceError;
-      // Temporarily reduce quality during camera movement for smoother animation
       const boosted = performanceFlags.isLowPower ? Math.max(original, 12) : Math.max(original * 1.5, original + 2);
       globe.maximumScreenSpaceError = boosted;
       restoreQuality = () => {
@@ -771,7 +675,6 @@ export function GlobeContainer({
       destination: Cesium.Cartesian3.fromDegrees(lon, lat, alt),
       orientation: {
         heading: Cesium.Math.toRadians(window.CesiumConfig.camera.heading || 0),
-        // Look straight down for a clean, map-like view on arrival
         pitch: Cesium.Math.toRadians(-90),
         roll: Cesium.Math.toRadians(window.CesiumConfig.camera.roll || 0)
       },
@@ -889,66 +792,15 @@ export function GlobeContainer({
       'aria-label': '3D Map View'
     }),
 
-    // Narrative intro overlay with typewriter effect
-    showIntro && React.createElement('div', {
-      className: 'globe-intro-overlay',
-      role: 'dialog',
-      'aria-modal': 'true',
-      'aria-label': 'Narrative Introduction'
-    },
-      // Gradient overlay
-      React.createElement('div', { className: 'intro-gradient-bg' }),
-
-      // Content container
-      React.createElement('div', { className: 'intro-content-wrapper' },
-        React.createElement('div', { className: 'intro-content' },
-          // Narrative title
-          React.createElement('h2', {
-            className: 'intro-title fade-in',
-            key: narrativeIndex
-          }, narrativePassages[narrativeIndex]?.title || ''),
-
-          // Typewriter text
-          React.createElement('p', {
-            className: 'intro-narrative-text',
-            key: `text-${narrativeIndex}`
-          }, displayedText),
-
-          // Progress indicator
-          React.createElement('div', { className: 'intro-progress' },
-            narrativePassages.map((_, idx) =>
-              React.createElement('div', {
-                key: idx,
-                className: `progress-dot ${idx === narrativeIndex ? 'active' : ''} ${idx < narrativeIndex ? 'completed' : ''}`,
-                'aria-label': `Narrative section ${idx + 1} of ${narrativePassages.length}`,
-                onClick: () => {
-                  if (typeof onNarrativeChange === 'function') {
-                    onNarrativeChange(idx);
-                  }
-                  setDisplayedText('');
-                  onTypewriterProgress && onTypewriterProgress(0);
-                },
-                title: `Go to section ${idx + 1}`
-              })
-            )
-          )
-        ),
-
-        // Action buttons
-        React.createElement('div', { className: 'intro-actions' },
-          React.createElement('button', {
-            className: 'intro-button',
-            onClick: continueNarrative,
-            'aria-label': narrativeIndex === narrativePassages.length - 1 ? 'Begin exploring' : 'Continue to next passage'
-          }, narrativeIndex === narrativePassages.length - 1 ? 'Begin Journey' : 'Continue'),
-          React.createElement('button', {
-            className: 'intro-skip',
-            onClick: skipIntro,
-            'aria-label': 'Skip introduction and go directly to map'
-          }, 'Skip to Map')
-        )
-      )
-    ),
+    // Narrative intro overlay with CSS staggered fade-in
+    showIntro && React.createElement(IntroOverlay, {
+      isActive: showIntro,
+      narrativeIndex,
+      passages: narrativePassages,
+      onNavigatePassage: handleNarrativeNavigate,
+      onContinue: continueNarrative,
+      onSkip: skipIntro
+    }),
 
     // Floating toolbar
     !showIntro && React.createElement('div', { className: 'globe-toolbar' },

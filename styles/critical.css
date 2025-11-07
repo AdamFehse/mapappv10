@@ -1,0 +1,337 @@
+/**
+ * critical.css - Inline critical styles for above-the-fold content
+ * Combines reset, variables, and essential globe container styles
+ * This file is inlined in HTML head to avoid render-blocking requests
+ */
+
+/* ===== CSS RESET ===== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  overflow: hidden;
+}
+
+/* ===== CSS VARIABLES (THEME) ===== */
+:root {
+  --primary: #ff6f91;
+  --primary-hover: #ff8a64;
+  --primary-rgb: 255, 111, 145;
+  --nebula-amber: #ff9a62;
+  --nebula-rose: #ff6f91;
+  --nebula-violet: #6d5dfc;
+  --nebula-indigo: #2f2fa2;
+  --nebula-gradient: linear-gradient(135deg, #ff9a62 0%, #ff6f91 45%, #6d5dfc 100%);
+  --nebula-gradient-soft: linear-gradient(135deg, rgba(255, 154, 98, 0.85) 0%, rgba(255, 111, 145, 0.8) 45%, rgba(109, 93, 252, 0.75) 100%);
+  --nebula-glow: 0 18px 40px rgba(38, 13, 54, 0.28);
+  --nebula-hero-focus: 0 0 0 3px rgba(255, 111, 145, 0.45);
+
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f6fb;
+  --bg-tertiary: #f1edf9;
+  --text-primary: #1f1b2b;
+  --text-secondary: #615a76;
+  --text-muted: #8c86a2;
+  --border-color: rgba(98, 86, 128, 0.18);
+  --border-strong: rgba(98, 86, 128, 0.32);
+  --shadow-light: rgba(27, 20, 43, 0.08);
+  --shadow-medium: rgba(27, 20, 43, 0.2);
+
+  --hero-overlay-bg: linear-gradient(135deg, rgba(22, 16, 38, 0.75) 0%, rgba(51, 16, 42, 0.72) 45%, rgba(22, 24, 54, 0.78) 100%);
+  --hero-text-color: #ffffff;
+  --hero-meta-color: rgba(255, 240, 250, 0.92);
+  --hero-label-color: rgba(255, 208, 230, 0.9);
+  --progress-bar-bg: rgba(255, 255, 255, 0.22);
+  --progress-bar-fill: linear-gradient(90deg, #ff9a62 0%, #ff6f91 50%, #6d5dfc 100%);
+  --progress-dot-inactive: rgba(255, 248, 252, 0.42);
+  --progress-dot-active: rgba(255, 255, 255, 0.92);
+
+  --sidebar-bg: var(--bg-primary);
+  --panel-top-background: rgba(255, 255, 255, 0.72);
+  --panel-clear-background: rgba(255, 255, 255, 0.86);
+  --panel-clear-background-hover: rgba(255, 255, 255, 0.95);
+  --panel-clear-border: var(--border-color);
+  --detail-close-background: rgba(255, 255, 255, 0.1);
+  --detail-close-color: var(--text-primary);
+  --detail-close-background-hover: rgba(255, 255, 255, 0.25);
+  --detail-back-background: rgba(255, 255, 255, 0.2);
+  --detail-back-background-hover: rgba(255, 255, 255, 0.35);
+  --detail-image-placeholder-bg: rgba(255, 255, 255, 0.2);
+  --detail-meta-background: rgba(255, 255, 255, 0.65);
+  --badge-theme-bg: rgba(255, 111, 145, 0.12);
+  --badge-theme-text: var(--text-primary);
+  --badge-theme-border: rgba(255, 111, 145, 0.35);
+  --badge-theme-bg-hover: rgba(255, 111, 145, 0.22);
+
+  --toolbar-background: rgba(255, 255, 255, 0.95);
+  --toolbar-border: rgba(98, 86, 128, 0.2);
+  --toolbar-text: var(--text-primary);
+  --toolbar-text-muted: rgba(65, 58, 102, 0.75);
+
+  --transition-fast: 150ms ease;
+  --transition-smooth: 320ms ease;
+  --transition-focus: 200ms ease;
+  --sidebar-transition: 300ms ease;
+
+  --shadow-card: 0 16px 38px rgba(31, 21, 45, 0.12);
+  --layout-sidebar-width: 360px;
+
+  --intro-overlay-gradient: linear-gradient(135deg, rgba(18, 12, 32, 0.72) 0%, rgba(52, 16, 42, 0.78) 50%, rgba(24, 20, 48, 0.85) 100%);
+  --intro-text-color: #ffffff;
+  --intro-muted-color: rgba(255, 240, 250, 0.92);
+  --intro-button-background: var(--nebula-gradient);
+  --intro-button-text: #ffffff;
+  --intro-button-shadow: 0 12px 28px rgba(111, 78, 204, 0.35);
+  --intro-button-shadow-strong: 0 18px 44px rgba(111, 78, 204, 0.45);
+  --intro-skip-background: rgba(255, 255, 255, 0.18);
+  --intro-skip-border: rgba(255, 255, 255, 0.32);
+
+  --narrative-overlay-gradient: linear-gradient(135deg, rgba(18, 12, 32, 0.76) 0%, rgba(54, 18, 42, 0.68) 48%, rgba(26, 24, 60, 0.8) 100%);
+  --border-soft: rgba(98, 86, 128, 0.22);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #12101c;
+    --bg-secondary: #191627;
+    --bg-tertiary: #211c33;
+    --text-primary: #f2ecff;
+    --text-secondary: #c1bce0;
+    --text-muted: #9691b4;
+    --border-color: rgba(184, 172, 230, 0.16);
+    --border-strong: rgba(184, 172, 230, 0.28);
+    --shadow-light: rgba(0, 0, 0, 0.3);
+    --shadow-medium: rgba(0, 0, 0, 0.5);
+
+    --hero-overlay-bg: linear-gradient(135deg, rgba(8, 6, 20, 0.88) 0%, rgba(40, 10, 36, 0.82) 48%, rgba(11, 18, 42, 0.88) 100%);
+    --hero-text-color: #fff8ff;
+    --hero-meta-color: rgba(255, 226, 240, 0.92);
+    --hero-label-color: rgba(255, 194, 226, 0.9);
+    --progress-bar-bg: rgba(255, 255, 255, 0.16);
+    --progress-bar-fill: linear-gradient(90deg, #ff8d74 0%, #ff57a6 50%, #8c7bff 100%);
+    --progress-dot-inactive: rgba(255, 208, 236, 0.4);
+    --progress-dot-active: rgba(255, 246, 255, 0.95);
+
+    --sidebar-bg: rgba(18, 16, 28, 0.96);
+    --panel-top-background: rgba(24, 21, 36, 0.85);
+    --panel-clear-background: rgba(27, 23, 40, 0.9);
+    --panel-clear-background-hover: rgba(35, 30, 50, 0.92);
+    --panel-clear-border: var(--border-color);
+    --detail-close-background: rgba(255, 255, 255, 0.06);
+    --detail-close-color: var(--text-primary);
+    --detail-close-background-hover: rgba(255, 255, 255, 0.12);
+    --detail-back-background: rgba(255, 111, 145, 0.12);
+    --detail-back-background-hover: rgba(255, 111, 145, 0.2);
+    --detail-image-placeholder-bg: rgba(65, 55, 100, 0.4);
+    --detail-meta-background: rgba(65, 55, 100, 0.35);
+    --badge-theme-bg: rgba(255, 111, 145, 0.18);
+    --badge-theme-text: #ffd6ea;
+    --badge-theme-border: rgba(255, 111, 145, 0.42);
+    --badge-theme-bg-hover: rgba(255, 111, 145, 0.32);
+
+    --toolbar-background: rgba(18, 16, 28, 0.88);
+    --toolbar-border: rgba(255, 111, 145, 0.25);
+    --toolbar-text: #f2ecff;
+    --toolbar-text-muted: rgba(255, 226, 240, 0.85);
+
+    --intro-overlay-gradient: linear-gradient(135deg, rgba(6, 4, 16, 0.92) 0%, rgba(38, 10, 36, 0.9) 48%, rgba(12, 16, 40, 0.94) 100%);
+    --intro-button-shadow: 0 16px 36px rgba(113, 88, 224, 0.45);
+    --intro-button-shadow-strong: 0 22px 48px rgba(113, 88, 224, 0.6);
+    --intro-skip-background: rgba(255, 255, 255, 0.12);
+    --intro-skip-border: rgba(255, 255, 255, 0.22);
+
+    --narrative-overlay-gradient: linear-gradient(135deg, rgba(6, 4, 16, 0.88) 0%, rgba(40, 10, 36, 0.8) 48%, rgba(10, 14, 36, 0.9) 100%);
+  }
+}
+
+/* ===== LAYOUT ===== */
+#root {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  position: relative;
+}
+
+.app-container > * {
+  height: 100vh;
+}
+
+.app-container > .globe-container {
+  flex: 1;
+  min-width: 0;
+}
+
+.app-container > .right-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100vh;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 200;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 300ms ease;
+}
+
+.sidebar-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ===== LOADING SKELETON ===== */
+.loading-skeleton {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(135deg, #05030c 0%, #0a0515 50%, #050a15 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.3s ease;
+}
+
+.loading-content {
+  text-align: center;
+  color: #ffffff;
+}
+
+.loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid rgba(255, 111, 145, 0.2);
+  border-top-color: #ff6f91;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1.5rem;
+}
+
+.loading-text {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 0.5rem;
+}
+
+.loading-subtext {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Staggered fade-in animations for intro overlay */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== GLOBE CONTAINER (CRITICAL) ===== */
+.globe-container {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  contain: layout style paint;
+}
+
+.globe-viewer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.cesium-viewer {
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.cesium-viewer canvas {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+.cesium-viewer canvas:focus {
+  outline-color: var(--primary);
+}
+
+@media (max-width: 768px) {
+  .sidebar-overlay {
+    display: block;
+  }
+}
