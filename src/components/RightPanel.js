@@ -15,7 +15,6 @@ export function RightPanel({
   onToggleSidebar = () => {},
   isSidebarOpen = true,
   narrativeIndex = 0,
-  typewriterProgress = 0,
   selectedProjectId = null,
   showNarrativeIntro = true
 }) {
@@ -213,8 +212,7 @@ export function RightPanel({
           onSelectProject: handleExpandProject,
           onNarrativeChange: onNarrativeChange,
           isActive: isNarrativeIntro,
-          narrativeIndex: narrativeIndex,
-          typewriterProgress: typewriterProgress
+          narrativeIndex: narrativeIndex
         })
         : // Explorer mode - show filters and list
         React.createElement('div', { className: 'panel-projects-list' },

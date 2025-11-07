@@ -8,8 +8,7 @@ export function NarrativeBar({
   onSelectProject = () => {},
   onNarrativeChange = () => {},
   isActive = true,
-  narrativeIndex = 0,
-  typewriterProgress = 0
+  narrativeIndex = 0
 }) {
   const narrativeConfig = React.useMemo(() => window.MapAppConfig?.narrative || { passages: [] }, []);
   const narrativePassages = narrativeConfig.passages || [];
@@ -34,7 +33,7 @@ export function NarrativeBar({
     ? Math.min(Math.max(narrativeIndex, 0), totalPassages - 1)
     : 0;
   const currentProject = passageProjects[safeIndex] || passageProjects.find(Boolean) || null;
-  const progressPercent = Math.max(0, Math.min(100, (typewriterProgress || 0) * 100));
+  const progressPercent = 100; // Always full since content displays immediately via CSS animations
   const currentPassage = narrativePassages[safeIndex] || null;
 
   const heroLabel = currentPassage ? 'Narrative Highlight' : 'Featured Project';

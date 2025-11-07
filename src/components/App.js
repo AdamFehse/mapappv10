@@ -35,7 +35,6 @@ export function App() {
   const [selectedProject, setSelectedProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [narrativeIndex, setNarrativeIndex] = useState(0);
-  const [typewriterProgress, setTypewriterProgress] = useState(0);
   const [showNarrativeIntro, setShowNarrativeIntro] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(getDefaultSidebarState);
 
@@ -171,7 +170,6 @@ export function App() {
       onGlobeReady: () => console.log('Globe ready'),
       narrativeIndex: narrativeIndex,
       onNarrativeChange: setNarrativeIndex,
-      onTypewriterProgress: setTypewriterProgress,
       onIntroComplete: setShowNarrativeIntro
     }),
 
@@ -183,7 +181,6 @@ export function App() {
       onToggleSidebar: handleToggleSidebar,
       isSidebarOpen,
       narrativeIndex,
-      typewriterProgress,
       selectedProjectId: selectedProject ? selectedProject.id : null,
       showNarrativeIntro
     })
