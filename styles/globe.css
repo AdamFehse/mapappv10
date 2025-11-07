@@ -284,7 +284,7 @@
   }
 }
 
-/* Typewriter narrative text */
+/* Narrative description text */
 .intro-narrative-text {
   margin: 0;
   font-size: clamp(1rem, 2.2vw, 1.25rem);
@@ -308,25 +308,6 @@
   }
 }
 
-/* Typing cursor */
-.intro-narrative-text::after {
-  content: '|';
-  animation: blink 1s infinite;
-  margin-left: 3px;
-  color: var(--pico-primary);
-}
-
-@keyframes blink {
-  0%, 49% { opacity: 1; }
-  50%, 100% { opacity: 0; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .intro-narrative-text::after {
-    animation: none;
-    opacity: 0;
-  }
-}
 /* Progress indicator dots */
 .intro-progress {
   display: flex;

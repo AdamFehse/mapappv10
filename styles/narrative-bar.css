@@ -181,7 +181,6 @@
   height: 100%;
   border-radius: 999px;
   background: var(--progress-bar-fill);
-  transition: width var(--transition-smooth);
 }
 
 .narrative-empty {
