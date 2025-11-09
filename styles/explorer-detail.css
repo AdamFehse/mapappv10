@@ -120,7 +120,7 @@
   margin: 0;
   font-size: 1.9rem;
   font-weight: 700;
-  color: var(--pico-text-color);
+  color: var(--text-primary);
   line-height: 1.25;
 }
 
@@ -165,7 +165,7 @@
   padding: 1.1rem;
   background: var(--detail-meta-background);
   border-radius: 10px;
-  border-left: 4px solid var(--pico-primary);
+  border-left: 4px solid var(--primary);
 }
 
 .detail-meta-item {
@@ -176,14 +176,14 @@
 }
 
 .detail-meta-item strong {
-  color: var(--pico-muted-color);
+  color: var(--text-muted);
   font-size: 0.78rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .detail-meta-item span {
-  color: var(--pico-text-color);
+  color: var(--text-primary);
   font-weight: 500;
 }
 
@@ -201,7 +201,7 @@
 .detail-section ul,
 .detail-section li {
   margin: 0;
-  color: var(--pico-text-color);
+  color: var(--text-primary);
 }
 
 .detail-section h3 {
@@ -249,7 +249,7 @@
 
 .detail-badge:is(:hover, .active) {
   background: var(--badge-theme-bg-hover);
-  border-color: var(--pico-primary);
+  border-color: var(--primary);
 }
 
 /* ===== REDUCED MOTION ===== */
