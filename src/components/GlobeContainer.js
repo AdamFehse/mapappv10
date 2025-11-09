@@ -4,6 +4,7 @@
  */
 
 import { IntroOverlay } from './globe/IntroOverlay.js';
+import { detectOSPreference, applyTheme } from '../utils/themeManager.js';
 
 const MARKER_PALETTE_FALLBACK = ['#4fc3f7', '#ff8a65', '#66bb6a', '#ffd54f', '#ba68c8'];
 const EARTH_AT_NIGHT_SERVICE_URL = 'https://tiles.arcgis.com/tiles/P3ePLMYs2RVChkJx/arcgis/rest/services/Earth_at_Night_2016/MapServer';
@@ -42,7 +43,8 @@ function getMarkerLabelText(project, maxChars) {
  * - onProjectClick: Callback when marker clicked
  * - narrativeIndex: Current narrative passage index
  * - onNarrativeChange: Callback for passage navigation
- * - onIntroComplete: Intro completion callback
+ * - showNarrativeIntro: Whether the intro overlay/mode is active
+ * - onNarrativeIntroChange: Toggle callback for intro visibility
  */
 export function GlobeContainer({
   projects = [],
@@ -51,14 +53,13 @@ export function GlobeContainer({
   onGlobeReady,
   narrativeIndex = 0,
   onNarrativeChange,
-  onIntroComplete
+  showNarrativeIntro = false,
+  onNarrativeIntroChange = null
 }) {
   const { useEffect, useRef, useState } = React;
   const container3DRef = useRef(null);
   const view3DRef = useRef(null);
   const entitiesRef = useRef({}); // Map of project.id -> Cesium.Entity
-  // Start with globe fully visible - story mode is optional
-  const [showIntro, setShowIntro] = useState(false);
   const [markersRevealed, setMarkersRevealed] = useState(false);
   const [viewerReady, setViewerReady] = useState(false);
   const [qualityMenuOpen, setQualityMenuOpen] = useState(false);
@@ -106,21 +107,43 @@ export function GlobeContainer({
 
   const mapStyleConfigs = mapStyleConfigsRef.current || {};
 
+  // Initialize theme based on OS preference on mount
   useEffect(() => {
-    if (showIntro && qualityMenuOpen) {
-      setQualityMenuOpen(false);
+    const osPreference = detectOSPreference();
+    applyTheme(osPreference);
+
+    // Set initial map style to match theme (dark/zen both use dark theme)
+    if (osPreference === 'dark') {
+      setMapStyle('dark');
+    } else {
+      setMapStyle('light');
     }
-  }, [showIntro, qualityMenuOpen]);
+  }, []);
 
   useEffect(() => {
-    if (!showIntro || !selectedProject) {
+    if (showNarrativeIntro) {
+      applyTheme('story');
+    } else {
+      applyTheme(mapStyle);
+    }
+  }, [showNarrativeIntro, mapStyle]);
+
+  useEffect(() => {
+    if (showNarrativeIntro && qualityMenuOpen) {
+      setQualityMenuOpen(false);
+    }
+  }, [showNarrativeIntro, qualityMenuOpen]);
+
+  useEffect(() => {
+    if (!showNarrativeIntro || !selectedProject) {
       return;
     }
 
-    setShowIntro(false);
-    onIntroComplete && onIntroComplete(false);
+    if (typeof onNarrativeIntroChange === 'function') {
+      onNarrativeIntroChange(false);
+    }
     revealMarkers();
-  }, [showIntro, selectedProject, onIntroComplete]);
+  }, [showNarrativeIntro, selectedProject, onNarrativeIntroChange]);
 
   const markerOptions = React.useMemo(() => {
     const config = window.CesiumConfig?.markers || {};
@@ -445,12 +468,12 @@ export function GlobeContainer({
         delete existingEntities[entityId];
       } else if (entity) {
         if (entity.billboard) {
-          entity.billboard.show = !showIntro;
+          entity.billboard.show = !showNarrativeIntro;
           entity.billboard.width = markerOptions.size;
           entity.billboard.height = Math.round(markerOptions.size * 1.25);
         }
         if (entity.label) {
-          entity.label.show = !!(markerOptions.showLabels && !showIntro);
+          entity.label.show = !!(markerOptions.showLabels && !showNarrativeIntro);
           entity.label.text = getMarkerLabelText(entity.projectData, markerOptions.labelMaxChars);
         }
       }
@@ -467,12 +490,12 @@ export function GlobeContainer({
         existing.projectData = project;
         if (existing.label) {
           existing.label.text = getMarkerLabelText(project, markerOptions.labelMaxChars);
-          existing.label.show = !!(markerOptions.showLabels && !showIntro);
+          existing.label.show = !!(markerOptions.showLabels && !showNarrativeIntro);
         }
         if (existing.billboard) {
           existing.billboard.width = markerOptions.size;
           existing.billboard.height = Math.round(markerOptions.size * 1.25);
-          existing.billboard.show = !showIntro;
+          existing.billboard.show = !showNarrativeIntro;
         }
         window.MapApp.MarkerManager.updateMarkerGraphics(existing, markerOptions, !!(selectedId && entityId === selectedId));
         return;
@@ -488,7 +511,7 @@ export function GlobeContainer({
           width: markerOptions.size,
           height: Math.round(markerOptions.size * 1.25),
           verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-          show: !showIntro,
+          show: !showNarrativeIntro,
           disableDepthTestDistance: Number.POSITIVE_INFINITY
         },
         label: markerOptions.showLabels ? {
@@ -502,7 +525,7 @@ export function GlobeContainer({
           pixelOffset: new Cesium.Cartesian2(0, 12),
           disableDepthTestDistance: Number.POSITIVE_INFINITY,
           translucencyByDistance: new Cesium.NearFarScalar(100000.0, 1.0, 600000.0, 0.0),
-          show: !showIntro
+          show: !showNarrativeIntro
         } : undefined,
         projectData: project
       });
@@ -512,7 +535,7 @@ export function GlobeContainer({
       window.MapApp.MarkerManager.updateMarkerGraphics(entity, markerOptions, !!(selectedId && entityId === selectedId));
     });
 
-    if (!showIntro) {
+    if (!showNarrativeIntro) {
       if (!markersRevealed) {
         revealMarkers();
       } else if (newlyCreated.length > 0) {
@@ -521,7 +544,7 @@ export function GlobeContainer({
     } else if (markersRevealed) {
       setMarkersRevealed(false);
     }
-  }, [projects, showIntro, markerOptions, selectedProject]);
+  }, [projects, showNarrativeIntro, markerOptions, selectedProject]);
 
   // Fly to selected project
   useEffect(() => {
@@ -650,6 +673,18 @@ export function GlobeContainer({
     onNarrativeChange && onNarrativeChange(boundedIndex);
   }
 
+  function toggleNarrativeMode(forceValue) {
+    const nextState = typeof forceValue === 'boolean' ? forceValue : !showNarrativeIntro;
+    if (typeof onNarrativeIntroChange === 'function') {
+      onNarrativeIntroChange(nextState);
+    }
+  }
+
+  // Update both map style and theme together
+  function handleStyleChange(newStyle) {
+    setMapStyle(newStyle);
+  }
+
   // Handle continue: advance to next narrative passage (or begin journey if on last passage)
   function continueNarrative() {
     if (narrativeIndex < narrativePassages.length - 1) {
@@ -661,8 +696,7 @@ export function GlobeContainer({
 
   // Handle intro begin: fly to Arizona-Sonora and then reveal markers
   function beginJourney() {
-    setShowIntro(false);
-    onIntroComplete && onIntroComplete(false);
+    toggleNarrativeMode(false);
     flyToBorderlands(() => {
       revealMarkers();
     }, performanceFlags.isLowPower);
@@ -670,8 +704,7 @@ export function GlobeContainer({
 
   // Handle skip: jump to region immediately and reveal markers
   function skipIntro() {
-    setShowIntro(false);
-    onIntroComplete && onIntroComplete(false);
+    toggleNarrativeMode(false);
     flyToBorderlands(() => {
       revealMarkers();
     }, true);
@@ -824,7 +857,7 @@ export function GlobeContainer({
   if (performanceFlags.isLowPower || performanceFlags.prefersReducedMotion) {
     containerClasses.push('low-power');
   }
-  if (showIntro) {
+  if (showNarrativeIntro) {
     containerClasses.push('narrative-active');
   }
 
@@ -840,60 +873,16 @@ export function GlobeContainer({
     }),
 
     // Narrative intro overlay with CSS staggered fade-in
-    showIntro && React.createElement(IntroOverlay, {
-      isActive: showIntro,
+    showNarrativeIntro && React.createElement(IntroOverlay, {
+      isActive: showNarrativeIntro,
       narrativeIndex,
       passages: narrativePassages,
       onNavigatePassage: handleNarrativeNavigate,
       onContinue: continueNarrative,
       onSkip: skipIntro
-    }),
+    })
 
-    // Map controls always visible - includes map styles, story, and share
-    React.createElement('div', { className: 'map-controls' },
-      // Map style buttons in a row
-      React.createElement('div', { className: 'map-styles-row' },
-        React.createElement('button', {
-          className: `map-style-btn light ${mapStyle === 'light' ? 'active' : ''}`,
-          onClick: () => setMapStyle('light'),
-          'aria-label': 'Light map style',
-          title: 'Light - OpenStreetMap'
-        }, 'Light'),
-
-        React.createElement('button', {
-          className: `map-style-btn dark ${mapStyle === 'dark' ? 'active' : ''}`,
-          onClick: () => setMapStyle('dark'),
-          'aria-label': 'Dark map style',
-          title: 'Dark - CartoDB'
-        }, 'Dark'),
-
-        React.createElement('button', {
-          className: `map-style-btn zen ${mapStyle === 'zen' ? 'active' : ''}`,
-          onClick: () => setMapStyle('zen'),
-          'aria-label': 'Zen mode - Earth at Night (Esri)',
-          title: 'Zen - Earth at Night (NASA Black Marble)'
-        }, 'Zen'),
-
-        // Story/Narrative button
-        narrativePassages.length > 0 && React.createElement('button', {
-          className: `map-style-btn story ${showIntro ? 'active' : ''}`,
-          onClick: () => setShowIntro(!showIntro),
-          'aria-label': 'Toggle story mode',
-          title: 'Enter story mode'
-        }, 'Story')
-      ),
-
-      // Share button
-      React.createElement('button', {
-        className: 'toolbar-share-btn',
-        onClick: () => {
-          if (window.MapAppUtils && window.MapAppUtils.Share) {
-            window.MapAppUtils.Share.sharePage();
-          }
-        },
-        'aria-label': 'Share this map',
-        title: 'Share this map'
-      }, 'Share')
-    )
+    // Map controls moved to BottomSheet component in App.js
+    // Theme switching and share button are now in the draggable bottom sheet for better mobile UX
   );
 }

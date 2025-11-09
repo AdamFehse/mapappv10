@@ -16,7 +16,7 @@ export function RightPanel({
   isSidebarOpen = true,
   narrativeIndex = 0,
   selectedProjectId = null,
-  showNarrativeIntro = true
+  showNarrativeIntro = false
 }) {
   // State
   const [expandedProject, setExpandedProject] = React.useState(null);
@@ -157,21 +157,8 @@ export function RightPanel({
 
   const modeLabel = isNarrativeIntro ? 'Narrative journey' : 'Project explorer';
   const panelContentId = 'right-panel-content';
-  const toggleLabel = isSidebarOpen ? 'Collapse project explorer' : 'Expand project explorer';
 
-  // Toggle button
-  const toggleButton = React.createElement('button', {
-    type: 'button',
-    className: `panel-toggle-tab ${isSidebarOpen ? 'open' : 'collapsed'}`,
-    onClick: onToggleSidebar,
-    'aria-label': toggleLabel,
-    'aria-expanded': isSidebarOpen,
-    'aria-controls': panelContentId,
-    title: toggleLabel
-  },
-    React.createElement('span', { className: 'panel-toggle-icon', 'aria-hidden': 'true' }, isSidebarOpen ? '>' : '<'),
-    React.createElement('span', { className: 'panel-toggle-text' }, isSidebarOpen ? 'Hide Projects' : 'Show Projects')
-  );
+  // Toggle button removed - now in BottomSheet component
 
   // Main panel element
   const panelElement = React.createElement('aside', {
@@ -258,5 +245,5 @@ export function RightPanel({
     )
   );
 
-  return React.createElement(React.Fragment, null, toggleButton, panelElement);
+  return panelElement;
 }

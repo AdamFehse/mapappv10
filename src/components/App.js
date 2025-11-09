@@ -4,39 +4,37 @@
  */
 
 import { GlobeContainer } from './GlobeContainer.js';
-import { RightPanel } from './RightPanel.js';
+import { BottomSheet } from './BottomSheet.js';
+import { initializeBottomSheet } from '../utils/bottom-sheet.js';
 
 /**
  * App Component
  *
  * RESPONSIBILITY:
- * - Global state management (projects, selection, narrative)
- * - Component orchestration (Globe + Right Panel)
- * - Simple 2-column layout
+ * - Global state management (projects, selection, narrative, theme)
+ * - Component orchestration (Globe + Bottom Sheet)
+ * - Unified layout: full-screen globe + draggable bottom control sheet
  *
  * STATE:
  * - projects: All project data loaded from JSON
  * - selectedProject: Currently focused project (or null)
  * - narrativeIndex: Which intro passage is active
+ * - currentTheme: Active theme (light, dark, zen, story)
  *
  * CHILDREN:
- * - GlobeContainer (left side)
- * - RightPanel (right side)
+ * - GlobeContainer (main viewport)
+ * - BottomSheet (unified control center with filters & projects)
  */
 export function App() {
   const { useState, useEffect, useMemo, useRef } = React;
-
-  function getDefaultSidebarState() {
-    return false;
-  }
 
   // State
   const [projects, setProjects] = useState([]);
   const [selectedProject, setSelectedProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [narrativeIndex, setNarrativeIndex] = useState(0);
-  const [showNarrativeIntro, setShowNarrativeIntro] = useState(true);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(getDefaultSidebarState);
+  const [showNarrativeIntro, setShowNarrativeIntro] = useState(false);
+  const [currentTheme, setCurrentTheme] = useState('light');
 
   // Router from global scope (loaded as plain script)
   const Router = window.MapAppUtils && window.MapAppUtils.Router;
@@ -111,11 +109,16 @@ export function App() {
     }
   }, [Router, selectedProject]);
 
+  // Sidebar state removed - all controls now in BottomSheet
+
+  // Initialize bottom sheet drag functionality
   useEffect(() => {
-    if (selectedProject) {
-      setIsSidebarOpen(true);
-    }
-  }, [selectedProject]);
+    const timer = setTimeout(() => {
+      initializeBottomSheet();
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // Event Handlers
   function handleSelectProject(project) {
@@ -126,12 +129,17 @@ export function App() {
     setSelectedProject(project);
   }
 
-  function handleToggleSidebar() {
-    setIsSidebarOpen(prev => !prev);
+  function handleSelectTheme(themeId) {
+    setCurrentTheme(themeId);
+    // Update the HTML element with theme class
+    const root = document.documentElement;
+    root.className = themeId === 'light' ? '' : `theme-${themeId}`;
   }
 
-  function handleCloseSidebar() {
-    setIsSidebarOpen(false);
+  function handleShare() {
+    if (window.MapAppUtils && window.MapAppUtils.Share) {
+      window.MapAppUtils.Share.shareProject(selectedProject);
+    }
   }
 
   // Loading state
@@ -142,16 +150,9 @@ export function App() {
     );
   }
 
-  // Main render - Simple 2-column layout
+  // Main render - Globe + Bottom control sheet
   return React.createElement('main',
     { className: 'app-container' },
-
-    // Mobile overlay scrim
-    React.createElement('div', {
-      className: `sidebar-overlay ${isSidebarOpen ? 'visible' : ''}`,
-      onClick: handleCloseSidebar,
-      role: 'presentation'
-    }),
 
     // Left: Globe
     React.createElement(GlobeContainer, {
@@ -161,19 +162,18 @@ export function App() {
       onGlobeReady: () => {},
       narrativeIndex: narrativeIndex,
       onNarrativeChange: setNarrativeIndex,
-      onIntroComplete: setShowNarrativeIntro
+      showNarrativeIntro,
+      onNarrativeIntroChange: setShowNarrativeIntro
     }),
 
-    // Right: Project discovery panel
-    React.createElement(RightPanel, {
+    // Bottom: Unified control center (themes, filters, projects, detail view)
+    React.createElement(BottomSheet, {
       projects,
       onSelectProject: handleSelectProject,
-      onNarrativeChange: setNarrativeIndex,
-      onToggleSidebar: handleToggleSidebar,
-      isSidebarOpen,
-      narrativeIndex,
       selectedProjectId: selectedProject ? selectedProject.id : null,
-      showNarrativeIntro
+      onSelectTheme: handleSelectTheme,
+      currentTheme: currentTheme,
+      onShare: handleShare
     })
   );
 }

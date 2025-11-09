@@ -1,5 +1,4 @@
-@import "./reset.css";
+@import "./theme-variables.css";
 @import "./globe.css";
-@import "./narrative-bar.css";
-@import "./explorer-bar.css";
-@import "./explorer-detail.css";
+/* @import "./right-panel.css"; -- Deprecated: RightPanel replaced by BottomSheet */
+@import "./bottom-sheet.css";
