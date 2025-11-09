@@ -67,6 +67,7 @@ export function GlobeContainer({
     }
   });
   const qualityLabel = qualityOverride || window.MapAppPerf?.qualityTier || 'auto';
+  const [mapStyle, setMapStyle] = useState('light'); // 'light', 'dark', 'darkvibe'
   const revealTimeoutsRef = useRef([]);
 
   useEffect(() => {
@@ -174,17 +175,18 @@ export function GlobeContainer({
         }
       }));
 
-      // CartoDB Voyager
+      // ESRI Dark Gray Canvas - Zen Mode
       imageryViewModels.push(new Cesium.ProviderViewModel({
-        name: 'CartoDB Voyager',
-        iconUrl: Cesium.buildModuleUrl('Widgets/Images/ImageryProviders/openStreetMap.png'),
-        tooltip: 'CartoDB Voyager - Clean, modern design',
-        creationFunction: function() {
-          return new Cesium.UrlTemplateImageryProvider({
-            url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
-            subdomains: ['a', 'b', 'c', 'd'],
-            credit: new Cesium.Credit(' CartoDB  OpenStreetMap contributors')
-          });
+        name: 'Dark Vibe',
+        iconUrl: Cesium.buildModuleUrl('Widgets/Images/ImageryProviders/mapboxSatellite.png'),
+        tooltip: 'ESRI Dark Gray - Zen mode meditation',
+        creationFunction: async function() {
+          return await Cesium.ArcGisMapServerImageryProvider.fromUrl(
+            'https://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Dark_Gray_Base/MapServer',
+            {
+              credit: new Cesium.Credit('Esri')
+            }
+          );
         }
       }));
 
@@ -206,14 +208,14 @@ export function GlobeContainer({
       const options3D = {
         animation: false,
         timeline: false,
-        baseLayerPicker: true,
+        baseLayerPicker: false,
         imageryProviderViewModels: imageryViewModels,
-        selectedImageryProviderViewModel: imageryViewModels[2],
+        selectedImageryProviderViewModel: imageryViewModels[0], // Light (OpenStreetMap)
         geocoder: false,
-        homeButton: true,
-        sceneModePicker: true,
-        navigationHelpButton: true,
-        fullscreenButton: true,
+        homeButton: false,
+        sceneModePicker: false,
+        navigationHelpButton: false,
+        fullscreenButton: false,
         vrButton: false,
         requestRenderMode: true,
         maximumRenderTimeChange: Infinity,
@@ -360,6 +362,52 @@ export function GlobeContainer({
       setViewerReady(false);
     };
   }, []);
+
+  // Handle map style changes
+  useEffect(() => {
+    const view3D = view3DRef.current;
+    if (!view3D || !viewerReady) return;
+
+    const styleToIndexMap = {
+      'light': 0,   // OpenStreetMap
+      'dark': 1,    // CartoDB Dark
+      'darkvibe': 2 // ESRI Dark Gray (Zen)
+    };
+
+    const layerIndex = styleToIndexMap[mapStyle] || 0;
+    const layers = view3D.imageryLayers;
+
+    try {
+      // Remove all existing layers
+      while (layers.length > 0) {
+        layers.remove(layers.get(0));
+      }
+
+      // Add the selected layer
+      const selectedModel = [
+        { url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', subdomains: ['a', 'b', 'c'], provider: 'UrlTemplate' },
+        { url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', subdomains: ['a', 'b', 'c', 'd'], provider: 'UrlTemplate' },
+        { url: 'https://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Dark_Gray_Base/MapServer', provider: 'ArcGis' }
+      ][layerIndex];
+
+      if (selectedModel.provider === 'UrlTemplate') {
+        const provider = new Cesium.UrlTemplateImageryProvider({
+          url: selectedModel.url,
+          subdomains: selectedModel.subdomains,
+          credit: new Cesium.Credit('Map data')
+        });
+        layers.addImageryProvider(provider);
+      } else if (selectedModel.provider === 'ArcGis') {
+        Cesium.ArcGisMapServerImageryProvider.fromUrl(selectedModel.url, {
+          credit: new Cesium.Credit('Esri')
+        }).then(provider => {
+          layers.addImageryProvider(provider);
+        });
+      }
+    } catch (error) {
+      console.error('Error switching map style:', error);
+    }
+  }, [mapStyle, viewerReady]);
 
   // Update markers when projects change
   useEffect(() => {
@@ -802,10 +850,31 @@ export function GlobeContainer({
       onSkip: skipIntro
     }),
 
-    // Floating toolbar
-    !showIntro && React.createElement('div', { className: 'globe-toolbar' },
-      React.createElement('h3', null, 'Arizona-Sonora Borderlands'),
-      React.createElement('p', null, 'Explore borderlands research projects'),
+    // Map style buttons and share button (Arizona-Sonora area)
+    !showIntro && React.createElement('div', { className: 'map-controls' },
+      // Map style buttons in a row
+      React.createElement('div', { className: 'map-styles-row' },
+        React.createElement('button', {
+          className: `map-style-btn light ${mapStyle === 'light' ? 'active' : ''}`,
+          onClick: () => setMapStyle('light'),
+          'aria-label': 'Light map style',
+          title: 'Light - OpenStreetMap'
+        }, '☀️ Light'),
+
+        React.createElement('button', {
+          className: `map-style-btn dark ${mapStyle === 'dark' ? 'active' : ''}`,
+          onClick: () => setMapStyle('dark'),
+          'aria-label': 'Dark map style',
+          title: 'Dark - CartoDB'
+        }, '🌙 Dark'),
+
+        React.createElement('button', {
+          className: `map-style-btn darkvibe ${mapStyle === 'darkvibe' ? 'active' : ''}`,
+          onClick: () => setMapStyle('darkvibe'),
+          'aria-label': 'Dark vibe zen mode',
+          title: 'Dark Vibe - Zen Mode'
+        }, '✨ Zen')
+      ),
 
       // Share button
       React.createElement('button', {
@@ -816,40 +885,8 @@ export function GlobeContainer({
           }
         },
         'aria-label': 'Share this map',
-        title: 'Share this map',
-        style: { marginTop: '0.5rem', width: '100%' }
-      }, 'Share Map'),
-
-      // Quality selector dropdown
-      React.createElement('div', { className: 'quality-selector', style: { marginTop: '0.5rem' } },
-        React.createElement('button', {
-          className: 'quality-button',
-          onClick: () => setQualityMenuOpen(!qualityMenuOpen),
-          'aria-label': 'Change quality settings',
-          'aria-expanded': qualityMenuOpen
-        }, `Quality: ${qualityLabel}`),
-
-        qualityMenuOpen && React.createElement('div', { className: 'quality-menu' },
-          React.createElement('button', {
-            onClick: () => handleQualityChange(null),
-            className: !qualityOverride ? 'active' : ''
-          }, 'Auto (detect)'),
-          React.createElement('button', {
-            onClick: () => handleQualityChange('low'),
-            className: qualityOverride === 'low' ? 'active' : ''
-          }, 'Low (fast)'),
-          React.createElement('button', {
-            onClick: () => handleQualityChange('medium'),
-            className: qualityOverride === 'medium' ? 'active' : ''
-          }, 'Medium (balanced)'),
-          React.createElement('button', {
-            onClick: () => handleQualityChange('high'),
-            className: qualityOverride === 'high' ? 'active' : ''
-          }, 'High (quality)')
-        )
-      ),
-
-      React.createElement('p', { className: 'toolbar-homage' }, 'Herons keep watch for our lead dev.')
+        title: 'Share this map'
+      }, '📍 Share Map')
     )
   );
 }
