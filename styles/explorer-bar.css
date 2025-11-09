@@ -206,7 +206,8 @@
 }
 
 .panel-toggle-tab:focus-visible {
-  outline: none;
+  outline: 3px solid var(--primary);
+  outline-offset: 3px;
 }
 
 .panel-toggle-icon {
@@ -291,8 +292,9 @@
   transition: border-color 200ms ease, box-shadow 200ms ease, background-color 200ms ease;
 }
 
-.search-input:focus {
-  outline: none;
+.search-input:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
   border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.15);
 }
