@@ -15,6 +15,14 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
   <link rel="preconnect" href="https://unpkg.com" crossorigin />
 
+  <!-- Module preload hints for HTTP/2 - enables parallel fetching of critical modules -->
+  <link rel="modulepreload" href="./src/components/App.js" />
+  <link rel="modulepreload" href="./src/components/GlobeContainer.js" />
+  <link rel="modulepreload" href="./src/components/RightPanel.js" />
+  <link rel="modulepreload" href="./src/components/NarrativeBar.js" />
+  <link rel="modulepreload" href="./src/components/globe/MarkerManager.js" />
+  <link rel="modulepreload" href="./src/components/globe/IntroOverlay.js" />
+
   <!-- Stylesheets -->
   <link rel="stylesheet" href="./styles/critical.css" />
   <link rel="stylesheet" href="./styles/main.css" />
