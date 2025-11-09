@@ -159,66 +159,72 @@ export function BottomSheet({
 
       // Content Area
       React.createElement('div', { className: 'bottom-sheet-content' },
-        // Top Control Bar: Themes + Share
-        React.createElement('div', { className: 'bottom-sheet-controls-bar' },
-          React.createElement('div', { className: 'bottom-sheet-themes' },
-            React.createElement('div', { className: 'bottom-sheet-themes-row' },
-              themes.map(theme =>
-                React.createElement('button', {
-                  key: theme.id,
-                  className: `bottom-sheet-theme-btn ${currentTheme === theme.id ? 'active' : ''}`,
-                  onClick: () => onSelectTheme(theme.id),
-                  'aria-pressed': currentTheme === theme.id
-                }, theme.label)
+        // Header Section: Controls + Filters (scrollable if needed)
+        React.createElement('div', { className: 'bottom-sheet-header' },
+          // Top Control Bar: Themes + Share
+          React.createElement('div', { className: 'bottom-sheet-controls-bar' },
+            React.createElement('div', { className: 'bottom-sheet-themes' },
+              React.createElement('div', { className: 'bottom-sheet-themes-row' },
+                themes.map(theme =>
+                  React.createElement('button', {
+                    key: theme.id,
+                    className: `bottom-sheet-theme-btn ${currentTheme === theme.id ? 'active' : ''}`,
+                    onClick: () => onSelectTheme(theme.id),
+                    'aria-pressed': currentTheme === theme.id
+                  }, theme.label)
+                )
               )
-            )
+            ),
+
+            React.createElement('button', {
+              className: 'bottom-sheet-share-btn',
+              onClick: onShare,
+              title: 'Share current view'
+            }, 'Share')
           ),
 
-          React.createElement('button', {
-            className: 'bottom-sheet-share-btn',
-            onClick: onShare,
-            title: 'Share current view'
-          }, 'Share')
+          // Filters Section
+          React.createElement(FilterPanel, {
+            searchQuery: searchQuery,
+            onSearchChange: setSearchQuery,
+            selectedTags: selectedTags,
+            onToggleTag: toggleTag,
+            allTags: allTags,
+            selectedCategories: selectedCategories,
+            onToggleCategory: toggleCategory,
+            allCategories: allCategories,
+            selectedYears: selectedYears,
+            onToggleYear: toggleYear,
+            allYears: allYears,
+            selectedProducts: selectedProducts,
+            onToggleProduct: toggleProduct,
+            allProducts: allProducts,
+            onClearAllFilters: clearFilters,
+            filteredCount: filteredProjects.length
+          })
         ),
 
-        // Filters Section
-        React.createElement(FilterPanel, {
-          searchQuery: searchQuery,
-          onSearchChange: setSearchQuery,
-          selectedTags: selectedTags,
-          onToggleTag: toggleTag,
-          allTags: allTags,
-          selectedCategories: selectedCategories,
-          onToggleCategory: toggleCategory,
-          allCategories: allCategories,
-          selectedYears: selectedYears,
-          onToggleYear: toggleYear,
-          allYears: allYears,
-          selectedProducts: selectedProducts,
-          onToggleProduct: toggleProduct,
-          allProducts: allProducts,
-          onClearAllFilters: clearFilters,
-          filteredCount: filteredProjects.length
-        }),
+        // Projects Area: Horizontal scrolling grid
+        React.createElement('div', { className: 'bottom-sheet-projects-area' },
+          // Projects Section
+          React.createElement(ProjectList, {
+            projects: filteredProjects,
+            selectedProjectId: selectedProjectId,
+            onSelectProject: handleExpandProject,
+            onClearFilters: clearFilters,
+            projectTagsMap: projectTagsMap
+          })
+        ),
 
-        // Projects Section
-        React.createElement(ProjectList, {
-          projects: filteredProjects,
-          selectedProjectId: selectedProjectId,
-          onSelectProject: handleExpandProject,
-          onClearFilters: clearFilters,
-          projectTagsMap: projectTagsMap
-        })
-      ),
-
-      // Detail View Modal (overlays everything)
-      expandedProject && React.createElement('div', { className: 'bottom-sheet-detail-modal' },
-        React.createElement(ProjectDetailView, {
-          project: expandedProject,
-          projectTagsMap: projectTagsMap,
-          onClose: closeDetail,
-          onShare: handleShare
-        })
+        // Detail View Modal (overlays everything)
+        expandedProject && React.createElement('div', { className: 'bottom-sheet-detail-modal' },
+          React.createElement(ProjectDetailView, {
+            project: expandedProject,
+            projectTagsMap: projectTagsMap,
+            onClose: closeDetail,
+            onShare: handleShare
+          })
+        )
       )
     ),
 
