@@ -182,9 +182,9 @@
 }
 
 .map-style-btn.light {
-  background: linear-gradient(135deg, #fff9f3 0%, #ffe3f3 48%, #ffd8ff 100%);
-  color: #3b2850;
-  border-color: rgba(255, 255, 255, 0.4);
+  background: linear-gradient(135deg, #e0ecf3 0%, #c9dae8 48%, #b8d0e3 100%);
+  color: #0d1f2d;
+  border-color: rgba(64, 196, 255, 0.3);
 }
 
 .map-style-btn.dark {
@@ -200,6 +200,13 @@
   box-shadow: 0 10px 30px rgba(64, 196, 255, 0.35);
 }
 
+.map-style-btn.story {
+  background: linear-gradient(140deg, #1a0f3f 0%, #2d1b5e 55%, #3d2a7f 100%);
+  color: #e8deff;
+  border-color: rgba(147, 112, 219, 0.45);
+  box-shadow: 0 10px 30px rgba(147, 112, 219, 0.28);
+}
+
 .map-style-btn.dark.active {
   box-shadow: 0 14px 32px rgba(15, 23, 42, 0.55);
 }
@@ -208,10 +215,14 @@
   box-shadow: 0 16px 38px rgba(64, 196, 255, 0.55);
 }
 
+.map-style-btn.story.active {
+  box-shadow: 0 16px 38px rgba(147, 112, 219, 0.45);
+}
+
 /* Share button styling */
 .map-controls .toolbar-share-btn {
   padding: 0.8rem 1.75rem;
-  background: linear-gradient(120deg, #ff8a64 0%, #ff6f91 40%, #6d5dfc 100%);
+  background: linear-gradient(120deg, #40c4ff 0%, #64d8ff 40%, #00a8cc 100%);
   color: #ffffff;
   border: none;
   border-radius: 999px;
@@ -221,7 +232,7 @@
   text-transform: uppercase;
   cursor: pointer;
   transition: transform var(--transition-fast), box-shadow var(--transition-fast);
-  box-shadow: 0 12px 30px rgba(var(--primary-rgb), 0.45);
+  box-shadow: 0 12px 30px rgba(64, 196, 255, 0.45);
   width: 100%;
   max-width: 200px;
 }
@@ -481,15 +492,15 @@
 }
 
 .progress-dot.active {
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(225, 248, 255, 0.92);
   width: 12px;
   height: 12px;
-  box-shadow: 0 0 14px rgba(109, 93, 252, 0.4);
+  box-shadow: 0 0 14px rgba(64, 196, 255, 0.4);
 }
 
 .progress-dot.completed {
-  background: rgba(109, 93, 252, 0.7);
-  box-shadow: 0 0 10px rgba(109, 93, 252, 0.35);
+  background: rgba(64, 196, 255, 0.7);
+  box-shadow: 0 0 10px rgba(64, 196, 255, 0.35);
 }
 
 .intro-actions {

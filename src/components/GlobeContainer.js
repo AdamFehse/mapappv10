@@ -8,6 +8,13 @@ import { IntroOverlay } from './globe/IntroOverlay.js';
 const MARKER_PALETTE_FALLBACK = ['#4fc3f7', '#ff8a65', '#66bb6a', '#ffd54f', '#ba68c8'];
 const EARTH_AT_NIGHT_SERVICE_URL = 'https://tiles.arcgis.com/tiles/P3ePLMYs2RVChkJx/arcgis/rest/services/Earth_at_Night_2016/MapServer';
 
+// Initial camera position - Sonora region with wide view
+const INITIAL_CAMERA_CONFIG = {
+  longitude: -110,    // Western Mexico
+  latitude: 29,       // Northern Mexico (Sonora)
+  altitude: 30000000  // 30M km altitude - see whole Earth with Sonora centered
+};
+
 // Utility: Get marker label text (used for Cesium entity labels)
 function getMarkerLabelText(project, maxChars) {
   const name = (project?.ProjectName || '').trim();
@@ -50,10 +57,8 @@ export function GlobeContainer({
   const container3DRef = useRef(null);
   const view3DRef = useRef(null);
   const entitiesRef = useRef({}); // Map of project.id -> Cesium.Entity
-  const [showIntro, setShowIntro] = useState(() => {
-    const passages = window.MapAppConfig?.narrative?.passages;
-    return Array.isArray(passages) && passages.length > 0;
-  });
+  // Start with globe fully visible - story mode is optional
+  const [showIntro, setShowIntro] = useState(false);
   const [markersRevealed, setMarkersRevealed] = useState(false);
   const [viewerReady, setViewerReady] = useState(false);
   const [qualityMenuOpen, setQualityMenuOpen] = useState(false);
@@ -332,16 +337,16 @@ export function GlobeContainer({
         }
       }
 
-      // Set initial camera position far out in space
-      const prefersReduced = !!(window.CesiumConfig && window.CesiumConfig.accessibility && window.CesiumConfig.accessibility.reducedMotion);
-      const spaceAltitude = 3.0e7; // 30,000 km
-      const startLon = -110.0;
-      const startLat = 10.0;
+      // Set initial camera position (configurable via INITIAL_CAMERA_CONFIG)
       view3D.camera.setView({
-        destination: Cesium.Cartesian3.fromDegrees(startLon, startLat, spaceAltitude),
+        destination: Cesium.Cartesian3.fromDegrees(
+          INITIAL_CAMERA_CONFIG.longitude,
+          INITIAL_CAMERA_CONFIG.latitude,
+          INITIAL_CAMERA_CONFIG.altitude
+        ),
         orientation: {
           heading: Cesium.Math.toRadians(0),
-          pitch: Cesium.Math.toRadians(-25),
+          pitch: Cesium.Math.toRadians(-90),
           roll: Cesium.Math.toRadians(0)
         }
       });
@@ -844,8 +849,8 @@ export function GlobeContainer({
       onSkip: skipIntro
     }),
 
-    // Map style buttons and share button (Arizona-Sonora area)
-    !showIntro && React.createElement('div', { className: 'map-controls' },
+    // Map controls always visible - includes map styles, story, and share
+    React.createElement('div', { className: 'map-controls' },
       // Map style buttons in a row
       React.createElement('div', { className: 'map-styles-row' },
         React.createElement('button', {
@@ -867,7 +872,15 @@ export function GlobeContainer({
           onClick: () => setMapStyle('zen'),
           'aria-label': 'Zen mode - Earth at Night (Esri)',
           title: 'Zen - Earth at Night (NASA Black Marble)'
-        }, 'Zen')
+        }, 'Zen'),
+
+        // Story/Narrative button
+        narrativePassages.length > 0 && React.createElement('button', {
+          className: `map-style-btn story ${showIntro ? 'active' : ''}`,
+          onClick: () => setShowIntro(!showIntro),
+          'aria-label': 'Toggle story mode',
+          title: 'Enter story mode'
+        }, 'Story')
       ),
 
       // Share button
