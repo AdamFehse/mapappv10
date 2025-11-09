@@ -172,8 +172,9 @@ function canUseNativeShare() {
   return !!(navigator.share);
 }
 
-// Export Share utilities
-export const Share = {
+// Share utilities
+window.MapAppUtils = window.MapAppUtils || {};
+window.MapAppUtils.Share = {
   shareProject,
   sharePage,
   shareToSocial,

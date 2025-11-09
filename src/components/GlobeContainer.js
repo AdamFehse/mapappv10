@@ -6,6 +6,7 @@
 import { IntroOverlay } from './globe/IntroOverlay.js';
 
 const MARKER_PALETTE_FALLBACK = ['#4fc3f7', '#ff8a65', '#66bb6a', '#ffd54f', '#ba68c8'];
+const EARTH_AT_NIGHT_SERVICE_URL = 'https://tiles.arcgis.com/tiles/P3ePLMYs2RVChkJx/arcgis/rest/services/Earth_at_Night_2016/MapServer';
 
 // Utility: Get marker label text (used for Cesium entity labels)
 function getMarkerLabelText(project, maxChars) {
@@ -62,13 +63,43 @@ export function GlobeContainer({
         ? localStorage.getItem('mapapp-quality-override')
         : null;
     } catch (error) {
-      console.warn('Unable to read quality override from storage:', error);
       return null;
     }
   });
   const qualityLabel = qualityOverride || window.MapAppPerf?.qualityTier || 'auto';
-  const [mapStyle, setMapStyle] = useState('light'); // 'light', 'dark', 'darkvibe'
+  const [mapStyle, setMapStyle] = useState('light'); // 'light', 'dark', 'zen'
   const revealTimeoutsRef = useRef([]);
+  const mapStyleConfigsRef = useRef(null);
+
+  if (!mapStyleConfigsRef.current && typeof Cesium !== 'undefined') {
+    mapStyleConfigsRef.current = {
+      light: {
+        type: 'UrlTemplate',
+        options: {
+          url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+          subdomains: ['a', 'b', 'c'],
+          credit: new Cesium.Credit('OpenStreetMap contributors')
+        }
+      },
+      dark: {
+        type: 'UrlTemplate',
+        options: {
+          url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
+          subdomains: ['a', 'b', 'c', 'd'],
+          credit: new Cesium.Credit('CartoDB / OpenStreetMap')
+        }
+      },
+      zen: {
+        type: 'ArcGis',
+        url: EARTH_AT_NIGHT_SERVICE_URL,
+        options: {
+          credit: new Cesium.Credit('NASA Earth Observatory / Esri')
+        }
+      }
+    };
+  }
+
+  const mapStyleConfigs = mapStyleConfigsRef.current || {};
 
   useEffect(() => {
     if (showIntro && qualityMenuOpen) {
@@ -122,8 +153,6 @@ export function GlobeContainer({
     if (!container3DRef.current) return;
     if (view3DRef.current) return;
 
-    console.log('Initializing Cesium 3D viewer');
-
     try {
       // Get quality settings based on device capabilities
       const qualitySettings = window.MapAppPerf ? window.MapAppPerf.getQualitySettings() : {
@@ -134,8 +163,6 @@ export function GlobeContainer({
         maximumAnisotropy: 8,
         tileCacheSize: 100
       };
-
-      console.log('Using quality preset:', window.MapAppPerf?.qualityTier || 'unknown', qualitySettings);
 
       // 3D Viewer options derived from CesiumConfig to avoid clashes
       const cfg = window.CesiumConfig && window.CesiumConfig.viewerOptions ? window.CesiumConfig.viewerOptions : {};
@@ -244,7 +271,6 @@ export function GlobeContainer({
       const scene = view3D.scene;
       if (scene && scene.globe) {
         scene.globe.show = true;
-        console.log('Globe visibility:', scene.globe.show);
 
         const globe = scene.globe;
         globe.depthTestAgainstTerrain = false;
@@ -257,20 +283,7 @@ export function GlobeContainer({
         scene.moon.show = false;
         view3D.targetFrameRate = 60;
         scene.screenSpaceCameraController.minimumZoomDistance = 100;
-
-        console.log('Dynamic quality settings applied:', {
-          tier: qualityOverride || window.MapAppPerf?.qualityTier || 'unknown',
-          maximumScreenSpaceError: globe.maximumScreenSpaceError,
-          resolutionScale: view3D.resolutionScale,
-          tileCacheSize: globe.tileCacheSize,
-          msaaSamples: typeof scene.msaaSamples === 'number' ? scene.msaaSamples : 'n/a',
-          antialias: 'fxaa' in scene ? scene.fxaa : 'n/a',
-          maximumAnisotropy: globe.maximumAnisotropy
-        });
       }
-
-      console.log(' Base layer picker enabled with 4 FREE map options!');
-      console.log('No Cesium Ion subscription needed - using open-source tiles');
 
       // Add 3D floating labels for major cities/regions
       const geoLabels = [
@@ -300,12 +313,10 @@ export function GlobeContainer({
           }
         });
       });
-      console.log(' 3D floating location labels added - visible on all maps!');
 
       // Remove terrain options from the picker
       if (view3D.baseLayerPicker) {
         view3D.baseLayerPicker.viewModel.terrainProviderViewModels.removeAll();
-        console.log('Terrain picker cleared (using flat terrain)');
       }
 
       // Optional globe lighting
@@ -317,7 +328,7 @@ export function GlobeContainer({
           const t = Cesium.JulianDate.fromIso8601(cfg.initialTimeIso);
           view3D.clock.currentTime = t;
         } catch (e) {
-          console.warn('Invalid initialTimeIso in config:', cfg.initialTimeIso);
+          // Invalid time format, skip
         }
       }
 
@@ -349,7 +360,7 @@ export function GlobeContainer({
       }
 
     } catch (error) {
-      console.error('Failed to initialize Cesium 3D viewer:', error);
+      // Initialization failed, silently skip
     }
 
     // Cleanup
@@ -368,53 +379,44 @@ export function GlobeContainer({
     const view3D = view3DRef.current;
     if (!view3D || !viewerReady) return;
 
-    const styleToIndexMap = {
-      'light': 0,   // OpenStreetMap
-      'dark': 1,    // CartoDB Dark
-      'darkvibe': 2 // ESRI Dark Gray (Zen)
-    };
-
-    const layerIndex = styleToIndexMap[mapStyle] || 0;
     const layers = view3D.imageryLayers;
+    const config = mapStyleConfigs[mapStyle] || mapStyleConfigs.light;
+    if (!config) return;
+
+    let cancelled = false;
 
     try {
-      // Remove all existing layers
       while (layers.length > 0) {
-        layers.remove(layers.get(0));
+        layers.remove(layers.get(0), true);
       }
 
-      // Add the selected layer
-      const selectedModel = [
-        { url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', subdomains: ['a', 'b', 'c'], provider: 'UrlTemplate' },
-        { url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', subdomains: ['a', 'b', 'c', 'd'], provider: 'UrlTemplate' },
-        { url: 'https://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Dark_Gray_Base/MapServer', provider: 'ArcGis' }
-      ][layerIndex];
-
-      if (selectedModel.provider === 'UrlTemplate') {
-        const provider = new Cesium.UrlTemplateImageryProvider({
-          url: selectedModel.url,
-          subdomains: selectedModel.subdomains,
-          credit: new Cesium.Credit('Map data')
-        });
-        layers.addImageryProvider(provider);
-      } else if (selectedModel.provider === 'ArcGis') {
-        Cesium.ArcGisMapServerImageryProvider.fromUrl(selectedModel.url, {
-          credit: new Cesium.Credit('Esri')
-        }).then(provider => {
+      const addProvider = (provider) => {
+        if (!cancelled && provider) {
           layers.addImageryProvider(provider);
-        });
+        }
+      };
+
+      if (config.type === 'UrlTemplate') {
+        const provider = new Cesium.UrlTemplateImageryProvider(config.options);
+        addProvider(provider);
+      } else if (config.type === 'ArcGis') {
+        Cesium.ArcGisMapServerImageryProvider.fromUrl(config.url, config.options)
+          .then(addProvider)
+          .catch(() => {});
       }
     } catch (error) {
-      console.error('Error switching map style:', error);
+      // Map style switch failed, silently skip
     }
-  }, [mapStyle, viewerReady]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [mapStyle, viewerReady, mapStyleConfigs]);
 
   // Update markers when projects change
   useEffect(() => {
     const view3D = view3DRef.current;
     if (!view3D || !Array.isArray(projects)) return;
-
-    console.log('Syncing project markers:', projects.length);
 
     const existingEntities = entitiesRef.current;
     const nextIds = new Set();
@@ -521,8 +523,6 @@ export function GlobeContainer({
     const view3D = view3DRef.current;
     if (!view3D || !selectedProject) return;
 
-    console.log('Flying camera to project:', selectedProject.id);
-
     view3D.camera.flyTo({
       destination: Cesium.Cartesian3.fromDegrees(
         selectedProject.Longitude,
@@ -602,7 +602,7 @@ export function GlobeContainer({
         }
       }
     } catch (error) {
-      console.warn('Failed to apply quality settings dynamically:', error);
+      // Quality settings update failed, silently skip
     }
   }
 
@@ -686,13 +686,7 @@ export function GlobeContainer({
       const nextSettings = window.MapAppPerf.getQualitySettings();
       if (view3D && nextSettings) {
         applyQualitySettings(view3D, nextSettings);
-        console.log('Quality settings applied:', {
-          tier: tier || window.MapAppPerf.qualityTier || 'auto',
-          settings: nextSettings
-        });
       }
-    } else {
-      console.warn('Quality override not applied:', tier);
     }
 
     setQualityMenuOpen(false);
@@ -859,21 +853,21 @@ export function GlobeContainer({
           onClick: () => setMapStyle('light'),
           'aria-label': 'Light map style',
           title: 'Light - OpenStreetMap'
-        }, '☀️ Light'),
+        }, 'Light'),
 
         React.createElement('button', {
           className: `map-style-btn dark ${mapStyle === 'dark' ? 'active' : ''}`,
           onClick: () => setMapStyle('dark'),
           'aria-label': 'Dark map style',
           title: 'Dark - CartoDB'
-        }, '🌙 Dark'),
+        }, 'Dark'),
 
         React.createElement('button', {
-          className: `map-style-btn darkvibe ${mapStyle === 'darkvibe' ? 'active' : ''}`,
-          onClick: () => setMapStyle('darkvibe'),
-          'aria-label': 'Dark vibe zen mode',
-          title: 'Dark Vibe - Zen Mode'
-        }, '✨ Zen')
+          className: `map-style-btn zen ${mapStyle === 'zen' ? 'active' : ''}`,
+          onClick: () => setMapStyle('zen'),
+          'aria-label': 'Zen mode - Earth at Night (Esri)',
+          title: 'Zen - Earth at Night (NASA Black Marble)'
+        }, 'Zen')
       ),
 
       // Share button
@@ -886,7 +880,7 @@ export function GlobeContainer({
         },
         'aria-label': 'Share this map',
         title: 'Share this map'
-      }, '📍 Share Map')
+      }, 'Share')
     )
   );
 }

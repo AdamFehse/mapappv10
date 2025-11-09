@@ -85,8 +85,8 @@ function onHashChange(callback) {
   return () => window.removeEventListener('hashchange', handler);
 }
 
-// Export Router utilities
-export const Router = {
+// Router utilities
+window.Router = {
   parseHash,
   navigateToProject,
   navigateHome,

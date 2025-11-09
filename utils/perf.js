@@ -134,8 +134,8 @@ const qualityPresets = {
 // Legacy compatibility
 const isLowPower = qualityTier === 'low';
 
-// Export performance detection object
-export default {
+// Performance detection object
+window.MapAppPerf = {
   // Device info
   prefersReducedMotion,
   hardwareThreads,
@@ -177,11 +177,9 @@ export default {
   setQualityOverride(tier) {
     if (tier && qualityPresets[tier]) {
       localStorage.setItem('mapapp-quality-override', tier);
-      console.log(`Quality override set to: ${tier}`);
       return true;
     } else if (tier === null) {
       localStorage.removeItem('mapapp-quality-override');
-      console.log('Quality override removed, using automatic detection');
       return true;
     }
     return false;

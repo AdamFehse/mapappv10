@@ -40,7 +40,6 @@ function initializeApp() {
   }
 
   // All dependencies loaded - render app
-  console.log('Initializing MapApp V10');
   ReactDOM.createRoot(document.getElementById('root')).render(
     React.createElement(window.MapApp.App)
   );

@@ -55,17 +55,13 @@ export function App() {
 
   // Load project data
   useEffect(() => {
-    console.log('Loading project data from data/projects.json');
-
     fetch('./data/projects.json')
       .then(response => response.json())
       .then(data => {
-        console.log('Loaded', data.length, 'projects');
         setProjects(data);
         setLoading(false);
       })
       .catch(error => {
-        console.error('Failed to load projects:', error);
         setProjects([]);
         setLoading(false);
       });
@@ -124,11 +120,9 @@ export function App() {
   // Event Handlers
   function handleSelectProject(project) {
     if (!project) {
-      console.log('Project deselected');
       setSelectedProject(null);
       return;
     }
-    console.log('Project selected:', project.id);
     setSelectedProject(project);
   }
 
@@ -164,7 +158,7 @@ export function App() {
       projects,
       selectedProject: selectedProject,
       onProjectClick: handleSelectProject,
-      onGlobeReady: () => console.log('Globe ready'),
+      onGlobeReady: () => {},
       narrativeIndex: narrativeIndex,
       onNarrativeChange: setNarrativeIndex,
       onIntroComplete: setShowNarrativeIntro
