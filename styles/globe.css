@@ -175,12 +175,6 @@
 }
 
 .quality-menu button.active {
-  background: rgba(var(--primary-rgb), 0.22);
-  color: var(--text-primary);
-  font-weight: 600;
-}
-
-.quality-menu button.active {
   background: var(--pico-primary-background);
   color: var(--pico-primary);
   font-weight: 600;

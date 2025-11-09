@@ -1,31 +1,8 @@
 /**
- * reset.css - Clean CSS reset with dark/light mode support
- * Replaces Pico CSS - gives us full control over styling
+ * reset.css - Additional CSS reset rules
+ * Note: Critical reset rules (box-sizing, layout) are in critical.css for above-the-fold performance
+ * This file provides supplemental typography and element rules
  */
-
-/* === CSS RESET === */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  font-size: 16px;
-  line-height: 1.6;
-  overflow: hidden;
-}
-
-/* No custom colors - use browser defaults */
 
 /* === TYPOGRAPHY === */
 h1, h2, h3, h4, h5, h6 {
@@ -61,73 +38,4 @@ button {
 button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-}
-
-/* === APP LAYOUT === */
-#root {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  flex-direction: row;
-  overflow: hidden;
-}
-
-.app-container {
-  display: flex;
-  flex-direction: row;
-  height: 100vh;
-  width: 100vw;
-  overflow: hidden;
-  position: relative;
-}
-
-.app-container > * {
-  height: 100vh;
-}
-
-.app-container > .globe-container {
-  flex: 1;
-  min-width: 0;
-}
-
-.app-container > .right-panel {
-  position: absolute;
-  top: 0;
-  right: 0;
-  height: 100vh;
-}
-
-.visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-/* Mobile overlay scrim */
-.sidebar-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 200;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 300ms ease;
-}
-
-.sidebar-overlay.visible {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-@media (max-width: 768px) {
-  .sidebar-overlay {
-    display: block;
-  }
 }

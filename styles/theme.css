@@ -85,15 +85,8 @@
   --intro-skip-border: rgba(255, 255, 255, 0.32);
 
   /* === PICO-STYLE VARIABLES (for compatibility) === */
-  --pico-background-color: var(--bg-primary);
-  --pico-color: var(--text-primary);
-  --pico-text-color: var(--text-primary);
-  --pico-contrast-color: var(--text-primary);
-  --pico-muted-color: var(--text-muted);
   --pico-primary: var(--primary);
   --pico-primary-background: rgba(255, 111, 145, 0.1);
-  --pico-secondary-background: rgba(255, 255, 255, 0.88);
-  --pico-muted-border-color: var(--border-color);
   --primary-focus: rgba(255, 111, 145, 0.45);
 
   /* === NARRATIVE OVERLAY === */
@@ -161,14 +154,5 @@
 
     /* Dark mode narrative overlay */
     --narrative-overlay-gradient: linear-gradient(135deg, rgba(6, 4, 16, 0.88) 0%, rgba(40, 10, 36, 0.8) 48%, rgba(10, 14, 36, 0.9) 100%);
-
-    /* Pico variables in dark mode */
-    --pico-background-color: var(--bg-primary);
-    --pico-color: var(--text-primary);
-    --pico-text-color: var(--text-primary);
-    --pico-contrast-color: var(--text-primary);
-    --pico-muted-color: var(--text-muted);
-    --pico-secondary-background: rgba(27, 23, 40, 0.9);
-    --pico-muted-border-color: var(--border-color);
   }
 }

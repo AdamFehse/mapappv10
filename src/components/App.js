@@ -140,20 +140,17 @@ export function App() {
     setIsSidebarOpen(false);
   }
 
-  // Compose container classes
-  const containerClasses = ['app-container', isSidebarOpen ? 'sidebar-open' : 'sidebar-collapsed'];
-
   // Loading state
   if (loading) {
     return React.createElement('main',
-      { className: 'app-loading' },
+      { className: 'app-container' },
       React.createElement('p', null, 'Loading 3D Globe...')
     );
   }
 
   // Main render - Simple 2-column layout
   return React.createElement('main',
-    { className: containerClasses.join(' ') },
+    { className: 'app-container' },
 
     // Mobile overlay scrim
     React.createElement('div', {
