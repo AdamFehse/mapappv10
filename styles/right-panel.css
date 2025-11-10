@@ -121,90 +121,9 @@
 
 /* ===== PANEL TOGGLE TAB ===== */
 
-/* Hidden - moved to bottom sheet for unified control center */
+/* Moved to bottom sheet for unified control center */
 .panel-toggle-tab {
   display: none;
-}
-
-/* Legacy panel toggle styles (kept for reference) */
-.panel-toggle-tab-legacy {
-  --toggle-scale: 1.02;
-  position: fixed;
-  top: 50%;
-  right: 1rem;
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.45rem;
-  padding: 0.9rem 0.5rem;
-  width: 32px;
-  border-radius: var(--btn-radius-default);
-  border: none;
-  background: var(--btn-primary-bg);
-  color: var(--btn-primary-text);
-  text-transform: uppercase;
-  font-size: 0.65rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  cursor: pointer;
-  box-shadow: var(--btn-primary-shadow);
-  transition: right var(--sidebar-transition, 280ms ease), transform var(--sidebar-transition, 280ms ease), opacity var(--sidebar-transition, 280ms ease), box-shadow 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
-  z-index: 240;
-  pointer-events: auto;
-  overflow: hidden;
-  position: relative;
-}
-
-/* Legacy shimmer animation (kept for reference) */
-.panel-toggle-tab-legacy::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  animation: shimmer 3s infinite;
-  pointer-events: none;
-}
-
-@keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-
-/* Legacy toggle tab states (kept for reference) */
-.panel-toggle-tab-legacy.open {
-  right: min(var(--layout-sidebar-width, 360px), 100vw);
-}
-
-.panel-toggle-tab-legacy:is(:hover, :focus-visible) {
-  background: var(--primary);
-  transform: translateY(-50%) scale(1.01);
-  box-shadow: var(--btn-primary-shadow-hover);
-}
-
-.panel-toggle-tab-legacy:focus-visible {
-  outline: 3px solid var(--primary);
-  outline-offset: 3px;
-}
-
-/* Legacy icon and text styles (kept for reference) */
-.panel-toggle-icon {
-  font-size: 1rem;
-  line-height: 1;
-}
-
-.panel-toggle-text {
-  white-space: nowrap;
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
-  transform: rotate(180deg);
-  letter-spacing: 0.12em;
-  line-height: 1;
-}
-
-.panel-toggle-tab-legacy.collapsed {
-  right: 0.25rem;
 }
 
 .right-panel.sidebar-hidden .panel-toolbar,
@@ -227,16 +146,7 @@
 }
 
 /* ===== FILTERS PANEL ===== */
-
-.panel-filters {
-  padding: 0.75rem;
-  background: var(--panel-clear-background);
-  border-bottom: 1px solid var(--border-soft);
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  flex-shrink: 0;
-}
+/* Panel filters styling moved to bottom-sheet.css */
 
 .filter-search-section {
   display: flex;
@@ -410,7 +320,7 @@
 
 .filter-item.active {
   background: var(--primary);
-  color: white;
+  color: var(--btn-primary-text);
   font-weight: 600;
 }
 
@@ -430,16 +340,16 @@
 
 .filter-clear-btn:is(:hover, :focus-visible) {
   background: var(--primary);
-  color: white;
+  color: var(--btn-primary-text);
   border-color: var(--primary);
 }
 
 .filter-clear-all-btn {
   padding: 0.4rem 0.8rem;
-  background: rgba(220, 38, 38, 0.1);
-  border: 1px solid rgba(220, 38, 38, 0.3);
+  background: rgba(var(--primary-rgb), 0.08);
+  border: 1px solid rgba(var(--primary-rgb), 0.25);
   border-radius: 6px;
-  color: #dc2626;
+  color: var(--text-primary);
   font-size: 0.7rem;
   font-weight: 700;
   cursor: pointer;
@@ -453,9 +363,9 @@
 }
 
 .filter-clear-all-btn:is(:hover, :focus-visible) {
-  background: #dc2626;
-  color: white;
-  border-color: #dc2626;
+  background: rgba(var(--primary-rgb), 0.15);
+  color: var(--primary);
+  border-color: var(--primary);
 }
 
 /* ===== PROJECT LIST ===== */

@@ -100,194 +100,9 @@
   transition: opacity 200ms ease;
 }
 
-/* Map style controls - HIDDEN (moved to bottom sheet) */
+/* Map style controls - moved to bottom sheet */
 .map-controls {
   display: none;
-}
-
-/* Legacy map controls (kept for reference, but hidden) */
-.map-controls-legacy {
-  position: absolute;
-  bottom: 2rem;
-  left: 50%;
-  transform: translate3d(-50%, 0, 0);
-  z-index: 100;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  align-items: center;
-  animation: mapControlsFloat 12s ease-in-out infinite alternate;
-}
-
-@keyframes mapControlsFloat {
-  0% {
-    transform: translate3d(-50%, 0, 0);
-  }
-  100% {
-    transform: translate3d(-50%, -10px, 0);
-  }
-}
-
-.map-styles-row-legacy {
-  display: flex;
-  gap: 0.75rem;
-  background: radial-gradient(circle at top, rgba(255, 255, 255, 0.12), rgba(5, 4, 18, 0.65));
-  padding: 0.85rem 1.25rem;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 25px 55px rgba(5, 3, 20, 0.45);
-  backdrop-filter: blur(18px);
-}
-
-/* Legacy map style button - kept for reference, hidden by parent */
-.map-style-btn {
-  position: relative;
-  padding: 0.65rem 1.4rem;
-  border-radius: var(--btn-radius-pill);
-  border: 1px solid var(--map-style-border, var(--theme-option-default-border));
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: var(--btn-transition);
-  white-space: nowrap;
-  overflow: hidden;
-  isolation: isolate;
-  filter: drop-shadow(0 8px 18px rgba(13, 8, 28, 0.25));
-  background: var(--map-style-bg, var(--btn-secondary-bg));
-  color: var(--map-style-text, var(--btn-secondary-text));
-  box-shadow: var(--map-style-shadow, var(--theme-option-default-shadow));
-  opacity: var(--map-style-opacity, 0.78);
-}
-
-.map-style-btn::after {
-  content: '';
-  position: absolute;
-  inset: 10%;
-  border-radius: inherit;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.35), transparent 70%);
-  opacity: 0;
-  transition: opacity var(--transition-fast);
-  z-index: -1;
-}
-
-.map-style-btn:hover::after,
-.map-style-btn.active::after {
-  opacity: 0.45;
-}
-
-.map-style-btn:hover {
-  transform: translateY(-3px);
-  opacity: 1;
-}
-
-.map-style-btn:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.6), 0 0 0 5px rgba(var(--primary-rgb), 0.35);
-  opacity: 1;
-}
-
-.map-style-btn.active {
-  transform: translateY(-3px) scale(1.02);
-  box-shadow: var(--map-style-shadow-active, var(--theme-option-default-shadow-active));
-  opacity: 1;
-  border-color: var(--map-style-border-active, var(--map-style-border, var(--theme-option-default-border)));
-}
-
-.map-style-btn.light {
-  --map-style-bg: var(--theme-option-light-bg);
-  --map-style-text: var(--theme-option-light-text);
-  --map-style-border: var(--theme-option-light-border);
-  --map-style-border-active: var(--theme-option-light-border-active);
-  --map-style-opacity: 0.82;
-  --map-style-shadow: var(--theme-option-light-shadow);
-  --map-style-shadow-active: var(--theme-option-light-shadow-active);
-}
-
-.map-style-btn.dark {
-  --map-style-bg: var(--theme-option-dark-bg);
-  --map-style-text: var(--theme-option-dark-text);
-  --map-style-border: var(--theme-option-dark-border);
-  --map-style-border-active: var(--theme-option-dark-border-active);
-  --map-style-shadow: var(--theme-option-dark-shadow);
-  --map-style-shadow-active: var(--theme-option-dark-shadow-active);
-}
-
-.map-style-btn.zen {
-  --map-style-bg: var(--theme-option-zen-bg);
-  --map-style-text: var(--theme-option-zen-text);
-  --map-style-border: var(--theme-option-zen-border);
-  --map-style-border-active: var(--theme-option-zen-border-active);
-  --map-style-shadow: var(--theme-option-zen-shadow);
-  --map-style-shadow-active: var(--theme-option-zen-shadow-active);
-}
-
-.map-style-btn.story {
-  --map-style-bg: var(--theme-option-story-bg);
-  --map-style-text: var(--theme-option-story-text);
-  --map-style-border: var(--theme-option-story-border);
-  --map-style-border-active: var(--theme-option-story-border-active);
-  --map-style-shadow: var(--theme-option-story-shadow);
-  --map-style-shadow-active: var(--theme-option-story-shadow-active);
-}
-
-/* Share button styling - HIDDEN (moved to bottom sheet) */
-.map-controls .toolbar-share-btn {
-  display: none;
-}
-
-/* Legacy share button styling (kept for reference) */
-.map-controls-legacy .toolbar-share-btn {
-  padding: 0.8rem 1.75rem;
-  background: var(--btn-primary-bg);
-  color: var(--btn-primary-text);
-  border: none;
-  border-radius: var(--btn-radius-pill);
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: var(--btn-transition);
-  box-shadow: var(--btn-primary-shadow-hover);
-  width: 100%;
-  max-width: 200px;
-}
-
-.map-controls-legacy .toolbar-share-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--btn-primary-shadow-hover);
-}
-
-.map-controls-legacy .toolbar-share-btn:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-}
-
-/* Low power mode adjustments */
-.globe-container.low-power .map-styles-row {
-  backdrop-filter: none;
-  background: rgba(12, 10, 24, 0.9);
-  border-color: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 12px 22px rgba(0, 0, 0, 0.4);
-}
-
-.globe-container.low-power .map-style-btn {
-  filter: none;
-}
-
-/* Responsive: stack buttons on mobile */
-@media (max-width: 480px) {
-  .map-styles-row {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .map-style-btn {
-    padding: 0.5rem 1rem;
-    font-size: 0.85rem;
-  }
 }
 
 /* Quality selector */
@@ -406,7 +221,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: var(--intro-text-color);
   padding: 2rem;
   opacity: 1;
   transition: opacity 600ms ease;
@@ -510,15 +325,15 @@
 }
 
 .progress-dot.active {
-  background: rgba(225, 248, 255, 0.92);
+  background: var(--progress-dot-active);
   width: 12px;
   height: 12px;
-  box-shadow: 0 0 14px rgba(64, 196, 255, 0.4);
+  box-shadow: 0 0 14px rgba(var(--primary-rgb), 0.4);
 }
 
 .progress-dot.completed {
-  background: rgba(64, 196, 255, 0.7);
-  box-shadow: 0 0 10px rgba(64, 196, 255, 0.35);
+  background: rgba(var(--primary-rgb), 0.7);
+  box-shadow: 0 0 10px rgba(var(--primary-rgb), 0.35);
 }
 
 .intro-actions {
