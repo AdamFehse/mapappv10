@@ -30,93 +30,93 @@ body {
 
 /* ===== CSS VARIABLES (THEME) ===== */
 :root {
-  --primary: #40c4ff;
-  --primary-hover: #64d8ff;
-  --primary-rgb: 64, 196, 255;
+  --primary: #c9a86a;
+  --primary-hover: #ddb878;
+  --primary-rgb: 201, 168, 106;
 
-  /* Default: Dark mode (matches background) */
-  --bg-primary: #0a1628;
-  --bg-secondary: #0f1f33;
-  --bg-tertiary: #142a42;
-  --text-primary: #e1f8ff;
-  --text-secondary: #a0d4f7;
-  --text-muted: #6db3d9;
-  --border-color: rgba(64, 196, 255, 0.16);
-  --border-strong: rgba(64, 196, 255, 0.28);
-  --border-soft: rgba(64, 196, 255, 0.2);
-  --shadow-light: rgba(0, 0, 0, 0.3);
-  --shadow-medium: rgba(0, 0, 0, 0.5);
+  /* Light mode: Warm whites and grays */
+  --bg-primary: #faf8f5;
+  --bg-secondary: #f0ebe8;
+  --bg-tertiary: #e5dfd8;
+  --text-primary: #3d3a38;
+  --text-secondary: #6b6865;
+  --text-muted: #9a9490;
+  --border-color: rgba(201, 168, 106, 0.15);
+  --border-strong: rgba(201, 168, 106, 0.28);
+  --border-soft: rgba(150, 140, 130, 0.25);
+  --shadow-light: rgba(61, 58, 56, 0.08);
+  --shadow-medium: rgba(61, 58, 56, 0.15);
 
-  --sidebar-bg: rgba(10, 18, 30, 0.96);
-  --panel-top-background: rgba(13, 23, 38, 0.85);
-  --panel-clear-background: rgba(15, 26, 42, 0.9);
-  --panel-clear-background-hover: rgba(20, 35, 55, 0.92);
+  --sidebar-bg: #faf8f5;
+  --panel-top-background: rgba(255, 255, 255, 0.85);
+  --panel-clear-background: rgba(255, 255, 255, 0.92);
+  --panel-clear-background-hover: rgba(255, 255, 255, 0.98);
   --panel-clear-border: var(--border-color);
-  --detail-close-background: rgba(255, 255, 255, 0.06);
+  --detail-close-background: rgba(61, 58, 56, 0.08);
   --detail-close-color: var(--text-primary);
-  --detail-close-background-hover: rgba(255, 255, 255, 0.12);
-  --detail-back-background: rgba(64, 196, 255, 0.12);
-  --detail-back-background-hover: rgba(64, 196, 255, 0.22);
-  --detail-image-placeholder-bg: rgba(64, 196, 255, 0.15);
-  --detail-meta-background: rgba(64, 196, 255, 0.18);
-  --badge-theme-bg: rgba(64, 196, 255, 0.15);
-  --badge-theme-text: #e1f8ff;
-  --badge-theme-border: rgba(64, 196, 255, 0.38);
-  --badge-theme-bg-hover: rgba(64, 196, 255, 0.28);
+  --detail-close-background-hover: rgba(61, 58, 56, 0.15);
+  --detail-back-background: rgba(201, 168, 106, 0.12);
+  --detail-back-background-hover: rgba(201, 168, 106, 0.2);
+  --detail-image-placeholder-bg: rgba(201, 168, 106, 0.12);
+  --detail-meta-background: rgba(201, 168, 106, 0.08);
+  --badge-theme-bg: rgba(201, 168, 106, 0.12);
+  --badge-theme-text: #3d3a38;
+  --badge-theme-border: rgba(201, 168, 106, 0.35);
+  --badge-theme-bg-hover: rgba(201, 168, 106, 0.2);
 
-  --toolbar-background: rgba(10, 18, 30, 0.88);
-  --toolbar-border: rgba(64, 196, 255, 0.25);
-  --toolbar-text: #e1f8ff;
-  --toolbar-text-muted: rgba(100, 216, 255, 0.85);
+  --toolbar-background: rgba(250, 248, 245, 0.92);
+  --toolbar-border: rgba(201, 168, 106, 0.2);
+  --toolbar-text: #3d3a38;
+  --toolbar-text-muted: rgba(107, 104, 101, 0.75);
 
-  --hero-overlay-bg: linear-gradient(140deg, rgba(1, 10, 31, 0.85) 0%, rgba(0, 28, 82, 0.82) 50%, rgba(13, 66, 111, 0.88) 100%);
-  --hero-text-color: #e1f8ff;
-  --hero-meta-color: rgba(100, 216, 255, 0.92);
-  --progress-bar-bg: rgba(64, 196, 255, 0.15);
-  --progress-bar-fill: linear-gradient(90deg, #40c4ff 0%, #64d8ff 50%, #00a8cc 100%);
-  --progress-dot-inactive: rgba(64, 196, 255, 0.35);
-  --progress-dot-active: rgba(225, 248, 255, 0.92);
+  --hero-overlay-bg: linear-gradient(140deg, rgba(61, 58, 56, 0.85) 0%, rgba(91, 82, 76, 0.82) 50%, rgba(107, 97, 88, 0.88) 100%);
+  --hero-text-color: #faf8f5;
+  --hero-meta-color: rgba(201, 168, 106, 0.92);
+  --progress-bar-bg: rgba(201, 168, 106, 0.15);
+  --progress-bar-fill: linear-gradient(90deg, #c9a86a 0%, #ddb878 50%, #b89850 100%);
+  --progress-dot-inactive: rgba(201, 168, 106, 0.35);
+  --progress-dot-active: rgba(250, 248, 245, 0.92);
 
-  --intro-overlay-gradient: linear-gradient(140deg, rgba(1, 10, 31, 0.85) 0%, rgba(0, 28, 82, 0.82) 50%, rgba(13, 66, 111, 0.88) 100%);
-  --intro-text-color: #e1f8ff;
-  --intro-muted-color: rgba(100, 216, 255, 0.92);
-  --intro-button-background: linear-gradient(120deg, #40c4ff 0%, #64d8ff 40%, #00a8cc 100%);
+  --intro-overlay-gradient: linear-gradient(140deg, rgba(61, 58, 56, 0.85) 0%, rgba(91, 82, 76, 0.82) 50%, rgba(107, 97, 88, 0.88) 100%);
+  --intro-text-color: #faf8f5;
+  --intro-muted-color: rgba(201, 168, 106, 0.92);
+  --intro-button-background: linear-gradient(120deg, #c9a86a 0%, #ddb878 40%, #b89850 100%);
   --intro-button-text: #ffffff;
-  --intro-button-shadow: 0 12px 28px rgba(64, 196, 255, 0.35);
-  --intro-button-shadow-strong: 0 18px 44px rgba(64, 196, 255, 0.45);
-  --intro-skip-background: rgba(225, 248, 255, 0.12);
-  --intro-skip-border: rgba(64, 196, 255, 0.32);
+  --intro-button-shadow: 0 12px 28px rgba(201, 168, 106, 0.25);
+  --intro-button-shadow-strong: 0 18px 44px rgba(201, 168, 106, 0.35);
+  --intro-skip-background: rgba(61, 58, 56, 0.08);
+  --intro-skip-border: rgba(201, 168, 106, 0.32);
 
   --transition-fast: 150ms ease;
   --transition-smooth: 320ms ease;
   --sidebar-transition: 300ms ease;
-  --shadow-card: 0 16px 38px rgba(1, 10, 31, 0.12);
+  --shadow-card: 0 16px 38px rgba(61, 58, 56, 0.12);
   --layout-sidebar-width: 360px;
 
   /* ===== BUTTON COMPONENT SYSTEM ===== */
   /* Primary buttons (accent, call-to-action) */
-  --btn-primary-bg: linear-gradient(135deg, #40c4ff 0%, #64d8ff 100%);
+  --btn-primary-bg: linear-gradient(135deg, #c9a86a 0%, #ddb878 100%);
   --btn-primary-text: #ffffff;
-  --btn-primary-shadow: 0 2px 6px rgba(64, 196, 255, 0.2);
-  --btn-primary-shadow-hover: 0 4px 12px rgba(64, 196, 255, 0.3);
-  --btn-primary-shadow-active: 0 1px 3px rgba(64, 196, 255, 0.15);
+  --btn-primary-shadow: 0 2px 6px rgba(201, 168, 106, 0.2);
+  --btn-primary-shadow-hover: 0 4px 12px rgba(201, 168, 106, 0.3);
+  --btn-primary-shadow-active: 0 1px 3px rgba(201, 168, 106, 0.15);
 
   /* Secondary buttons (filters, toggles) */
   --btn-secondary-bg: transparent;
-  --btn-secondary-text: #a0d4f7;
-  --btn-secondary-border: rgba(64, 196, 255, 0.2);
-  --btn-secondary-bg-hover: rgba(64, 196, 255, 0.15);
-  --btn-secondary-text-hover: #e1f8ff;
-  --btn-secondary-border-hover: #40c4ff;
+  --btn-secondary-text: #6b6865;
+  --btn-secondary-border: rgba(201, 168, 106, 0.2);
+  --btn-secondary-bg-hover: rgba(201, 168, 106, 0.12);
+  --btn-secondary-text-hover: #3d3a38;
+  --btn-secondary-border-hover: #c9a86a;
   --btn-secondary-shadow: none;
 
   /* Tertiary buttons (ghost, minimal) */
   --btn-tertiary-bg: transparent;
-  --btn-tertiary-text: #a0d4f7;
+  --btn-tertiary-text: #6b6865;
   --btn-tertiary-border: transparent;
-  --btn-tertiary-bg-hover: rgba(64, 196, 255, 0.08);
-  --btn-tertiary-text-hover: #e1f8ff;
-  --btn-tertiary-border-hover: #40c4ff;
+  --btn-tertiary-bg-hover: rgba(201, 168, 106, 0.08);
+  --btn-tertiary-text-hover: #3d3a38;
+  --btn-tertiary-border-hover: #c9a86a;
 
   /* Button transitions and spacing */
   --btn-transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
@@ -160,113 +160,113 @@ body {
 
 /* Dark theme */
 .theme-dark {
-  --primary: #4f6cff;
-  --primary-hover: #8aa1ff;
-  --primary-rgb: 79, 108, 255;
+  --primary: #c9a86a;
+  --primary-hover: #ddb878;
+  --primary-rgb: 201, 168, 106;
 
-  --bg-primary: #0a1628;
-  --bg-secondary: #0f1f33;
-  --bg-tertiary: #142a42;
-  --text-primary: #e1f8ff;
-  --text-secondary: #a0d4f7;
-  --text-muted: #6db3d9;
-  --border-color: rgba(64, 196, 255, 0.16);
-  --border-strong: rgba(64, 196, 255, 0.28);
-  --border-soft: rgba(64, 196, 255, 0.2);
-  --shadow-light: rgba(0, 0, 0, 0.3);
-  --shadow-medium: rgba(0, 0, 0, 0.5);
+  --bg-primary: #0d0c0a;
+  --bg-secondary: #1a1915;
+  --bg-tertiary: #252218;
+  --text-primary: #d9d3ca;
+  --text-secondary: #9a9490;
+  --text-muted: #6b6865;
+  --border-color: rgba(201, 168, 106, 0.15);
+  --border-strong: rgba(201, 168, 106, 0.28);
+  --border-soft: rgba(201, 168, 106, 0.2);
+  --shadow-light: rgba(0, 0, 0, 0.4);
+  --shadow-medium: rgba(0, 0, 0, 0.6);
 
-  --sidebar-bg: rgba(10, 18, 30, 0.96);
-  --panel-top-background: rgba(13, 23, 38, 0.85);
-  --panel-clear-background: rgba(15, 26, 42, 0.9);
-  --panel-clear-background-hover: rgba(20, 35, 55, 0.92);
+  --sidebar-bg: rgba(13, 12, 10, 0.96);
+  --panel-top-background: rgba(26, 25, 21, 0.85);
+  --panel-clear-background: rgba(32, 30, 26, 0.9);
+  --panel-clear-background-hover: rgba(42, 39, 35, 0.92);
   --detail-close-background: rgba(255, 255, 255, 0.06);
   --detail-close-background-hover: rgba(255, 255, 255, 0.12);
-  --detail-back-background: rgba(64, 196, 255, 0.12);
-  --detail-back-background-hover: rgba(64, 196, 255, 0.22);
-  --detail-image-placeholder-bg: rgba(64, 196, 255, 0.15);
-  --detail-meta-background: rgba(64, 196, 255, 0.18);
-  --badge-theme-bg: rgba(64, 196, 255, 0.15);
-  --badge-theme-text: #e1f8ff;
-  --badge-theme-border: rgba(64, 196, 255, 0.38);
-  --badge-theme-bg-hover: rgba(64, 196, 255, 0.28);
+  --detail-back-background: rgba(201, 168, 106, 0.12);
+  --detail-back-background-hover: rgba(201, 168, 106, 0.22);
+  --detail-image-placeholder-bg: rgba(201, 168, 106, 0.15);
+  --detail-meta-background: rgba(201, 168, 106, 0.18);
+  --badge-theme-bg: rgba(201, 168, 106, 0.15);
+  --badge-theme-text: #d9d3ca;
+  --badge-theme-border: rgba(201, 168, 106, 0.38);
+  --badge-theme-bg-hover: rgba(201, 168, 106, 0.28);
 
-  --toolbar-background: rgba(10, 18, 30, 0.88);
-  --toolbar-border: rgba(64, 196, 255, 0.25);
-  --toolbar-text: #e1f8ff;
-  --toolbar-text-muted: rgba(100, 216, 255, 0.85);
+  --toolbar-background: rgba(13, 12, 10, 0.88);
+  --toolbar-border: rgba(201, 168, 106, 0.25);
+  --toolbar-text: #d9d3ca;
+  --toolbar-text-muted: rgba(154, 148, 144, 0.85);
 
-  --hero-overlay-bg: linear-gradient(140deg, rgba(1, 10, 31, 0.92) 0%, rgba(0, 28, 82, 0.88) 50%, rgba(13, 66, 111, 0.92) 100%);
-  --intro-overlay-gradient: linear-gradient(135deg, rgba(1, 10, 31, 0.92) 0%, rgba(0, 28, 82, 0.9) 48%, rgba(13, 66, 111, 0.94) 100%);
+  --hero-overlay-bg: linear-gradient(140deg, rgba(13, 12, 10, 0.92) 0%, rgba(26, 25, 21, 0.88) 50%, rgba(42, 39, 35, 0.92) 100%);
+  --intro-overlay-gradient: linear-gradient(135deg, rgba(13, 12, 10, 0.92) 0%, rgba(26, 25, 21, 0.9) 48%, rgba(42, 39, 35, 0.94) 100%);
 
   /* Dark theme buttons */
   --btn-primary-text: #ffffff;
-  --btn-primary-shadow: 0 2px 6px rgba(var(--primary-rgb), 0.2);
-  --btn-primary-shadow-hover: 0 4px 12px rgba(var(--primary-rgb), 0.3);
+  --btn-primary-shadow: 0 2px 6px rgba(201, 168, 106, 0.2);
+  --btn-primary-shadow-hover: 0 4px 12px rgba(201, 168, 106, 0.3);
 }
 
-/* Zen theme */
+/* Zen theme - Same as dark mode (map styling handled by map library) */
 .theme-zen {
-  --primary: #0ed4ff;
-  --primary-hover: #7efeff;
-  --primary-rgb: 14, 212, 255;
+  --primary: #c9a86a;
+  --primary-hover: #ddb878;
+  --primary-rgb: 201, 168, 106;
 
-  --bg-primary: #020714;
-  --bg-secondary: #031226;
-  --bg-tertiary: #042039;
-  --text-primary: #def9ff;
-  --text-secondary: #aee6ff;
-  --text-muted: #7ac8e3;
-  --border-color: rgba(14, 212, 255, 0.18);
-  --border-strong: rgba(14, 212, 255, 0.32);
-  --border-soft: rgba(14, 212, 255, 0.22);
-  --shadow-light: rgba(0, 0, 0, 0.32);
-  --shadow-medium: rgba(0, 0, 0, 0.55);
+  --bg-primary: #0d0c0a;
+  --bg-secondary: #1a1915;
+  --bg-tertiary: #252218;
+  --text-primary: #d9d3ca;
+  --text-secondary: #9a9490;
+  --text-muted: #6b6865;
+  --border-color: rgba(201, 168, 106, 0.15);
+  --border-strong: rgba(201, 168, 106, 0.28);
+  --border-soft: rgba(201, 168, 106, 0.2);
+  --shadow-light: rgba(0, 0, 0, 0.4);
+  --shadow-medium: rgba(0, 0, 0, 0.6);
 
-  --sidebar-bg: rgba(2, 9, 24, 0.94);
-  --panel-top-background: rgba(4, 16, 36, 0.85);
-  --panel-clear-background: rgba(5, 21, 45, 0.9);
-  --panel-clear-background-hover: rgba(7, 27, 56, 0.92);
-  --panel-clear-border: rgba(14, 212, 255, 0.24);
-  --detail-close-background: rgba(255, 255, 255, 0.05);
+  --sidebar-bg: rgba(13, 12, 10, 0.96);
+  --panel-top-background: rgba(26, 25, 21, 0.85);
+  --panel-clear-background: rgba(32, 30, 26, 0.9);
+  --panel-clear-background-hover: rgba(42, 39, 35, 0.92);
+  --panel-clear-border: rgba(201, 168, 106, 0.24);
+  --detail-close-background: rgba(255, 255, 255, 0.06);
   --detail-close-color: var(--text-primary);
   --detail-close-background-hover: rgba(255, 255, 255, 0.12);
-  --detail-back-background: rgba(14, 212, 255, 0.14);
-  --detail-back-background-hover: rgba(14, 212, 255, 0.26);
-  --detail-image-placeholder-bg: rgba(14, 212, 255, 0.2);
-  --detail-meta-background: rgba(14, 212, 255, 0.2);
-  --badge-theme-bg: rgba(14, 212, 255, 0.14);
-  --badge-theme-text: #def9ff;
-  --badge-theme-border: rgba(14, 212, 255, 0.34);
-  --badge-theme-bg-hover: rgba(14, 212, 255, 0.24);
+  --detail-back-background: rgba(201, 168, 106, 0.12);
+  --detail-back-background-hover: rgba(201, 168, 106, 0.22);
+  --detail-image-placeholder-bg: rgba(201, 168, 106, 0.15);
+  --detail-meta-background: rgba(201, 168, 106, 0.18);
+  --badge-theme-bg: rgba(201, 168, 106, 0.15);
+  --badge-theme-text: #d9d3ca;
+  --badge-theme-border: rgba(201, 168, 106, 0.38);
+  --badge-theme-bg-hover: rgba(201, 168, 106, 0.28);
 
-  --toolbar-background: rgba(3, 16, 36, 0.88);
-  --toolbar-border: rgba(14, 212, 255, 0.28);
-  --toolbar-text: #def9ff;
-  --toolbar-text-muted: rgba(158, 233, 255, 0.85);
+  --toolbar-background: rgba(13, 12, 10, 0.88);
+  --toolbar-border: rgba(201, 168, 106, 0.25);
+  --toolbar-text: #d9d3ca;
+  --toolbar-text-muted: rgba(154, 148, 144, 0.85);
 
-  --hero-overlay-bg: linear-gradient(145deg, rgba(1, 7, 20, 0.95) 0%, rgba(0, 40, 73, 0.88) 50%, rgba(0, 66, 89, 0.92) 100%);
-  --hero-text-color: #def9ff;
-  --hero-meta-color: rgba(164, 233, 255, 0.95);
-  --progress-bar-bg: rgba(14, 212, 255, 0.2);
-  --progress-bar-fill: linear-gradient(90deg, #00c9ff 0%, #00f0ff 50%, #0089ff 100%);
-  --progress-dot-inactive: rgba(14, 212, 255, 0.35);
-  --progress-dot-active: rgba(222, 249, 255, 0.95);
+  --hero-overlay-bg: linear-gradient(140deg, rgba(13, 12, 10, 0.92) 0%, rgba(26, 25, 21, 0.88) 50%, rgba(42, 39, 35, 0.92) 100%);
+  --hero-text-color: #d9d3ca;
+  --hero-meta-color: rgba(201, 168, 106, 0.95);
+  --progress-bar-bg: rgba(201, 168, 106, 0.2);
+  --progress-bar-fill: linear-gradient(90deg, #c9a86a 0%, #ddb878 50%, #b89850 100%);
+  --progress-dot-inactive: rgba(201, 168, 106, 0.35);
+  --progress-dot-active: rgba(217, 211, 202, 0.95);
 
-  --intro-overlay-gradient: linear-gradient(150deg, rgba(1, 10, 28, 0.95) 0%, rgba(0, 38, 66, 0.9) 50%, rgba(0, 58, 84, 0.92) 100%);
-  --intro-text-color: #def9ff;
-  --intro-muted-color: rgba(158, 233, 255, 0.9);
-  --intro-button-background: linear-gradient(120deg, #00d4ff 0%, #00f0ff 45%, #00ffa3 100%);
-  --intro-button-text: #001524;
-  --intro-button-shadow: 0 12px 32px rgba(14, 212, 255, 0.32);
-  --intro-button-shadow-strong: 0 18px 48px rgba(14, 212, 255, 0.45);
-  --intro-skip-background: rgba(0, 245, 255, 0.08);
-  --intro-skip-border: rgba(14, 212, 255, 0.35);
+  --intro-overlay-gradient: linear-gradient(140deg, rgba(13, 12, 10, 0.92) 0%, rgba(26, 25, 21, 0.9) 48%, rgba(42, 39, 35, 0.94) 100%);
+  --intro-text-color: #d9d3ca;
+  --intro-muted-color: rgba(201, 168, 106, 0.92);
+  --intro-button-background: linear-gradient(120deg, #c9a86a 0%, #ddb878 40%, #b89850 100%);
+  --intro-button-text: #ffffff;
+  --intro-button-shadow: 0 12px 32px rgba(201, 168, 106, 0.25);
+  --intro-button-shadow-strong: 0 18px 48px rgba(201, 168, 106, 0.35);
+  --intro-skip-background: rgba(201, 168, 106, 0.08);
+  --intro-skip-border: rgba(201, 168, 106, 0.32);
 
   /* Zen theme buttons */
   --btn-primary-text: #ffffff;
-  --btn-primary-shadow: 0 2px 6px rgba(14, 212, 255, 0.2);
-  --btn-primary-shadow-hover: 0 4px 12px rgba(14, 212, 255, 0.3);
+  --btn-primary-shadow: 0 2px 6px rgba(201, 168, 106, 0.2);
+  --btn-primary-shadow-hover: 0 4px 12px rgba(201, 168, 106, 0.3);
 }
 
 .theme-story {
