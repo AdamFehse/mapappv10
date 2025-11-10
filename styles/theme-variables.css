@@ -30,7 +30,8 @@ body {
 }
 
 /* ===== CSS VARIABLES (THEME) ===== */
-:root {
+/* Light mode as default (no class) */
+html {
   --primary: #c9a86a;
   --primary-hover: #ddb878;
   --primary-rgb: 201, 168, 106;
@@ -160,7 +161,7 @@ body {
 }
 
 /* Dark theme */
-.theme-dark {
+html.theme-dark {
   --primary: #c9a86a;
   --primary-hover: #ddb878;
   --primary-rgb: 201, 168, 106;
@@ -207,7 +208,7 @@ body {
 }
 
 /* Zen theme - Same as dark mode (map styling handled by map library) */
-.theme-zen {
+html.theme-zen {
   --primary: #c9a86a;
   --primary-hover: #ddb878;
   --primary-rgb: 201, 168, 106;
@@ -270,7 +271,7 @@ body {
   --btn-primary-shadow-hover: 0 4px 12px rgba(201, 168, 106, 0.3);
 }
 
-.theme-story {
+html.theme-story {
   --primary: #ffb347;
   --primary-hover: #ffd26f;
   --primary-rgb: 255, 179, 71;
