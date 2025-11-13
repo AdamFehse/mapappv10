@@ -20,7 +20,7 @@ import { detectOSPreference, applyTheme } from '../utils/themeManager.js';
  * - projects: All project data loaded from JSON
  * - selectedProject: Currently focused project (or null)
  * - narrativeIndex: Which intro passage is active
- * - currentTheme: Active theme (light, dark, zen, story)
+ * - currentTheme: Active theme (light, dark, night, story)
  *
  * CHILDREN:
  * - GlobeContainer (main viewport)

@@ -13,8 +13,8 @@
   top: 0;
   z-index: 10;
   background: var(--bg-primary);
-  border-bottom: none;
-  padding: 0.35rem 0.75rem;
+  border-bottom: 1px solid var(--border-soft);
+  padding: 0.5rem 1rem;
   display: flex;
   align-items: center;
 }
@@ -23,11 +23,11 @@
   background: none;
   border: none;
   color: var(--text-primary);
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  padding: 0.35rem 0.6rem;
-  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
   transition: background 200ms ease;
 }
 
@@ -41,8 +41,8 @@
   overflow: hidden;
   min-height: 320px;
   isolation: isolate;
-  background: transparent;
-  box-shadow: none;
+  background: var(--detail-hero-overlay);
+  box-shadow: var(--detail-hero-shadow);
   margin: 1.25rem 1.5rem 1.25rem;
 }
 
@@ -187,12 +187,12 @@
 
 .project-detail-main,
 .project-detail-aside {
-  background: var(--sidebar-bg);
-  border: none;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-soft);
   border-radius: 20px;
   padding: 1.5rem;
-  backdrop-filter: none;
-  box-shadow: none;
+  backdrop-filter: blur(10px);
+  box-shadow: var(--detail-panel-shadow);
 }
 
 .detail-section {
@@ -330,7 +330,7 @@
   flex-direction: column;
   overflow-y: auto;
   overflow-x: hidden;
-  background: radial-gradient(circle at top, rgba(var(--detail-hero-base-rgb), 0.85), rgba(var(--detail-hero-base-rgb), 0.98));
+  background: var(--sidebar-bg);
   backdrop-filter: blur(18px);
   padding-bottom: env(safe-area-inset-bottom, 1rem);
   animation: detailModalSlideIn 320ms ease;

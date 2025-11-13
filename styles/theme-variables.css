@@ -73,8 +73,9 @@
   --overlay-medium: rgba(0, 0, 0, 0.14);
   --overlay-light: rgba(0, 0, 0, 0.04);
 
-  --bg-primary: #faf8f5;
-  --bg-secondary: #f0ede8;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f5;
+  --bottom-sheet-bg: #fce4ec;
 
   --text-primary: #2a251f;
   --text-secondary: #5a4d42;
@@ -85,16 +86,16 @@
   --shadow-light: rgba(42, 37, 31, 0.06);
   --shadow-medium: rgba(42, 37, 31, 0.12);
 
-  --sidebar-bg: rgba(250, 248, 245, 0.96);
-  --panel-clear-background: rgba(252, 251, 249, 0.95);
-  --panel-clear-background-hover: rgba(254, 253, 252, 0.99);
+  --sidebar-bg: #ffffff;
+  --panel-clear-background: #ffffff;
+  --panel-clear-background-hover: #fafafa;
 
   --detail-close-background: rgba(42, 37, 31, 0.06);
   --detail-close-color: var(--text-primary);
   --detail-close-background-hover: rgba(42, 37, 31, 0.12);
 
   --toolbar-background: rgba(250, 248, 245, 0.93);
-  --toolbar-border: rgba(168, 153, 104, 0.18);
+  --toolbar-border: rgba(2, 2, 2, 0.18);
   --toolbar-text: #2a251f;
   --toolbar-text-muted: rgba(90, 77, 66, 0.8);
 
@@ -132,6 +133,7 @@
 
   --bg-primary: #050914;
   --bg-secondary: #081126;
+  --bottom-sheet-bg: rgba(5, 9, 20, 0.92);
 
   --text-primary: #dde6ff;
   --text-secondary: #9fb7ff;
@@ -190,6 +192,7 @@
 
   --bg-primary: #041f1c;
   --bg-secondary: #052b25;
+  --bottom-sheet-bg: rgba(4, 27, 23, 0.93);
 
   --text-primary: #dff7f1;
   --text-secondary: #a8d8cf;
@@ -252,6 +255,7 @@
 
   --bg-primary: #170b1c;
   --bg-secondary: #201029;
+  --bottom-sheet-bg: rgba(23, 11, 28, 0.93);
 
   --text-primary: #ffeef7;
   --text-secondary: #f9cce0;

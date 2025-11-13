@@ -40,7 +40,7 @@ window.CesiumConfig = {
     terrainProvider: null, // or 'CESIUM_WORLD_TERRAIN' for 3D terrain
 
     // Performance
-    requestRenderMode: true,    // Only render when needed (saves battery)
+    requestRenderMode: true,    // Only render when needed 
     maximumRenderTimeChange: Infinity // Disable FPS throttling
   },
 

@@ -28,9 +28,9 @@
   overflow-x: hidden;
   display: block;
   column-width: 320px;
-  column-gap: 1.5rem;
+  column-gap: 1.25rem;
   column-fill: balance;
-  padding: 1.5rem;
+  padding: 1.25rem;
   scroll-behavior: smooth;
   overscroll-behavior: contain;
 }

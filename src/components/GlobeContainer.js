@@ -100,7 +100,7 @@ export function GlobeContainer({
     }
   });
   const qualityLabel = qualityOverride || window.MapAppPerf?.qualityTier || 'auto';
-  const [mapStyle, setMapStyle] = useState(() => satelliteView ? 'satellite' : getMapStyleForTheme(theme)); // 'light', 'dark', 'zen', 'satellite'
+  const [mapStyle, setMapStyle] = useState(() => satelliteView ? 'satellite' : getMapStyleForTheme(theme)); // 'light', 'dark', 'night', 'satellite'
   const revealTimeoutsRef = useRef([]);
   const mapStyleConfigsRef = useRef(null);
 
@@ -122,7 +122,7 @@ export function GlobeContainer({
           credit: new Cesium.Credit('CartoDB / OpenStreetMap')
         }
       },
-      zen: {
+      night: {
         type: 'ArcGis',
         url: EARTH_AT_NIGHT_SERVICE_URL,
         options: {
@@ -214,11 +214,11 @@ export function GlobeContainer({
         }
       }));
 
-      // ESRI Dark Gray Canvas - Zen Mode
+      // ESRI Dark Gray Canvas - Night Mode
       imageryViewModels.push(new Cesium.ProviderViewModel({
         name: 'Dark Vibe',
         iconUrl: Cesium.buildModuleUrl('Widgets/Images/ImageryProviders/mapboxSatellite.png'),
-        tooltip: 'ESRI Dark Gray - Zen mode meditation',
+        tooltip: 'ESRI Dark Gray',
         creationFunction: async function() {
           return await Cesium.ArcGisMapServerImageryProvider.fromUrl(
             'https://services.arcgisonline.com/arcgis/rest/services/Canvas/World_Dark_Gray_Base/MapServer',
