@@ -187,12 +187,12 @@
 
 .project-detail-main,
 .project-detail-aside {
-  background: var(--bg-primary);
-  border: 1px solid var(--border-soft);
+  background: var(--sidebar-bg);
+  border: none;
   border-radius: 20px;
   padding: 1.5rem;
-  backdrop-filter: blur(10px);
-  box-shadow: var(--detail-panel-shadow);
+  backdrop-filter: none;
+  box-shadow: none;
 }
 
 .detail-section {
