@@ -1,6 +1,177 @@
 /**
- * FilterPanel.js - Filter controls for project search
+ * FilterPanel.js - Filter controls with unified dropdown behaviour
  */
+
+function FilterDropdown({
+  id,
+  label,
+  items = [],
+  selectedItems = [],
+  isOpen = false,
+  onToggle = () => {},
+  onClose = () => {},
+  onToggleItem = () => {}
+}) {
+  const buttonRef = React.useRef(null);
+  const menuRef = React.useRef(null);
+  const [highlightedIndex, setHighlightedIndex] = React.useState(-1);
+
+  React.useEffect(() => {
+    if (isOpen && menuRef.current) {
+      menuRef.current.focus({ preventScroll: true });
+      if (items.length > 0) {
+        setHighlightedIndex(0);
+      }
+    } else {
+      setHighlightedIndex(-1);
+    }
+  }, [isOpen, items.length]);
+
+  React.useEffect(() => {
+    if (!isOpen || highlightedIndex < 0) return;
+    const menuEl = menuRef.current;
+    if (!menuEl) return;
+    const optionEl = menuEl.querySelector(`[data-filter-item="${id}-${highlightedIndex}"]`);
+    if (optionEl && optionEl.scrollIntoView) {
+      optionEl.scrollIntoView({ block: 'nearest' });
+    }
+  }, [highlightedIndex, isOpen, id]);
+
+  const focusMenu = () => {
+    if (menuRef.current) {
+      menuRef.current.focus({ preventScroll: true });
+    }
+  };
+
+  const handleButtonKeyDown = (e) => {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (!isOpen) {
+        onToggle();
+      } else {
+        focusMenu();
+        setHighlightedIndex(prev => {
+          if (items.length === 0) return -1;
+          if (prev === -1) return e.key === 'ArrowDown' ? 0 : items.length - 1;
+          return prev;
+        });
+      }
+      return;
+    }
+
+    if (!isOpen && (e.key === 'Enter' || e.key === ' ')) {
+      e.preventDefault();
+      onToggle();
+      return;
+    }
+
+    if (isOpen && (e.key === 'Enter' || e.key === ' ')) {
+      e.preventDefault();
+      onClose();
+      return;
+    }
+
+    if (isOpen && e.key === 'Escape') {
+      e.preventDefault();
+      onClose();
+      if (buttonRef.current) buttonRef.current.focus();
+    }
+  };
+
+  const handleMenuKeyDown = (e) => {
+    if (!isOpen) return;
+
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      onClose();
+      if (buttonRef.current) buttonRef.current.focus();
+      return;
+    }
+
+    if (e.key === 'Tab') {
+      onClose();
+      return;
+    }
+
+    if (!items.length) return;
+
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      setHighlightedIndex(prev => {
+        if (prev === -1) return 0;
+        const next = e.key === 'ArrowDown'
+          ? (prev + 1) % items.length
+          : (prev - 1 + items.length) % items.length;
+        return next;
+      });
+      return;
+    }
+
+    if (e.key === 'Home') {
+      e.preventDefault();
+      setHighlightedIndex(0);
+      return;
+    }
+
+    if (e.key === 'End') {
+      e.preventDefault();
+      setHighlightedIndex(items.length - 1);
+      return;
+    }
+
+    if (e.key === 'Enter' || e.key === ' ') {
+      if (highlightedIndex >= 0 && highlightedIndex < items.length) {
+        e.preventDefault();
+        onToggleItem(items[highlightedIndex]);
+      }
+    }
+  };
+
+  const countLabel = selectedItems.length > 0 ? ` (${selectedItems.length})` : '';
+
+  return React.createElement('div', {
+    className: `filter-category ${isOpen ? 'open' : ''}`
+  },
+    React.createElement('button', {
+      className: 'filter-category-toggle',
+      onClick: onToggle,
+      ref: buttonRef,
+      onKeyDown: handleButtonKeyDown,
+      type: 'button',
+      'aria-expanded': isOpen,
+      'aria-controls': `${id}-filter-list`,
+      'aria-haspopup': 'listbox',
+      'data-open': isOpen ? 'true' : 'false'
+    },
+      React.createElement('span', { className: 'filter-toggle-caret', 'aria-hidden': 'true' }, '▾'),
+      React.createElement('span', null, `${label}${countLabel}`)
+    ),
+    React.createElement('div', {
+      className: 'filter-items',
+      id: `${id}-filter-list`,
+      role: 'listbox',
+      'aria-multiselectable': 'true',
+      tabIndex: isOpen ? 0 : -1,
+      'aria-hidden': !isOpen,
+      ref: menuRef,
+      onKeyDown: handleMenuKeyDown
+    },
+      items.map((item, index) => {
+        const isActive = selectedItems.includes(item);
+        const isFocused = highlightedIndex === index;
+        return React.createElement('button', {
+          key: `${id}-${item}`,
+          className: `filter-item ${isActive ? 'active' : ''} ${isFocused ? 'focused' : ''}`,
+          onClick: () => onToggleItem(item),
+          type: 'button',
+          'aria-pressed': isActive,
+          'data-filter-item': `${id}-${index}`,
+          onMouseEnter: () => setHighlightedIndex(index)
+        }, item);
+      })
+    )
+  );
+}
 
 export function FilterPanel({
   searchQuery = '',
@@ -20,24 +191,63 @@ export function FilterPanel({
   onClearAllFilters = () => {},
   filteredCount = 0
 }) {
-  const [expandedFilters, setExpandedFilters] = React.useState({
-    themes: false,
-    categories: false,
-    years: false,
-    products: false
-  });
+  const [openFilterId, setOpenFilterId] = React.useState(null);
+  const panelRef = React.useRef(null);
 
-  const toggleFilterSection = (section) => {
-    setExpandedFilters(prev => ({
-      ...prev,
-      [section]: !prev[section]
-    }));
-  };
+  const closeDropdowns = React.useCallback(() => {
+    setOpenFilterId(null);
+  }, []);
+
+  const handleToggleFilter = React.useCallback((id) => {
+    setOpenFilterId(prev => (prev === id ? null : id));
+  }, []);
+
+  const handleClickOutside = React.useCallback((e) => {
+    if (panelRef.current && !panelRef.current.contains(e.target)) {
+      closeDropdowns();
+    }
+  }, [closeDropdowns]);
+
+  React.useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [handleClickOutside]);
 
   const hasActiveFilters = selectedTags.length > 0 || selectedCategories.length > 0 ||
                            selectedYears.length > 0 || selectedProducts.length > 0;
 
-  return React.createElement('div', { className: 'panel-filters' },
+  const filters = [
+    {
+      id: 'themes',
+      label: 'Themes',
+      items: allTags,
+      selectedItems: selectedTags,
+      onToggleItem: onToggleTag
+    },
+    {
+      id: 'categories',
+      label: 'Type',
+      items: allCategories,
+      selectedItems: selectedCategories,
+      onToggleItem: onToggleCategory
+    },
+    {
+      id: 'years',
+      label: 'Year',
+      items: allYears,
+      selectedItems: selectedYears,
+      onToggleItem: onToggleYear
+    },
+    {
+      id: 'products',
+      label: 'Medium',
+      items: allProducts,
+      selectedItems: selectedProducts,
+      onToggleItem: onToggleProduct
+    }
+  ].filter(filter => filter.items.length > 0);
+
+  return React.createElement('div', { className: 'panel-filters', ref: panelRef },
     // Search input with project count
     React.createElement('div', { className: 'filter-search-section' },
       React.createElement('div', { className: 'filter-search' },
@@ -63,100 +273,18 @@ export function FilterPanel({
 
     // Collapsible filter categories in a row
     React.createElement('div', { className: 'filter-categories-row' },
-      // Themes filter
-      allTags.length > 0 && React.createElement('div', { className: 'filter-category' },
-        React.createElement('button', {
-          className: `filter-category-toggle ${expandedFilters.themes ? 'expanded' : ''}`,
-          onClick: () => toggleFilterSection('themes'),
-          type: 'button',
-          'aria-expanded': expandedFilters.themes,
-          'aria-controls': 'filter-themes-section'
-        },
-          `▼ Themes ${selectedTags.length > 0 ? `(${selectedTags.length})` : ''}`
-        ),
-        expandedFilters.themes && React.createElement('div', { className: 'filter-items', id: 'filter-themes-section' },
-          allTags.map(tag =>
-            React.createElement('button', {
-              key: tag,
-              className: `filter-item ${selectedTags.includes(tag) ? 'active' : ''}`,
-              onClick: () => onToggleTag(tag),
-              type: 'button',
-              'aria-pressed': selectedTags.includes(tag)
-            }, tag)
-          )
-        )
-      ),
-
-      // Category filter
-      allCategories.length > 0 && React.createElement('div', { className: 'filter-category' },
-        React.createElement('button', {
-          className: `filter-category-toggle ${expandedFilters.categories ? 'expanded' : ''}`,
-          onClick: () => toggleFilterSection('categories'),
-          type: 'button',
-          'aria-expanded': expandedFilters.categories,
-          'aria-controls': 'filter-categories-section'
-        },
-          `▼ Type ${selectedCategories.length > 0 ? `(${selectedCategories.length})` : ''}`
-        ),
-        expandedFilters.categories && React.createElement('div', { className: 'filter-items', id: 'filter-categories-section' },
-          allCategories.map(cat =>
-            React.createElement('button', {
-              key: cat,
-              className: `filter-item ${selectedCategories.includes(cat) ? 'active' : ''}`,
-              onClick: () => onToggleCategory(cat),
-              type: 'button',
-              'aria-pressed': selectedCategories.includes(cat)
-            }, cat)
-          )
-        )
-      ),
-
-      // Year filter
-      allYears.length > 0 && React.createElement('div', { className: 'filter-category' },
-        React.createElement('button', {
-          className: `filter-category-toggle ${expandedFilters.years ? 'expanded' : ''}`,
-          onClick: () => toggleFilterSection('years'),
-          type: 'button',
-          'aria-expanded': expandedFilters.years,
-          'aria-controls': 'filter-years-section'
-        },
-          `▼ Year ${selectedYears.length > 0 ? `(${selectedYears.length})` : ''}`
-        ),
-        expandedFilters.years && React.createElement('div', { className: 'filter-items', id: 'filter-years-section' },
-          allYears.map(year =>
-            React.createElement('button', {
-              key: year,
-              className: `filter-item ${selectedYears.includes(year) ? 'active' : ''}`,
-              onClick: () => onToggleYear(year),
-              type: 'button',
-              'aria-pressed': selectedYears.includes(year)
-            }, year)
-          )
-        )
-      ),
-
-      // Product filter
-      allProducts.length > 0 && React.createElement('div', { className: 'filter-category' },
-        React.createElement('button', {
-          className: `filter-category-toggle ${expandedFilters.products ? 'expanded' : ''}`,
-          onClick: () => toggleFilterSection('products'),
-          type: 'button',
-          'aria-expanded': expandedFilters.products,
-          'aria-controls': 'filter-products-section'
-        },
-          `▼ Medium ${selectedProducts.length > 0 ? `(${selectedProducts.length})` : ''}`
-        ),
-        expandedFilters.products && React.createElement('div', { className: 'filter-items', id: 'filter-products-section' },
-          allProducts.map(prod =>
-            React.createElement('button', {
-              key: prod,
-              className: `filter-item ${selectedProducts.includes(prod) ? 'active' : ''}`,
-              onClick: () => onToggleProduct(prod),
-              type: 'button',
-              'aria-pressed': selectedProducts.includes(prod)
-            }, prod)
-          )
-        )
+      filters.map(filter =>
+        React.createElement(FilterDropdown, {
+          key: filter.id,
+          id: filter.id,
+          label: filter.label,
+          items: filter.items,
+          selectedItems: filter.selectedItems,
+          isOpen: openFilterId === filter.id,
+          onToggle: () => handleToggleFilter(filter.id),
+          onClose: closeDropdowns,
+          onToggleItem: filter.onToggleItem
+        })
       )
     ),
 

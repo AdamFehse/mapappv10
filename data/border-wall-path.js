@@ -9,11 +9,11 @@
     capWidth: 10,
     capHeightOffset: 50,
     material: {
-      color: '#f97316',
-      face: '#ff6a3d',
-      top: '#fef3c7',
-      glow: '#ffd166',
-      outline: '#7a3f00'
+      color: 'var(--border-wall-color, #f97316)',
+      face: 'var(--border-wall-face, #ff6a3d)',
+      top: 'var(--border-wall-top, #fef3c7)',
+      glow: 'var(--border-wall-glow, #ffd166)',
+      outline: 'var(--border-wall-outline, #7a3f00)'
     },
     positions: [
       { lat: 32.5343, lon: -117.1260 },

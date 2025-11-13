@@ -9,132 +9,141 @@ export function initializeBottomSheet() {
   const overlay = document.querySelector('.bottom-sheet-overlay');
 
   if (!sheet || !handle) return;
+  if (sheet.dataset.bottomSheetReady === 'true') return;
 
-  let isDragging = false;
+  sheet.dataset.bottomSheetReady = 'true';
+
+  const MIN_VISIBLE_HEIGHT = 56; // matches handle height
+  const EXPANDED_THRESHOLD = 0.25; // overlay once 25% open
+
+  let collapsedOffset = 0;
+  let currentOffset = 0;
+  let startOffset = 0;
   let startY = 0;
-  let startHeight = 0;
-  let currentY = 0;
+  let isDragging = false;
+  let ignoreClick = false;
 
-  const DRAG_THRESHOLD = 50; // pixels to trigger expand/collapse
-  const sheetHeight = sheet.clientHeight;
-  const maxHeight = window.innerHeight * 0.7; // max 70% of viewport
+  const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
-  // Touch start - begin drag
-  handle.addEventListener('touchstart', (e) => {
-    isDragging = true;
-    startY = e.touches[0].clientY;
-    startHeight = sheet.offsetHeight;
-    sheet.style.transition = 'none';
-  });
+  const getExpansionRatio = () => {
+    if (collapsedOffset === 0) return 0;
+    return 1 - (currentOffset / collapsedOffset);
+  };
 
-  handle.addEventListener('mousedown', (e) => {
-    isDragging = true;
-    startY = e.clientY;
-    startHeight = sheet.offsetHeight;
-    sheet.style.transition = 'none';
-  });
+  const updateOverlayState = () => {
+    const shouldShowOverlay = getExpansionRatio() > EXPANDED_THRESHOLD;
+    sheet.classList.toggle('expanded', shouldShowOverlay);
+  };
 
-  // Touch/mouse move - drag
-  document.addEventListener('touchmove', (e) => {
-    if (!isDragging) return;
+  const setOffset = (nextValue) => {
+    const clamped = clamp(nextValue, 0, collapsedOffset);
+    currentOffset = clamped;
+    sheet.style.setProperty('--bottom-sheet-translate', `${clamped}px`);
+    updateOverlayState();
+  };
 
-    currentY = e.touches[0].clientY - startY;
-    const newHeight = Math.max(48, startHeight - currentY);
+  const recalcBounds = ({ preservePosition = true } = {}) => {
+    const nextCollapsed = Math.max(0, sheet.getBoundingClientRect().height - MIN_VISIBLE_HEIGHT);
+    let openness = 0;
 
-    if (newHeight <= maxHeight) {
-      sheet.style.height = newHeight + 'px';
+    if (preservePosition && collapsedOffset > 0) {
+      openness = getExpansionRatio();
     }
-  }, { passive: true });
 
-  document.addEventListener('mousemove', (e) => {
+    collapsedOffset = nextCollapsed;
+    const targetOffset = preservePosition ? collapsedOffset * (1 - openness) : collapsedOffset;
+    setOffset(targetOffset);
+  };
+
+  const beginDrag = (clientY) => {
+    isDragging = true;
+    startY = clientY;
+    startOffset = currentOffset;
+    ignoreClick = false;
+    sheet.style.transition = 'none';
+  };
+
+  const dragTo = (clientY) => {
     if (!isDragging) return;
+    const delta = clientY - startY;
 
-    currentY = e.clientY - startY;
-    const newHeight = Math.max(48, startHeight - currentY);
-
-    if (newHeight <= maxHeight) {
-      sheet.style.height = newHeight + 'px';
+    if (!ignoreClick && Math.abs(delta) > 4) {
+      ignoreClick = true;
     }
-  });
 
-  // Touch/mouse end - snap to expanded or collapsed
-  document.addEventListener('touchend', () => {
+    setOffset(startOffset + delta);
+  };
+
+  const endDrag = () => {
     if (!isDragging) return;
     isDragging = false;
+    sheet.style.removeProperty('transition');
+  };
 
-    sheet.style.transition = 'height 300ms ease, transform 300ms ease';
+  const handleTouchStart = (event) => {
+    if (event.touches.length !== 1) return;
+    beginDrag(event.touches[0].clientY);
+  };
 
-    // Determine if we should expand or collapse based on drag distance
-    if (currentY < -DRAG_THRESHOLD) {
-      // Dragged up - expand
-      sheet.classList.add('expanded');
-      sheet.style.height = maxHeight + 'px';
-    } else if (currentY > DRAG_THRESHOLD) {
-      // Dragged down - collapse
-      sheet.classList.remove('expanded');
-      sheet.style.height = '100%';
-    } else {
-      // Not enough drag - return to previous state
-      if (sheet.classList.contains('expanded')) {
-        sheet.style.height = maxHeight + 'px';
-      } else {
-        sheet.style.height = '100%';
-      }
-    }
-  });
+  const handleMouseDown = (event) => {
+    if (event.button !== 0) return;
+    beginDrag(event.clientY);
+    event.preventDefault();
+  };
 
-  document.addEventListener('mouseup', () => {
+  const handleTouchMove = (event) => {
     if (!isDragging) return;
-    isDragging = false;
+    dragTo(event.touches[0].clientY);
+    event.preventDefault();
+  };
 
-    sheet.style.transition = 'height 300ms ease, transform 300ms ease';
+  const handleMouseMove = (event) => {
+    if (!isDragging) return;
+    dragTo(event.clientY);
+    event.preventDefault();
+  };
 
-    // Determine if we should expand or collapse based on drag distance
-    if (currentY < -DRAG_THRESHOLD) {
-      // Dragged up - expand
-      sheet.classList.add('expanded');
-      sheet.style.height = maxHeight + 'px';
-    } else if (currentY > DRAG_THRESHOLD) {
-      // Dragged down - collapse
-      sheet.classList.remove('expanded');
-      sheet.style.height = '100%';
+  const stopTouchDrag = () => endDrag();
+  const stopMouseDrag = () => endDrag();
+
+  const toggleSheet = () => {
+    sheet.style.removeProperty('transition');
+    const ratio = getExpansionRatio();
+
+    if (ratio > 0.5) {
+      setOffset(collapsedOffset);
     } else {
-      // Not enough drag - return to previous state
-      if (sheet.classList.contains('expanded')) {
-        sheet.style.height = maxHeight + 'px';
-      } else {
-        sheet.style.height = '100%';
-      }
+      setOffset(0);
     }
-  });
+  };
 
-  // Click handle to toggle expand/collapse
+  handle.addEventListener('touchstart', handleTouchStart, { passive: true });
+  handle.addEventListener('mousedown', handleMouseDown);
+
+  window.addEventListener('touchmove', handleTouchMove, { passive: false });
+  window.addEventListener('mousemove', handleMouseMove);
+
+  window.addEventListener('touchend', stopTouchDrag);
+  window.addEventListener('touchcancel', stopTouchDrag);
+  window.addEventListener('mouseup', stopMouseDrag);
+
   handle.addEventListener('click', () => {
-    sheet.style.transition = 'height 300ms ease, transform 300ms ease';
-
-    if (sheet.classList.contains('expanded')) {
-      sheet.classList.remove('expanded');
-      sheet.style.height = '100%';
-    } else {
-      sheet.classList.add('expanded');
-      sheet.style.height = maxHeight + 'px';
+    if (ignoreClick) {
+      ignoreClick = false;
+      return;
     }
+    toggleSheet();
   });
 
-  // Click overlay to close
   if (overlay) {
     overlay.addEventListener('click', () => {
-      sheet.classList.remove('expanded');
-      sheet.style.transition = 'height 300ms ease, transform 300ms ease';
-      sheet.style.height = '100%';
+      ignoreClick = false;
+      sheet.style.removeProperty('transition');
+      setOffset(collapsedOffset);
     });
   }
 
-  // Handle window resize
-  window.addEventListener('resize', () => {
-    const newMaxHeight = window.innerHeight * 0.7;
-    if (sheet.classList.contains('expanded')) {
-      sheet.style.height = newMaxHeight + 'px';
-    }
-  });
+  window.addEventListener('resize', () => recalcBounds());
+
+  recalcBounds({ preservePosition: false });
 }

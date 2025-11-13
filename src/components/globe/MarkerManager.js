@@ -1,12 +1,16 @@
 /**
- * MarkerManager.js - Marker creation and visual management
+ * MarkerManager.js - Minimal placeholder marker system
+ * Simple circles with theme integration - ready for future iteration
  */
 
-import { pickMarkerColor, lightenHex } from '../../utils/colorUtils.js';
 import { getMarkerBadgeText, getMarkerLabelText } from '../../utils/stringUtils.js';
+import { resolveThemeColor } from '../../utils/themeVars.js';
 
 const markerVisualCache = new Map();
 
+/**
+ * Convert SVG string to data URI
+ */
 function svgToDataUri(svgString) {
   if (typeof window !== 'undefined' && typeof window.btoa === 'function') {
     return 'data:image/svg+xml;base64,' + window.btoa(unescape(encodeURIComponent(svgString)));
@@ -14,29 +18,45 @@ function svgToDataUri(svgString) {
   return 'data:image/svg+xml;base64,' + btoa(svgString);
 }
 
-function createMarkerSvg({ text, baseColor, accentColor, strokeColor, fontSize, isSelected }) {
-  const glow = isSelected ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.35)';
+/**
+ * Create minimal placeholder marker - simple circle with badge text
+ * Theme-wired but basic - ready for future iteration
+ */
+function createMarkerSvg({ text, fontSize, size, isSelected }) {
+  const markerSize = size || 40;
+  const center = markerSize / 2;
+
+  // Get theme color
+  const markerColor = resolveThemeColor('--marker-default-color', '#6aa8ff');
+  const textColor = resolveThemeColor('--marker-badge-text', '#ffffff');
+
   return `
-    <svg width="64" height="80" viewBox="0 0 64 80" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="markerGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stop-color="${accentColor}"/>
-          <stop offset="100%" stop-color="${baseColor}"/>
-        </linearGradient>
-        <filter id="markerShadow" x="-50%" y="-50%" width="200%" height="200%">
-          <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="${glow}" flood-opacity="0.8"/>
-        </filter>
-      </defs>
-      <path d="M32 2C19 2 9 12.6 9 26.3c0 19.8 23 45.9 23 45.9s23-25.6 23-45.9C55 12.6 45 2 32 2z"
-        fill="url(#markerGrad)" stroke="${strokeColor}" stroke-width="2" filter="url(#markerShadow)" />
-      <circle cx="32" cy="27" r="15" fill="rgba(255,255,255,0.12)"/>
-      <text x="32" y="32" text-anchor="middle" font-family="Inter, Arial, sans-serif"
-        font-size="${fontSize}" font-weight="700" fill="#ffffff" letter-spacing="0.5">${text}</text>
+    <svg width="${markerSize}" height="${markerSize}" viewBox="0 0 ${markerSize} ${markerSize}" xmlns="http://www.w3.org/2000/svg">
+      <circle
+        cx="${center}"
+        cy="${center}"
+        r="${center - 2}"
+        fill="${markerColor}"
+        stroke="rgba(0,0,0,0.2)"
+        stroke-width="1"
+      />
+      <text
+        x="${center}"
+        y="${center + fontSize * 0.35}"
+        text-anchor="middle"
+        font-family="Inter, sans-serif"
+        font-size="${fontSize}"
+        font-weight="600"
+        fill="${textColor}"
+      >${text}</text>
     </svg>
   `.trim();
 }
 
-function createMarkerVisualCacheKey(project, markerOptions, baseColor, isSelected) {
+/**
+ * Create cache key for marker visual
+ */
+function createMarkerVisualCacheKey(project, markerOptions, isSelected, theme) {
   const paletteKey = Array.isArray(markerOptions?.palette)
     ? markerOptions.palette.join(',')
     : 'none';
@@ -48,57 +68,67 @@ function createMarkerVisualCacheKey(project, markerOptions, baseColor, isSelecte
     project?.Abbreviation ?? '',
     project?.ProjectCategory ?? '',
     project?.Theme ?? '',
-    baseColor || '',
-    markerOptions?.defaultColor || '',
-    markerOptions?.selectedColor || '',
     markerOptions?.size || '',
     markerOptions?.labelMaxChars || '',
     paletteKey,
-    isSelected ? 'selected' : 'default'
+    theme || 'light',
+    isSelected ? 'selected' : 'default',
+    typeof project?.clusterSize === 'number' && project.clusterSize > 1 ? `cluster-${project.clusterSize}` : 'single'
   ].join('|');
 }
 
-function buildMarkerVisual(project, markerOptions, isSelected) {
+/**
+ * Build marker visual (image, dimensions, label)
+ * Theme-integrated with CSS variables
+ */
+function buildMarkerVisual(project, markerOptions, isSelected, theme = 'light') {
   if (!project) return null;
 
-  const paletteColor = pickMarkerColor(project, markerOptions.palette, markerOptions.defaultColor);
-  const baseColor = isSelected ? (markerOptions.selectedColor || paletteColor) : paletteColor;
-  const cacheKey = createMarkerVisualCacheKey(project, markerOptions, baseColor, isSelected);
+  const isClustered = typeof project.clusterSize === 'number' && project.clusterSize > 1;
+  const cacheKey = createMarkerVisualCacheKey(project, markerOptions, isSelected, theme);
 
+  // Return cached visual if available
   if (markerVisualCache.has(cacheKey)) {
     return markerVisualCache.get(cacheKey);
   }
 
-  const accentColor = lightenHex(baseColor, 0.25);
-  const strokeColor = isSelected ? lightenHex(baseColor, 0.35) : 'rgba(13, 27, 42, 0.45)';
-  const badgeText = getMarkerBadgeText(project);
-  const fontSize = badgeText.length === 1 ? 22 : badgeText.length === 2 ? 18 : 14;
+  // Determine badge text
+  const badgeText = isClustered
+    ? `+${project.clusterSize}`
+    : getMarkerBadgeText(project);
 
+  const fontSize = badgeText.length <= 2 ? 14 : badgeText.length <= 3 ? 12 : 10;
+  const markerSize = markerOptions.size || 40;
+
+  // Generate simple SVG
   const svgMarkup = createMarkerSvg({
     text: badgeText,
-    baseColor,
-    accentColor,
-    strokeColor,
     fontSize,
+    size: markerSize,
     isSelected
   });
 
+  // Build visual object
   const visual = {
     image: svgToDataUri(svgMarkup),
-    width: markerOptions.size,
-    height: Math.round(markerOptions.size * 1.25),
-    scale: isSelected ? 1.08 : 1,
+    width: markerSize,
+    height: markerSize,
+    scale: isSelected ? 1.2 : 1.0,
     labelText: getMarkerLabelText(project, markerOptions.labelMaxChars)
   };
 
+  // Cache it
   markerVisualCache.set(cacheKey, visual);
   return visual;
 }
 
-function updateMarkerGraphics(entity, markerOptions, isSelected) {
+/**
+ * Update marker graphics on Cesium entity
+ */
+function updateMarkerGraphics(entity, markerOptions, isSelected, theme = 'light') {
   if (!entity || !entity.projectData || !entity.billboard) return;
 
-  const visual = buildMarkerVisual(entity.projectData, markerOptions, isSelected);
+  const visual = buildMarkerVisual(entity.projectData, markerOptions, isSelected, theme);
   if (!visual) return;
 
   entity.billboard.image = visual.image;

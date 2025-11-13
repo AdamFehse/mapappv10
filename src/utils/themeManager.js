@@ -1,34 +1,67 @@
 /**
- * themeManager.js - Simple theme detection and application
- * Detects OS preference and provides theme control
+ * themeManager.js - Theme detection + DOM application helpers
  */
 
-const VALID_THEMES = ['light', 'dark', 'zen', 'story'];
-const THEME_CLASSES = VALID_THEMES.map(name => `theme-${name}`);
+import {
+  ALL_THEME_IDS,
+  COLOR_THEMES,
+  CINEMATIC_THEME,
+  THEME_CLASS_PREFIX,
+  getMetaColorForTheme,
+  getThemeDefinition
+} from '../config/themes.js';
+
+const MATCH_MEDIA_QUERY = '(prefers-color-scheme: dark)';
+const THEME_CLASSES = ALL_THEME_IDS.map(id => `${THEME_CLASS_PREFIX}${id}`);
+const FALLBACK_THEME_ID = COLOR_THEMES[0].id;
+
+function getMediaQuery() {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+    return null;
+  }
+  return window.matchMedia(MATCH_MEDIA_QUERY);
+}
 
 /**
  * Detect user's OS color scheme preference
  * @returns {'light' | 'dark'}
  */
 export function detectOSPreference() {
-  if (typeof window === 'undefined') return 'light';
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  const mediaQuery = getMediaQuery();
+  if (!mediaQuery) return 'light';
+  return mediaQuery.matches ? 'dark' : 'light';
+}
+
+function updateMetaThemeColor(themeId) {
+  if (typeof document === 'undefined') return;
+  const metaTag = document.querySelector('meta[name="theme-color"]');
+  if (!metaTag) return;
+  const color = getMetaColorForTheme(themeId);
+  if (color) {
+    metaTag.setAttribute('content', color);
+  }
 }
 
 /**
  * Apply theme to document
- * @param {'light' | 'dark' | 'zen' | 'story'} theme
+ * @param {'light' | 'dark' | 'zen' | 'story'} themeId
  */
-export function applyTheme(theme) {
+export function applyTheme(themeId) {
   if (typeof document === 'undefined') return;
 
   const root = document.documentElement;
-  const normalized = VALID_THEMES.includes(theme) ? theme : 'light';
+  const normalized = ALL_THEME_IDS.includes(themeId) ? themeId : FALLBACK_THEME_ID;
 
-  // Remove legacy and new theme classes before applying the next one
   THEME_CLASSES.forEach(cls => root.classList.remove(cls));
+  root.classList.add(`${THEME_CLASS_PREFIX}${normalized}`);
+  root.dataset.theme = normalized;
 
-  root.classList.add(`theme-${normalized}`);
+  const definition = getThemeDefinition(normalized);
+  if (definition?.colorScheme) {
+    root.style.colorScheme = definition.colorScheme;
+  }
+
+  updateMetaThemeColor(normalized);
 }
 
 /**
@@ -36,17 +69,44 @@ export function applyTheme(theme) {
  * @returns {'light' | 'dark' | 'zen' | 'story'}
  */
 export function getCurrentTheme() {
-  if (typeof document === 'undefined') return 'light';
+  if (typeof document === 'undefined') return FALLBACK_THEME_ID;
   const root = document.documentElement;
   const active = THEME_CLASSES.find(cls => root.classList.contains(cls));
   if (active) {
-    return active.replace('theme-', '');
+    return active.replace(THEME_CLASS_PREFIX, '');
   }
-  return 'light';
+  return FALLBACK_THEME_ID;
+}
+
+/**
+ * Subscribe to OS preference changes (used when honoring system theme)
+ * @param {(next:'light'|'dark') => void} callback
+ * @returns {() => void} unsubscribe
+ */
+export function subscribeToOSPreferenceChange(callback) {
+  const mediaQuery = getMediaQuery();
+  if (!mediaQuery || typeof callback !== 'function') {
+    return () => {};
+  }
+
+  const handler = (event) => {
+    callback(event.matches ? 'dark' : 'light');
+  };
+
+  if (typeof mediaQuery.addEventListener === 'function') {
+    mediaQuery.addEventListener('change', handler);
+    return () => mediaQuery.removeEventListener('change', handler);
+  }
+
+  mediaQuery.addListener(handler);
+  return () => mediaQuery.removeListener(handler);
 }
 
 window.MapAppTheme = {
   detectOSPreference,
   applyTheme,
-  getCurrentTheme
+  getCurrentTheme,
+  subscribeToOSPreferenceChange,
+  COLOR_THEMES,
+  CINEMATIC_THEME
 };

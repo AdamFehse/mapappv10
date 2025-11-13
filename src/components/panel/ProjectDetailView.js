@@ -12,97 +12,148 @@ export function ProjectDetailView({
     return null;
   }
 
-  const description = project.DescriptionLong || project.DescriptionShort || project.Description;
+  const projectName = project.ProjectName || 'Untitled Project';
+  const description = project.DescriptionLong || project.DescriptionShort || project.Description || '';
+  const descriptionTrimmed = description ? description.trim().replace(/\s+/g, ' ') : '';
+  const heroSubtitle = descriptionTrimmed
+    ? (descriptionTrimmed.length > 220 ? `${descriptionTrimmed.slice(0, 217).trim()}…` : descriptionTrimmed)
+    : '';
+
   const tagKey = project.id !== undefined && project.id !== null ? String(project.id) : project;
   const tagInfo = projectTagsMap.get(tagKey) || { tags: [], themes: [] };
-  const themeTokens = tagInfo.themes;
+  const themeTokens = tagInfo.themes || [];
 
-  // Build metadata items
-  const metaItems = [];
-  if (project.Location) {
-    metaItems.push(React.createElement('div', { className: 'detail-meta-item', key: 'location' },
-      React.createElement('strong', null, 'Location:'),
-      React.createElement('span', null, project.Location)
-    ));
-  }
-  if (project.Year) {
-    metaItems.push(React.createElement('div', { className: 'detail-meta-item', key: 'year' },
-      React.createElement('strong', null, 'Year:'),
-      React.createElement('span', null, project.Year)
-    ));
-  }
-  if (project.ProjectCategory) {
-    metaItems.push(React.createElement('div', { className: 'detail-meta-item', key: 'category' },
-      React.createElement('strong', null, 'Category:'),
-      React.createElement('span', null, project.ProjectCategory)
-    ));
-  }
+  const leads = Array.isArray(project.ProjectLeads) ? project.ProjectLeads.filter(Boolean) : [];
+  const locationLabel = (project.Location || 'Location forthcoming').trim();
+  const productLabel = (project.Product || '').trim();
 
-  return React.createElement('div', { className: 'project-detail' },
-    React.createElement('button', {
-      className: 'detail-back-btn',
-      onClick: onClose,
-      type: 'button',
-      'aria-label': 'Return to project list'
-    }, '← Back to Projects'),
+  const metaGrid = [
+    { label: 'Location', value: locationLabel, key: 'meta-location' },
+    { label: 'Year', value: project.Year || 'Year TBD', key: 'meta-year' },
+    { label: 'Category', value: project.ProjectCategory || 'Uncategorized', key: 'meta-category' },
+    productLabel && { label: 'Primary Output', value: productLabel, key: 'meta-product' }
+  ].filter(Boolean);
 
-    React.createElement('div', { className: 'detail-image-wrapper' },
-      project.ImageUrl
-        ? React.createElement('img', {
-            src: project.ImageUrl,
-            alt: project.ProjectName || 'Project image',
-            className: 'detail-image'
-          })
-        : React.createElement('div', {
-            className: 'detail-image-placeholder',
-            'aria-hidden': 'true'
-          }, 'No Image')
+  const contentFlags = [
+    { label: 'Art', active: Boolean(project.HasArtwork) },
+    { label: 'Music', active: Boolean(project.HasMusic) },
+    { label: 'Research', active: Boolean(project.HasResearch) },
+    { label: 'Poetry', active: Boolean(project.HasPoems) }
+  ];
+
+  return React.createElement('div', {
+    className: 'project-detail',
+    role: 'dialog',
+    'aria-label': `${projectName} details`
+  },
+    React.createElement('section', { className: 'project-detail-hero' },
+      React.createElement('div', {
+        className: `project-detail-media ${project.ImageUrl ? 'has-image' : 'placeholder'}`
+      },
+        project.ImageUrl
+          ? React.createElement('img', {
+              src: project.ImageUrl,
+              alt: projectName,
+              loading: 'lazy'
+            })
+          : React.createElement('div', { className: 'project-detail-media-placeholder', 'aria-hidden': 'true' },
+              'Imagery coming soon'
+            ),
+        React.createElement('div', { className: 'project-detail-media-fade', 'aria-hidden': 'true' })
+      ),
+
+      React.createElement('div', { className: 'project-detail-hero-content' },
+        React.createElement('button', {
+          className: 'project-detail-back',
+          onClick: onClose,
+          type: 'button',
+          'aria-label': 'Return to project list'
+        }, '← Back to projects'),
+
+        React.createElement('div', { className: 'project-detail-hero-text' },
+          React.createElement('p', { className: 'project-detail-eyebrow' },
+            project.ProjectCategory || 'Project highlight'
+          ),
+          React.createElement('h2', { className: 'project-detail-title' }, projectName),
+          heroSubtitle && React.createElement('p', { className: 'project-detail-subtitle' }, heroSubtitle),
+          React.createElement('div', { className: 'project-detail-hero-pills' },
+            React.createElement('span', { className: 'project-detail-pill' },
+              project.Year ? `Year ${project.Year}` : 'Year TBD'
+            ),
+            React.createElement('span', { className: 'project-detail-pill' }, locationLabel),
+            productLabel && React.createElement('span', { className: 'project-detail-pill' }, productLabel)
+          ),
+          React.createElement('div', { className: 'project-detail-hero-actions' },
+            React.createElement('button', {
+              className: 'project-detail-action primary',
+              onClick: () => onShare(project),
+              type: 'button'
+            }, 'Share project'),
+            React.createElement('button', {
+              className: 'project-detail-action ghost',
+              onClick: onClose,
+              type: 'button'
+            }, 'Keep browsing')
+          )
+        )
+      )
     ),
 
-    React.createElement('div', { className: 'detail-body' },
-      React.createElement('h2', { className: 'detail-title' }, project.ProjectName),
+    React.createElement('div', { className: 'project-detail-body' },
+      React.createElement('div', { className: 'project-detail-main' },
+        descriptionTrimmed && React.createElement('div', { className: 'detail-section' },
+          React.createElement('h3', null, 'About this work'),
+          React.createElement('p', null, descriptionTrimmed)
+        ),
 
-      React.createElement('button', {
-        className: 'detail-share-btn',
-        onClick: () => onShare(project),
-        type: 'button',
-        'aria-label': 'Share this project',
-        title: 'Share this project'
-      }, 'Copy share link'),
+        leads.length > 0 && React.createElement('div', { className: 'detail-section' },
+          React.createElement('h3', null, 'Project leads'),
+          React.createElement('ul', null,
+            leads.map((lead, idx) =>
+              React.createElement('li', { key: idx }, lead)
+            )
+          )
+        ),
 
-      metaItems.length > 0 && React.createElement('div', { className: 'detail-meta' }, metaItems),
-
-      description && React.createElement('div', { className: 'detail-section' },
-        React.createElement('h3', null, 'About'),
-        React.createElement('p', null, description)
-      ),
-
-      project.ProjectLeads && project.ProjectLeads.length > 0 && React.createElement('div', { className: 'detail-section' },
-        React.createElement('h3', null, 'Project Leads'),
-        React.createElement('ul', null,
-          project.ProjectLeads.map((lead, idx) =>
-            React.createElement('li', { key: idx }, lead)
+        themeTokens.length > 0 && React.createElement('div', { className: 'detail-section' },
+          React.createElement('h3', null, 'Themes explored'),
+          React.createElement('div', { className: 'detail-badges' },
+            themeTokens.map((theme, idx) =>
+              React.createElement('span', { key: theme + idx, className: 'detail-badge' }, theme)
+            )
           )
         )
       ),
 
-      themeTokens.length > 0 && React.createElement('div', { className: 'detail-section' },
-        React.createElement('h3', null, 'Themes'),
-        React.createElement('div', { className: 'detail-badges' },
-          themeTokens.map((theme, idx) =>
-            React.createElement('span', { key: theme + idx, className: 'detail-badge' }, theme)
+      React.createElement('aside', { className: 'project-detail-aside' },
+        metaGrid.length > 0 && React.createElement('div', { className: 'detail-meta-grid' },
+          metaGrid.map(meta =>
+            React.createElement('div', { className: 'detail-meta-card', key: meta.key },
+              React.createElement('span', { className: 'detail-meta-label' }, meta.label),
+              React.createElement('span', { className: 'detail-meta-value' }, meta.value)
+            )
           )
-        )
-      ),
+        ),
 
-      // Content type badges
-      React.createElement('div', { className: 'detail-section' },
-        React.createElement('h3', null, 'Content Types'),
-        React.createElement('div', { className: 'detail-badges' },
-          project.HasArtwork && React.createElement('span', { className: 'detail-badge active' }, 'Art'),
-          project.HasMusic && React.createElement('span', { className: 'detail-badge active' }, 'Music'),
-          project.HasResearch && React.createElement('span', { className: 'detail-badge active' }, 'Research'),
-          project.HasPoems && React.createElement('span', { className: 'detail-badge active' }, 'Poetry')
+        React.createElement('div', { className: 'detail-section compact' },
+          React.createElement('h3', null, 'Content palette'),
+          React.createElement('div', { className: 'detail-flags' },
+            contentFlags.map(flag =>
+              React.createElement('span', {
+                key: flag.label,
+                className: `detail-flag ${flag.active ? 'active' : ''}`
+              }, flag.label)
+            )
+          )
+        ),
+
+        themeTokens.length > 0 && React.createElement('div', { className: 'detail-section compact secondary' },
+          React.createElement('h3', null, 'Featured tags'),
+          React.createElement('div', { className: 'detail-badges wrap' },
+            themeTokens.map((theme, idx) =>
+              React.createElement('span', { key: `aside-theme-${idx}`, className: 'detail-badge subtle' }, theme)
+            )
+          )
         )
       )
     )

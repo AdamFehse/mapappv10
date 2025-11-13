@@ -5,14 +5,12 @@
 
 // Import main components (ES modules)
 import { App } from './components/App.js';
-import { NarrativeBar } from './components/NarrativeBar.js';
 import { GlobeContainer } from './components/GlobeContainer.js';
 import { MarkerManager } from './components/globe/MarkerManager.js';
 
 // Register components in window.MapApp namespace for React usage
 window.MapApp = window.MapApp || {};
 window.MapApp.App = App;
-window.MapApp.NarrativeBar = NarrativeBar;
 window.MapApp.GlobeContainer = GlobeContainer;
 window.MapApp.MarkerManager = MarkerManager;
 

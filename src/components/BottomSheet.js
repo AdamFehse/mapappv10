@@ -8,6 +8,7 @@ import { FilterPanel } from './panel/FilterPanel.js';
 import { ProjectList } from './panel/ProjectList.js';
 import { ProjectDetailView } from './panel/ProjectDetailView.js';
 import { buildProjectTagsMap, extractThemes, extractCategories, extractYears, extractProducts } from '../utils/filterUtils.js';
+import { getSelectableThemes } from '../config/themes.js';
 
 export function BottomSheet({
   projects = [],
@@ -15,11 +16,13 @@ export function BottomSheet({
   selectedProjectId = null,
   onSelectTheme = () => {},
   currentTheme = 'light',
+  satelliteView = false,
+  onToggleSatelliteView = () => {},
   onShare = () => {}
 }) {
   const { useState, useMemo, useEffect } = React;
 
-  // All filtering state (moved from RightPanel)
+  // All filtering state
   const [expandedProject, setExpandedProject] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTags, setSelectedTags] = useState([]);
@@ -144,12 +147,7 @@ export function BottomSheet({
     }
   };
 
-  const themes = [
-    { id: 'light', label: 'Light' },
-    { id: 'dark', label: 'Dark' },
-    { id: 'zen', label: 'Zen' },
-    { id: 'story', label: 'Story' }
-  ];
+  const themes = useMemo(() => getSelectableThemes(), []);
 
   return React.createElement(React.Fragment, null,
     // Bottom Sheet Container
@@ -175,6 +173,13 @@ export function BottomSheet({
                 )
               )
             ),
+
+            React.createElement('button', {
+              className: `bottom-sheet-satellite-btn ${satelliteView ? 'active' : ''}`,
+              onClick: onToggleSatelliteView,
+              type: 'button',
+              'aria-pressed': satelliteView ? 'true' : 'false'
+            }, satelliteView ? 'Satellite On' : 'Satellite View'),
 
             React.createElement('button', {
               className: 'bottom-sheet-share-btn',
@@ -204,26 +209,26 @@ export function BottomSheet({
           })
         ),
 
-        // Projects Area: Horizontal scrolling grid
+        // Projects Area: Horizontal scrolling grid OR Detail View Modal
         React.createElement('div', { className: 'bottom-sheet-projects-area' },
-          // Projects Section
-          React.createElement(ProjectList, {
+          // Projects Section (hidden when detail is open)
+          !expandedProject && React.createElement(ProjectList, {
             projects: filteredProjects,
             selectedProjectId: selectedProjectId,
             onSelectProject: handleExpandProject,
             onClearFilters: clearFilters,
             projectTagsMap: projectTagsMap
-          })
-        ),
+          }),
 
-        // Detail View Modal (overlays everything)
-        expandedProject && React.createElement('div', { className: 'bottom-sheet-detail-modal' },
-          React.createElement(ProjectDetailView, {
-            project: expandedProject,
-            projectTagsMap: projectTagsMap,
-            onClose: closeDetail,
-            onShare: handleShare
-          })
+          // Detail View Modal (replaces projects list)
+          expandedProject && React.createElement('div', { className: 'bottom-sheet-detail-modal' },
+            React.createElement(ProjectDetailView, {
+              project: expandedProject,
+              projectTagsMap: projectTagsMap,
+              onClose: closeDetail,
+              onShare: handleShare
+            })
+          )
         )
       )
     ),

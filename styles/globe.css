@@ -51,15 +51,15 @@
   padding: 1rem;
   border-radius: 8px;
   border: 1px solid var(--toolbar-border);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px var(--shadow-medium);
   backdrop-filter: blur(10px);
   transition: opacity 200ms ease, transform 200ms ease;
 }
 
 .globe-container.low-power .globe-toolbar {
   backdrop-filter: none;
-  background: color-mix(in srgb, var(--toolbar-background) 85%, rgba(0, 0, 0, 0.08));
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.18);
+  background: color-mix(in srgb, var(--toolbar-background) 85%, var(--overlay-light) 15%);
+  box-shadow: 0 3px 8px var(--shadow-light);
 }
 
 .globe-toolbar h3 {
@@ -135,10 +135,10 @@
   top: calc(100% + 0.5rem);
   left: 0;
   right: 0;
-  background: color-mix(in srgb, var(--sidebar-bg) 80%, rgba(255, 255, 255, 0.2) 20%);
+  background: color-mix(in srgb, var(--sidebar-bg) 80%, var(--white-overlay-subtle) 20%);
   border: 1px solid rgba(var(--primary-rgb), 0.25);
   border-radius: 6px;
-  box-shadow: 0 20px 40px rgba(23, 19, 40, 0.22);
+  box-shadow: 0 20px 40px var(--shadow-medium);
   z-index: 1000;
   overflow: hidden;
   animation: slideDown 200ms ease-out;
@@ -400,7 +400,7 @@
 }
 
 .globe-container.low-power .intro-button {
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 18px var(--shadow-medium);
 }
 
 .globe-container.low-power .intro-skip {
@@ -411,7 +411,7 @@
 .intro-skip:focus-visible {
   background: color-mix(in srgb, var(--intro-skip-background) 60%, rgba(var(--primary-rgb), 0.2) 40%);
   border-color: color-mix(in srgb, var(--intro-skip-border) 60%, rgba(var(--primary-rgb), 0.5) 40%);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 16px var(--shadow-medium);
 }
 
 /* Reduced motion: avoid fades */

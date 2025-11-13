@@ -59,13 +59,19 @@ window.CesiumConfig = {
 
   // Marker/Billboard styling
   markers: {
-    defaultColor: '#2196F3',   // Blue
-    selectedColor: '#FF5722',  // Orange-red
-    hoverColor: '#1976D2',     // Dark blue
+    defaultColor: 'var(--marker-default-color, #2196F3)',   // Blue
+    selectedColor: 'var(--marker-selected-color, #FF5722)',  // Orange-red
+    hoverColor: 'var(--marker-hover-color, #1976D2)',     // Dark blue
     size: 32,                  // Billboard size (pixels)
     clusteringEnabled: true,   // Group nearby markers
     clusterRadius: 80,         // Pixels to group within
-    palette: ['#4fc3f7', '#ff8a65', '#66bb6a', '#ffd54f', '#ba68c8'],
+    palette: [
+      'var(--marker-palette-1, #4fc3f7)',
+      'var(--marker-palette-2, #ff8a65)',
+      'var(--marker-palette-3, #66bb6a)',
+      'var(--marker-palette-4, #ffd54f)',
+      'var(--marker-palette-5, #ba68c8)'
+    ],
     showLabels: false,
     labelMaxChars: 18
   },
