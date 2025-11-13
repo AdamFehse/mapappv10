@@ -14,7 +14,7 @@
   z-index: 10;
   background: var(--bg-primary);
   border-bottom: 1px solid var(--border-soft);
-  padding: 0.5rem 1rem;
+  padding: 0.35rem 0.75rem;
   display: flex;
   align-items: center;
 }
@@ -23,11 +23,11 @@
   background: none;
   border: none;
   color: var(--text-primary);
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  padding: 0.5rem 0.75rem;
-  border-radius: 8px;
+  padding: 0.35rem 0.6rem;
+  border-radius: 6px;
   transition: background 200ms ease;
 }
 
