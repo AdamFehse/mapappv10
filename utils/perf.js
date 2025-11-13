@@ -48,7 +48,7 @@ try {
     }
   }
 } catch (e) {
-  console.warn('GPU detection failed:', e);
+  // GPU detection failed, continue with defaults
 }
 
 /**

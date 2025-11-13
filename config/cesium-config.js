@@ -19,9 +19,9 @@ window.CesiumConfig = {
     timeline: false,            // Bottom timeline scrubber
     baseLayerPicker: false,     // Top-right imagery selector (disabled for simplicity)
     geocoder: false,            // Top-right search box
-    homeButton: true,           // Top-right home button
-    sceneModePicker: true,      // Allow users to switch 2D/3D
-    navigationHelpButton: false,// Hide help button (cleaner UI)
+    homeButton: false,           // Top-right home button
+    sceneModePicker: false,      // Allow users to switch 2D/3D
+    navigationHelpButton: false,// Hide help button
     fullscreenButton: true,     // Enable fullscreen toggle
     vrButton: false,            // VR mode toggle
 

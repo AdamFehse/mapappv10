@@ -43,12 +43,11 @@ async function shareProject(project) {
         text: text,
         url: url
       });
-      console.log('Shared via Web Share API');
       return true;
     } catch (error) {
       // User cancelled or error occurred
       if (error.name !== 'AbortError') {
-        console.log('Web Share API failed, falling back to clipboard:', error);
+        // Fall back to clipboard
       }
     }
   }
@@ -67,8 +66,6 @@ async function copyToClipboard(url, text) {
   try {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       await navigator.clipboard.writeText(url);
-      console.log('Copied to clipboard:', url);
-      // TODO: Show toast notification
       alert('Link copied to clipboard!');
       return true;
     } else {
@@ -83,103 +80,20 @@ async function copyToClipboard(url, text) {
       document.body.removeChild(textArea);
 
       if (success) {
-        console.log('Copied to clipboard (fallback):', url);
         alert('Link copied to clipboard!');
         return true;
       }
     }
   } catch (error) {
-    console.error('Failed to copy to clipboard:', error);
     alert('Failed to copy link. Please copy manually: ' + url);
   }
   return false;
-}
-
-/**
- * Share to specific social media platform
- * @param {string} platform - 'twitter', 'facebook', 'linkedin', 'email'
- * @param {Object} project - Project to share
- */
-function shareToSocial(platform, project) {
-  const url = getProjectShareUrl(project);
-  const text = getProjectShareText(project);
-  const title = project?.ProjectName || 'Arizona-Sonora Borderlands';
-
-  let shareUrl;
-
-  switch (platform.toLowerCase()) {
-    case 'twitter':
-    case 'x':
-      shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
-      break;
-
-    case 'facebook':
-      shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
-      break;
-
-    case 'linkedin':
-      shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
-      break;
-
-    case 'email':
-      const subject = encodeURIComponent(title);
-      const body = encodeURIComponent(`${text}\n\n${url}`);
-      shareUrl = `mailto:?subject=${subject}&body=${body}`;
-      break;
-
-    default:
-      console.error('Unknown platform:', platform);
-      return;
-  }
-
-  // Open in new window (except email)
-  if (platform.toLowerCase() !== 'email') {
-    window.open(shareUrl, '_blank', 'width=600,height=400,noopener,noreferrer');
-  } else {
-    window.location.href = shareUrl;
-  }
-
-  console.log(`Shared to ${platform}`);
-}
-
-/**
- * Share the entire map/page
- */
-async function sharePage() {
-  const url = window.location.origin + window.location.pathname;
-  const title = 'Arizona-Sonora Borderlands Research Map';
-  const text = 'Explore research projects across the Arizona-Sonora borderlands';
-
-  if (navigator.share) {
-    try {
-      await navigator.share({ title, text, url });
-      return true;
-    } catch (error) {
-      if (error.name !== 'AbortError') {
-        console.log('Web Share API failed:', error);
-      }
-    }
-  }
-
-  return copyToClipboard(url, text);
-}
-
-/**
- * Check if Web Share API is available
- * @returns {boolean}
- */
-function canUseNativeShare() {
-  return !!(navigator.share);
 }
 
 // Share utilities
 window.MapAppUtils = window.MapAppUtils || {};
 window.MapAppUtils.Share = {
   shareProject,
-  sharePage,
-  shareToSocial,
   getProjectShareUrl,
-  getProjectShareText,
-  copyToClipboard,
-  canUseNativeShare
+  getProjectShareText
 };

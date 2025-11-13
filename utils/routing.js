@@ -59,14 +59,6 @@ function navigateHome() {
 }
 
 /**
- * Navigate to search results
- * @param {string} query - Search query string
- */
-function navigateToSearch(query) {
-  window.location.hash = `#search?q=${encodeURIComponent(query)}`;
-}
-
-/**
  * Listen for hash changes
  * @param {Function} callback - Called with parseHash() result
  * @returns {Function} Cleanup function to remove listener
@@ -90,6 +82,5 @@ window.Router = {
   parseHash,
   navigateToProject,
   navigateHome,
-  navigateToSearch,
   onHashChange
 };
