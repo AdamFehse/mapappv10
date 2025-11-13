@@ -39,41 +39,9 @@ window.CesiumConfig = {
     // SIMPLIFIED: Using flat terrain for debugging
     terrainProvider: null, // or 'CESIUM_WORLD_TERRAIN' for 3D terrain
 
-    // Lighting & Time (optional)
-    // enableLighting darkens the night side of the globe based on the current time
-    enableLighting: false,
-    // Set an initial time (UTC) to bias lighting (e.g., '2024-06-21T04:00:00Z')
-    initialTimeIso: null,
-
-    // Night imagery (Black Marble) options
-    // DISABLED FOR DEBUGGING
-    nightAsBase: false,
-    addNightOverlay: false,
-    nightAssetId: 3812, // Cesium ion "Black Marble" asset id
-    nightOverlayAlpha: 0.85,
-
     // Performance
     requestRenderMode: true,    // Only render when needed (saves battery)
     maximumRenderTimeChange: Infinity // Disable FPS throttling
-  },
-
-  // Marker/Billboard styling
-  markers: {
-    defaultColor: 'var(--marker-default-color, #2196F3)',   // Blue
-    selectedColor: 'var(--marker-selected-color, #FF5722)',  // Orange-red
-    hoverColor: 'var(--marker-hover-color, #1976D2)',     // Dark blue
-    size: 32,                  // Billboard size (pixels)
-    clusteringEnabled: true,   // Group nearby markers
-    clusterRadius: 80,         // Pixels to group within
-    palette: [
-      'var(--marker-palette-1, #4fc3f7)',
-      'var(--marker-palette-2, #ff8a65)',
-      'var(--marker-palette-3, #66bb6a)',
-      'var(--marker-palette-4, #ffd54f)',
-      'var(--marker-palette-5, #ba68c8)'
-    ],
-    showLabels: false,
-    labelMaxChars: 18
   },
 
   // Camera animation settings
@@ -92,5 +60,4 @@ window.CesiumConfig = {
 if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
   window.CesiumConfig.accessibility.reducedMotion = true;
   window.CesiumConfig.animation.duration = 0; // Instant transitions
-  console.log('Reduced motion enabled');
 }
