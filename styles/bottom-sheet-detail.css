@@ -41,8 +41,8 @@
   overflow: hidden;
   min-height: 320px;
   isolation: isolate;
-  background: var(--detail-hero-overlay);
-  box-shadow: var(--detail-hero-shadow);
+  background: transparent;
+  box-shadow: none;
   margin: 1.25rem 1.5rem 1.25rem;
 }
 
