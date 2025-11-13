@@ -1,48 +1,24 @@
 /**
  * main.js - Application entry point
- * Modern ES modules - no build step needed
+ * ES modules - no build step
  */
 
-// Import main components (ES modules)
 import { App } from './components/App.js';
 import { GlobeContainer } from './components/GlobeContainer.js';
 import { MarkerManager } from './components/globe/MarkerManager.js';
 
-// Register components in window.MapApp namespace for React usage
+// Register components in window.MapApp namespace
 window.MapApp = window.MapApp || {};
 window.MapApp.App = App;
 window.MapApp.GlobeContainer = GlobeContainer;
 window.MapApp.MarkerManager = MarkerManager;
 
-// Initialize app once DOM is ready
-function initializeApp() {
-  // Check if all required components are loaded
-  if (
-    !window.MapApp?.App ||
-    !window.MapApp?.GlobeContainer ||
-    !window.CesiumConfig ||
-    !window.Cesium
-  ) {
-    // Not ready yet, retry
-    setTimeout(initializeApp, 50);
-    return;
-  }
-
-  // Hide loading skeleton
-  const loadingSkeleton = document.getElementById('loading-skeleton');
-  if (loadingSkeleton) {
-    loadingSkeleton.style.display = 'none';
-  }
-
-  // All dependencies loaded - render app
-  ReactDOM.createRoot(document.getElementById('root')).render(
-    React.createElement(window.MapApp.App)
-  );
+// Hide loading skeleton and render app
+const loadingSkeleton = document.getElementById('loading-skeleton');
+if (loadingSkeleton) {
+  loadingSkeleton.style.display = 'none';
 }
 
-// Start initialization after DOM ready
-if (document.readyState === 'loading') {
-  window.addEventListener('DOMContentLoaded', initializeApp);
-} else {
-  initializeApp();
-}
+ReactDOM.createRoot(document.getElementById('root')).render(
+  React.createElement(App)
+);
