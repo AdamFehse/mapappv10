@@ -46,6 +46,15 @@ export function ProjectDetailView({
     role: 'dialog',
     'aria-label': `${projectName} details`
   },
+    React.createElement('header', { className: 'project-detail-header' },
+      React.createElement('button', {
+        className: 'project-detail-back-button',
+        onClick: onClose,
+        type: 'button',
+        'aria-label': 'Return to project list'
+      }, '← Back')
+    ),
+
     React.createElement('section', { className: 'project-detail-hero' },
       React.createElement('div', {
         className: `project-detail-media ${project.ImageUrl ? 'has-image' : 'placeholder'}`
@@ -63,13 +72,6 @@ export function ProjectDetailView({
       ),
 
       React.createElement('div', { className: 'project-detail-hero-content' },
-        React.createElement('button', {
-          className: 'project-detail-back',
-          onClick: onClose,
-          type: 'button',
-          'aria-label': 'Return to project list'
-        }, '← Back to projects'),
-
         React.createElement('div', { className: 'project-detail-hero-text' },
           React.createElement('p', { className: 'project-detail-eyebrow' },
             project.ProjectCategory || 'Project highlight'
