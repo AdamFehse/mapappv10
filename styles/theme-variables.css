@@ -60,62 +60,62 @@
   --badge-theme-bg: rgba(var(--primary-rgb), 0.15);
 }
 
-/* ===== LIGHT THEME (Default) ===== */
+/* ===== LIGHT THEME (Default - Cozy Warm) ===== */
 :root,
 :root.theme-light {
   color-scheme: light;
 
-  --primary: #4a8fbf;
-  --primary-hover: #5fa3d9;
-  --primary-rgb: 74, 143, 191;
+  --primary: #a89968;
+  --primary-hover: #c2b088;
+  --primary-rgb: 168, 153, 104;
 
   --overlay-strong: rgba(0, 0, 0, 0.25);
   --overlay-medium: rgba(0, 0, 0, 0.14);
   --overlay-light: rgba(0, 0, 0, 0.04);
 
-  --bg-primary: #fafbfc;
-  --bg-secondary: #f0f2f5;
+  --bg-primary: #faf8f5;
+  --bg-secondary: #f0ede8;
 
-  --text-primary: #1a1f26;
-  --text-secondary: #4a5568;
-  --text-muted: #8a94a6;
+  --text-primary: #2a251f;
+  --text-secondary: #5a4d42;
+  --text-muted: #8d8076;
 
-  --border-soft: rgba(74, 143, 191, 0.12);
+  --border-soft: rgba(168, 153, 104, 0.15);
 
-  --shadow-light: rgba(26, 31, 38, 0.06);
-  --shadow-medium: rgba(26, 31, 38, 0.12);
+  --shadow-light: rgba(42, 37, 31, 0.06);
+  --shadow-medium: rgba(42, 37, 31, 0.12);
 
-  --sidebar-bg: rgba(250, 251, 252, 0.96);
-  --panel-clear-background: rgba(255, 255, 255, 0.95);
-  --panel-clear-background-hover: rgba(255, 255, 255, 0.99);
+  --sidebar-bg: rgba(250, 248, 245, 0.96);
+  --panel-clear-background: rgba(252, 251, 249, 0.95);
+  --panel-clear-background-hover: rgba(254, 253, 252, 0.99);
 
-  --detail-close-background: rgba(26, 31, 38, 0.06);
+  --detail-close-background: rgba(42, 37, 31, 0.06);
   --detail-close-color: var(--text-primary);
-  --detail-close-background-hover: rgba(26, 31, 38, 0.12);
+  --detail-close-background-hover: rgba(42, 37, 31, 0.12);
 
-  --toolbar-background: rgba(250, 251, 252, 0.93);
-  --toolbar-border: rgba(74, 143, 191, 0.15);
-  --toolbar-text: #1a1f26;
-  --toolbar-text-muted: rgba(74, 85, 104, 0.75);
+  --toolbar-background: rgba(250, 248, 245, 0.93);
+  --toolbar-border: rgba(168, 153, 104, 0.18);
+  --toolbar-text: #2a251f;
+  --toolbar-text-muted: rgba(90, 77, 66, 0.8);
 
-  --hero-overlay-bg: linear-gradient(145deg, rgba(26, 31, 38, 0.6) 0%, rgba(50, 70, 90, 0.55) 60%, rgba(74, 100, 130, 0.6) 100%);
-  --hero-text-color: #f8fafc;
-  --hero-meta-color: rgba(95, 163, 217, 0.95);
+  --hero-overlay-bg: linear-gradient(145deg, rgba(42, 37, 31, 0.65) 0%, rgba(80, 68, 52, 0.6) 60%, rgba(110, 90, 70, 0.65) 100%);
+  --hero-text-color: #faf8f5;
+  --hero-meta-color: rgba(168, 153, 104, 0.98);
 
-  --progress-dot-active: rgba(250, 251, 252, 0.96);
+  --progress-dot-active: rgba(250, 248, 245, 0.96);
 
   /* Detail view hero base for light theme */
-  --detail-hero-base-rgb: 36, 44, 56;
-  --detail-hero-overlay: linear-gradient(135deg, rgba(var(--primary-rgb), 0.18), rgba(var(--detail-hero-base-rgb), 0.72));
+  --detail-hero-base-rgb: 50, 42, 34;
+  --detail-hero-overlay: linear-gradient(135deg, rgba(var(--primary-rgb), 0.22), rgba(var(--detail-hero-base-rgb), 0.75));
   --detail-hero-fade: linear-gradient(
     180deg,
-    rgba(var(--detail-hero-base-rgb), 0.10) 0%,
-    rgba(var(--detail-hero-base-rgb), 0.55) 70%,
-    rgba(var(--detail-hero-base-rgb), 0.80) 100%
+    rgba(var(--detail-hero-base-rgb), 0.12) 0%,
+    rgba(var(--detail-hero-base-rgb), 0.58) 70%,
+    rgba(var(--detail-hero-base-rgb), 0.82) 100%
   );
-  --detail-hero-placeholder-bg: radial-gradient(circle at 30% 30%, rgba(var(--primary-rgb), 0.30), rgba(var(--detail-hero-base-rgb), 0.78));
-  --detail-hero-shadow: 0 30px 80px rgba(var(--detail-hero-base-rgb), 0.28);
-  --detail-panel-shadow: 0 15px 35px rgba(var(--detail-hero-base-rgb), 0.10);
+  --detail-hero-placeholder-bg: radial-gradient(circle at 30% 30%, rgba(var(--primary-rgb), 0.35), rgba(var(--detail-hero-base-rgb), 0.8));
+  --detail-hero-shadow: 0 30px 80px rgba(var(--detail-hero-base-rgb), 0.32);
+  --detail-panel-shadow: 0 15px 35px rgba(var(--detail-hero-base-rgb), 0.12);
 }
 
 /* ===== DARK THEME ===== */
