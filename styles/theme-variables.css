@@ -100,7 +100,7 @@
 
   --hero-overlay-bg: linear-gradient(145deg, rgba(42, 37, 31, 0.7) 0%, rgba(80, 68, 52, 0.65) 60%, rgba(110, 90, 70, 0.7) 100%);
   --hero-text-color: #fefdfb;
-  --hero-meta-color: rgba(200, 185, 160, 1);
+  --hero-meta-color: #f5f2ed;
 
   --progress-dot-active: rgba(250, 248, 245, 0.96);
 
