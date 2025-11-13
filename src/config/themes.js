@@ -26,10 +26,10 @@ export const COLOR_THEMES = [
     }
   },
   {
-    id: 'zen',
-    label: 'Zen',
-    cssClass: 'theme-zen',
-    mapStyle: 'zen',
+    id: 'night',
+    label: 'Night',
+    cssClass: 'theme-night',
+    mapStyle: 'night',
     colorScheme: 'dark',
     metaColor: '#041f1c',
     lensColors: {

@@ -44,7 +44,7 @@ function updateMetaThemeColor(themeId) {
 
 /**
  * Apply theme to document
- * @param {'light' | 'dark' | 'zen' | 'story'} themeId
+ * @param {'light' | 'dark' | 'night' | 'story'} themeId
  */
 export function applyTheme(themeId) {
   if (typeof document === 'undefined') return;
@@ -66,7 +66,7 @@ export function applyTheme(themeId) {
 
 /**
  * Get current theme
- * @returns {'light' | 'dark' | 'zen' | 'story'}
+ * @returns {'light' | 'dark' | 'night' | 'story'}
  */
 export function getCurrentTheme() {
   if (typeof document === 'undefined') return FALLBACK_THEME_ID;

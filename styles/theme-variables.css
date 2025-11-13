@@ -1,6 +1,6 @@
 /**
  * theme-variables.css - Simplified theme system
- * Light, Dark, Zen (dark), Story (dark) - using only CSS custom properties that are actively used
+ * Light, Dark, Night (dark), Story (dark) - using only CSS custom properties that are actively used
  */
 
 /* ===== GLOBAL TOKENS (all themes) ===== */
@@ -180,8 +180,8 @@
   --detail-panel-shadow: 0 15px 35px rgba(var(--detail-hero-base-rgb), 0.15);
 }
 
-/* ===== ZEN THEME (inherits from dark) ===== */
-:root.theme-zen {
+/* ===== NIGHT THEME (inherits from dark) ===== */
+:root.theme-night {
   color-scheme: dark;
 
   --primary: #6fcfbf;
@@ -224,7 +224,7 @@
   --btn-primary-shadow-hover: 0 4px 12px rgba(var(--primary-rgb), 0.4);
   --btn-primary-shadow-active: 0 1px 3px rgba(var(--primary-rgb), 0.22);
 
-  /* Detail view hero base for zen theme */
+  /* Detail view hero base for night theme */
   --detail-hero-base-rgb: 4, 27, 23;
   --detail-hero-overlay: linear-gradient(135deg, rgba(var(--primary-rgb), 0.25), rgba(var(--detail-hero-base-rgb), 0.85));
   --detail-hero-fade: linear-gradient(
