@@ -24,13 +24,13 @@
   --btn-primary-shadow-active: 0 1px 3px rgba(var(--primary-rgb), 0.2);
 
   /* Detail view contrast elements (for hero overlays with images) */
-  --detail-contrast-border: rgba(255, 255, 255, 0.3);
-  --detail-contrast-border-strong: rgba(255, 255, 255, 0.45);
-  --detail-contrast-button-bg: rgba(255, 255, 255, 0.18);
-  --detail-contrast-button-bg-hover: rgba(255, 255, 255, 0.28);
-  --detail-contrast-ghost-bg: rgba(0, 0, 0, 0.15);
-  --detail-contrast-ghost-bg-hover: rgba(0, 0, 0, 0.25);
-  --detail-contrast-faint: rgba(255, 255, 255, 0.6);
+  --detail-contrast-border: rgba(255, 255, 255, 0.4);
+  --detail-contrast-border-strong: rgba(255, 255, 255, 0.55);
+  --detail-contrast-button-bg: rgba(255, 255, 255, 0.22);
+  --detail-contrast-button-bg-hover: rgba(255, 255, 255, 0.35);
+  --detail-contrast-ghost-bg: rgba(0, 0, 0, 0.2);
+  --detail-contrast-ghost-bg-hover: rgba(0, 0, 0, 0.32);
+  --detail-contrast-faint: rgba(255, 255, 255, 0.75);
 
   /* Detail view glass elements */
   --detail-glass-highlight: rgba(255, 255, 255, 0.04);
@@ -98,9 +98,9 @@
   --toolbar-text: #2a251f;
   --toolbar-text-muted: rgba(90, 77, 66, 0.8);
 
-  --hero-overlay-bg: linear-gradient(145deg, rgba(42, 37, 31, 0.65) 0%, rgba(80, 68, 52, 0.6) 60%, rgba(110, 90, 70, 0.65) 100%);
-  --hero-text-color: #faf8f5;
-  --hero-meta-color: rgba(168, 153, 104, 0.98);
+  --hero-overlay-bg: linear-gradient(145deg, rgba(42, 37, 31, 0.7) 0%, rgba(80, 68, 52, 0.65) 60%, rgba(110, 90, 70, 0.7) 100%);
+  --hero-text-color: #fefdfb;
+  --hero-meta-color: rgba(200, 185, 160, 1);
 
   --progress-dot-active: rgba(250, 248, 245, 0.96);
 
