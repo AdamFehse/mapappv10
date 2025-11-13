@@ -6,35 +6,7 @@
 import { GlobeContainer } from './GlobeContainer.js';
 import { BottomSheet } from './BottomSheet.js';
 import { initializeBottomSheet } from '../utils/bottom-sheet.js';
-import { detectOSPreference, applyTheme, subscribeToOSPreferenceChange } from '../utils/themeManager.js';
-
-const THEME_STORAGE_KEY = 'mapapp-theme';
-
-function getStoredTheme() {
-  if (typeof window === 'undefined') return null;
-  try {
-    return localStorage.getItem(THEME_STORAGE_KEY);
-  } catch (error) {
-    return null;
-  }
-}
-
-function persistTheme(theme) {
-  if (typeof window === 'undefined') return;
-  try {
-    localStorage.setItem(THEME_STORAGE_KEY, theme);
-  } catch (error) {
-    // Ignore storage errors
-  }
-}
-
-function getInitialThemeState() {
-  const stored = getStoredTheme();
-  if (stored) {
-    return { value: stored, source: 'user' };
-  }
-  return { value: detectOSPreference(), source: 'system' };
-}
+import { detectOSPreference, applyTheme } from '../utils/themeManager.js';
 
 /**
  * App Component
@@ -56,14 +28,12 @@ function getInitialThemeState() {
  */
 export function App() {
   const { useState, useEffect, useMemo, useRef } = React;
-  const initialThemeState = useMemo(() => getInitialThemeState(), []);
 
   // State
   const [projects, setProjects] = useState([]);
   const [selectedProject, setSelectedProject] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [currentTheme, setCurrentTheme] = useState(initialThemeState.value);
-  const [themeSource, setThemeSource] = useState(initialThemeState.source);
+  const [currentTheme, setCurrentTheme] = useState(() => detectOSPreference());
   const [satelliteView, setSatelliteView] = useState(false);
 
   // Router from global scope (loaded as plain script)
@@ -161,22 +131,7 @@ export function App() {
     applyTheme(currentTheme);
   }, [currentTheme]);
 
-  useEffect(() => {
-    if (themeSource !== 'system') {
-      persistTheme(currentTheme);
-    }
-  }, [currentTheme, themeSource]);
-
-  useEffect(() => {
-    if (themeSource !== 'system') return;
-    const unsubscribe = subscribeToOSPreferenceChange((nextPreference) => {
-      setCurrentTheme(nextPreference);
-    });
-    return unsubscribe;
-  }, [themeSource]);
-
   function handleSelectTheme(themeId) {
-    setThemeSource('user');
     setCurrentTheme(themeId);
   }
 
