@@ -3,7 +3,6 @@
  * ES module version
  */
 
-import { MarkerTooltip } from './globe/MarkerTooltip.js';
 import { getMapStyleForTheme } from '../config/themes.js';
 import { resolveThemeColor } from '../utils/themeVars.js';
 
@@ -108,7 +107,6 @@ export function GlobeContainer({
   const [markersRevealed, setMarkersRevealed] = useState(false);
   const [viewerReady, setViewerReady] = useState(false);
   const [qualityMenuOpen, setQualityMenuOpen] = useState(false);
-  const [tooltipData, setTooltipData] = useState(null); // { project, x, y, visible }
   const [qualityOverride, setQualityOverrideState] = useState(() => {
     try {
       return typeof window !== 'undefined'
@@ -891,13 +889,6 @@ export function GlobeContainer({
       ref: container3DRef,
       className: 'globe-viewer',
       'aria-label': '3D Map View'
-    }),
-
-    // Marker tooltip (appears on hover)
-    tooltipData && React.createElement(MarkerTooltip, {
-      project: tooltipData.project,
-      position: { x: tooltipData.x, y: tooltipData.y },
-      visible: tooltipData.visible
     })
   );
 }
