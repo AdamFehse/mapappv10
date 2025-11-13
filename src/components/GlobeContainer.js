@@ -66,12 +66,9 @@ const INITIAL_CAMERA_CONFIG = {
  *
  * RESPONSIBILITY:
  * - Initialize and manage Cesium 3D viewer
- * - Render project markers (via MarkerManager)
+ * - Render project markers (Cesium points)
  * - Handle camera movements and animations
  * - Dispatch click events to parent
- *
- * Uses modular components:
- * - MarkerManager: for marker visuals and updates
  *
  * PROPS:
  * - projects: Array of project objects
