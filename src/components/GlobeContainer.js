@@ -6,13 +6,6 @@
 import { getMapStyleForTheme } from '../config/themes.js';
 import { resolveThemeColor } from '../utils/themeVars.js';
 
-const MARKER_PALETTE_FALLBACK = [
-  'var(--marker-palette-1, #4fc3f7)',
-  'var(--marker-palette-2, #ff8a65)',
-  'var(--marker-palette-3, #66bb6a)',
-  'var(--marker-palette-4, #ffd54f)',
-  'var(--marker-palette-5, #ba68c8)'
-];
 const EARTH_AT_NIGHT_SERVICE_URL = 'https://tiles.arcgis.com/tiles/P3ePLMYs2RVChkJx/arcgis/rest/services/Earth_at_Night_2016/MapServer';
 const CLUSTER_GRID_METERS = 3200;
 const MIN_OFFSET_METERS = 220;
@@ -67,13 +60,6 @@ const INITIAL_CAMERA_CONFIG = {
   latitude: 29,       // Northern Mexico (Sonora)
   altitude: 30000000  // 30M km altitude - see whole Earth with Sonora centered
 };
-
-// Utility: Get marker label text (used for Cesium entity labels)
-function getMarkerLabelText(project, maxChars) {
-  const name = (project?.ProjectName || '').trim();
-  if (!name || typeof maxChars !== 'number' || maxChars <= 0) return name;
-  return name.length <= maxChars ? name : `${name.slice(0, Math.max(0, maxChars - 3))}...`;
-}
 
 /**
  * GlobeContainer Component
@@ -167,38 +153,6 @@ export function GlobeContainer({
   }, [theme, satelliteView]);
 
 
-  const markerOptions = React.useMemo(() => {
-    const config = window.CesiumConfig?.markers || {};
-    const defaults = {
-      defaultColor: 'var(--marker-default-color, #2196F3)',
-      selectedColor: 'var(--marker-selected-color, #FF5722)',
-      hoverColor: 'var(--marker-hover-color, #1976D2)',
-      size: 36,
-      palette: MARKER_PALETTE_FALLBACK,
-      showLabels: false,
-      labelMaxChars: 18
-    };
-
-    const merged = {
-      ...defaults,
-      ...config,
-      palette: Array.isArray(config.palette) && config.palette.length ? config.palette : defaults.palette
-    };
-
-    const finalPalette = merged.palette
-      .map(color => resolveThemeColor(color))
-      .filter(Boolean);
-
-    const fallbackPalette = finalPalette.length ? finalPalette : [resolveThemeColor(merged.defaultColor, '#2196F3')];
-
-    return {
-      ...merged,
-      defaultColor: resolveThemeColor(merged.defaultColor, '#2196F3'),
-      selectedColor: resolveThemeColor(merged.selectedColor, '#FF5722'),
-      hoverColor: resolveThemeColor(merged.hoverColor, '#1976D2'),
-      palette: fallbackPalette
-    };
-  }, []);
 
   // PERFORMANCE FLAGS
   const performanceFlags = React.useMemo(() => {
@@ -499,23 +453,10 @@ export function GlobeContainer({
           view3D.entities.remove(entity);
         }
         delete existingEntities[entityId];
-      } else if (entity) {
-        if (entity.billboard) {
-          entity.billboard.show = true;
-          entity.billboard.width = markerOptions.size;
-          entity.billboard.height = Math.round(markerOptions.size * 1.25);
-        }
-        if (entity.label) {
-          entity.label.show = !!markerOptions.showLabels;
-          entity.label.text = getMarkerLabelText(entity.projectData, markerOptions.labelMaxChars);
-        }
       }
     });
 
     const newlyCreated = [];
-    const selectedId = selectedProject && selectedProject.id !== undefined && selectedProject.id !== null
-      ? String(selectedProject.id)
-      : null;
 
     validProjects.forEach(({ project, entityId }) => {
       const existing = existingEntities[entityId];
@@ -528,19 +469,6 @@ export function GlobeContainer({
       if (existing) {
         existing.projectData = entityProjectData;
         existing.position = Cesium.Cartesian3.fromDegrees(longitude, latitude);
-        if (existing.label) {
-          const labelSource = clusterInfo && clusterInfo.clusterSize > 1
-            ? { ProjectName: `${clusterInfo.clusterSize} projects` }
-            : project;
-          existing.label.text = getMarkerLabelText(labelSource, markerOptions.labelMaxChars);
-          existing.label.show = !!markerOptions.showLabels;
-        }
-        if (existing.billboard) {
-          existing.billboard.width = markerOptions.size;
-          existing.billboard.height = Math.round(markerOptions.size * 1.25);
-          existing.billboard.show = true;
-        }
-        window.MapApp.MarkerManager.updateMarkerGraphics(existing, markerOptions, !!(selectedId && entityId === selectedId), theme);
         return;
       }
 
@@ -549,38 +477,18 @@ export function GlobeContainer({
           longitude,
           latitude
         ),
-        billboard: {
-          image: '',
-          width: markerOptions.size,
-          height: Math.round(markerOptions.size * 1.25),
-          verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-          show: true,
+        point: {
+          pixelSize: 8,
+          color: Cesium.Color.SKYBLUE,
+          outlineColor: Cesium.Color.WHITE,
+          outlineWidth: 2,
           disableDepthTestDistance: Number.POSITIVE_INFINITY
         },
-        label: markerOptions.showLabels ? {
-          text: getMarkerLabelText(
-            clusterInfo && clusterInfo.clusterSize > 1
-              ? { ProjectName: `${clusterInfo.clusterSize} projects` }
-              : project,
-            markerOptions.labelMaxChars
-          ),
-          font: '600 12px "Inter", sans-serif',
-          fillColor: Cesium.Color.WHITE,
-          outlineColor: Cesium.Color.fromAlpha(Cesium.Color.BLACK, 0.6),
-          outlineWidth: 2,
-          style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-          verticalOrigin: Cesium.VerticalOrigin.TOP,
-          pixelOffset: new Cesium.Cartesian2(0, 12),
-          disableDepthTestDistance: Number.POSITIVE_INFINITY,
-          translucencyByDistance: new Cesium.NearFarScalar(100000.0, 1.0, 600000.0, 0.0),
-          show: !!markerOptions.showLabels
-        } : undefined,
         projectData: entityProjectData
       });
 
       existingEntities[entityId] = entity;
       newlyCreated.push(entity);
-      window.MapApp.MarkerManager.updateMarkerGraphics(entity, markerOptions, !!(selectedId && entityId === selectedId), theme);
     });
 
     if (!markersRevealed) {
@@ -588,7 +496,7 @@ export function GlobeContainer({
     } else if (newlyCreated.length > 0) {
       revealMarkers(newlyCreated);
     }
-  }, [projects, markerOptions, selectedProject, clusterMetadata]);
+  }, [projects, selectedProject, clusterMetadata]);
 
   // Fly to selected project
   useEffect(() => {
@@ -616,7 +524,6 @@ export function GlobeContainer({
     Object.values(entitiesRef.current).forEach(entity => {
       if (!entity || !entity.projectData) return;
       const isSelected = !!(selectedProject && entity.projectData.id === selectedProject.id);
-      window.MapApp.MarkerManager.updateMarkerGraphics(entity, markerOptions, isSelected, theme);
 
       if (isSelected && view3D) {
         view3D.selectedEntity = entity;
@@ -626,7 +533,7 @@ export function GlobeContainer({
     if (!selectedProject && view3D) {
       view3D.selectedEntity = undefined;
     }
-  }, [selectedProject, markerOptions]);
+  }, [selectedProject]);
 
   function clearRevealTimeouts() {
     if (!Array.isArray(revealTimeoutsRef.current)) {
@@ -694,11 +601,8 @@ export function GlobeContainer({
       const delay = (prefersReduced || performanceFlags.isLowPower) ? 0 : Math.min(idx * 50, 800);
       const reveal = () => {
         if (!entity || (typeof entity.isDestroyed === 'function' && entity.isDestroyed())) return;
-        if (entity.billboard) {
-          entity.billboard.show = true;
-        }
-        if (entity.label) {
-          entity.label.show = !!markerOptions.showLabels;
+        if (entity.point) {
+          entity.point.pixelSize = 8;
         }
       };
 
