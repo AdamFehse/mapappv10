@@ -13,12 +13,7 @@ window.MapApp.App = App;
 window.MapApp.GlobeContainer = GlobeContainer;
 window.MapApp.MarkerManager = MarkerManager;
 
-// Hide loading skeleton and render app
-const loadingSkeleton = document.getElementById('loading-skeleton');
-if (loadingSkeleton) {
-  loadingSkeleton.style.display = 'none';
-}
-
+// Render app
 ReactDOM.createRoot(document.getElementById('root')).render(
   React.createElement(App)
 );
