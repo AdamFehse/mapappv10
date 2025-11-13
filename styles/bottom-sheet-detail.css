@@ -187,7 +187,7 @@
 
 .project-detail-main,
 .project-detail-aside {
-  background: radial-gradient(circle at top, var(--sidebar-bg), rgba(var(--detail-hero-base-rgb), 0.04));
+  background: var(--sidebar-bg);
   border: none;
   border-radius: 20px;
   padding: 1.5rem;
