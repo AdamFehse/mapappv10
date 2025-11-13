@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Interactive 3D globe exploring Arizona-Sonora borderlands research projects" />
-  <meta name="theme-color" content="#05030c" />
+  <meta name="theme-color" content="#ffffff" />
   <title>3D Globe Story Map - Arizona-Sonora Borderlands</title>
 
   <!-- DNS Prefetch for fastest connection -->
@@ -18,14 +18,15 @@
   <!-- Module preload hints for HTTP/2 - enables parallel fetching of critical modules -->
   <link rel="modulepreload" href="./src/components/App.js" />
   <link rel="modulepreload" href="./src/components/GlobeContainer.js" />
-  <link rel="modulepreload" href="./src/components/RightPanel.js" />
-  <link rel="modulepreload" href="./src/components/NarrativeBar.js" />
   <link rel="modulepreload" href="./src/components/globe/MarkerManager.js" />
-  <link rel="modulepreload" href="./src/components/globe/IntroOverlay.js" />
 
   <!-- Stylesheets -->
   <link rel="stylesheet" href="./styles/theme-variables.css" />
-  <link rel="stylesheet" href="./styles/main.css" />
+  <link rel="stylesheet" href="./styles/base.css" />
+  <link rel="stylesheet" href="./styles/globe.css" />
+  <link rel="stylesheet" href="./styles/bottom-sheet.css" />
+  <link rel="stylesheet" href="./styles/marker-animations.css" />
+  <link rel="stylesheet" href="./styles/marker-tooltip.css" />
   <!-- Cesium CSS deferred -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cesium@latest/Build/Cesium/Widgets/widgets.css" media="print" onload="this.media='all'" />
 

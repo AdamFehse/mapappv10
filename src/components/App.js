@@ -6,6 +6,35 @@
 import { GlobeContainer } from './GlobeContainer.js';
 import { BottomSheet } from './BottomSheet.js';
 import { initializeBottomSheet } from '../utils/bottom-sheet.js';
+import { detectOSPreference, applyTheme, subscribeToOSPreferenceChange } from '../utils/themeManager.js';
+
+const THEME_STORAGE_KEY = 'mapapp-theme';
+
+function getStoredTheme() {
+  if (typeof window === 'undefined') return null;
+  try {
+    return localStorage.getItem(THEME_STORAGE_KEY);
+  } catch (error) {
+    return null;
+  }
+}
+
+function persistTheme(theme) {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(THEME_STORAGE_KEY, theme);
+  } catch (error) {
+    // Ignore storage errors
+  }
+}
+
+function getInitialThemeState() {
+  const stored = getStoredTheme();
+  if (stored) {
+    return { value: stored, source: 'user' };
+  }
+  return { value: detectOSPreference(), source: 'system' };
+}
 
 /**
  * App Component
@@ -27,14 +56,15 @@ import { initializeBottomSheet } from '../utils/bottom-sheet.js';
  */
 export function App() {
   const { useState, useEffect, useMemo, useRef } = React;
+  const initialThemeState = useMemo(() => getInitialThemeState(), []);
 
   // State
   const [projects, setProjects] = useState([]);
   const [selectedProject, setSelectedProject] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [narrativeIndex, setNarrativeIndex] = useState(0);
-  const [showNarrativeIntro, setShowNarrativeIntro] = useState(false);
-  const [currentTheme, setCurrentTheme] = useState('light');
+  const [currentTheme, setCurrentTheme] = useState(initialThemeState.value);
+  const [themeSource, setThemeSource] = useState(initialThemeState.source);
+  const [satelliteView, setSatelliteView] = useState(false);
 
   // Router from global scope (loaded as plain script)
   const Router = window.MapAppUtils && window.MapAppUtils.Router;
@@ -109,8 +139,6 @@ export function App() {
     }
   }, [Router, selectedProject]);
 
-  // Sidebar state removed - all controls now in BottomSheet
-
   // Initialize bottom sheet drag functionality
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -129,11 +157,31 @@ export function App() {
     setSelectedProject(project);
   }
 
+  useEffect(() => {
+    applyTheme(currentTheme);
+  }, [currentTheme]);
+
+  useEffect(() => {
+    if (themeSource !== 'system') {
+      persistTheme(currentTheme);
+    }
+  }, [currentTheme, themeSource]);
+
+  useEffect(() => {
+    if (themeSource !== 'system') return;
+    const unsubscribe = subscribeToOSPreferenceChange((nextPreference) => {
+      setCurrentTheme(nextPreference);
+    });
+    return unsubscribe;
+  }, [themeSource]);
+
   function handleSelectTheme(themeId) {
+    setThemeSource('user');
     setCurrentTheme(themeId);
-    // Update the HTML element with theme class
-    const root = document.documentElement;
-    root.className = themeId === 'light' ? '' : `theme-${themeId}`;
+  }
+
+  function handleToggleSatelliteView() {
+    setSatelliteView(prev => !prev);
   }
 
   function handleShare() {
@@ -160,10 +208,8 @@ export function App() {
       selectedProject: selectedProject,
       onProjectClick: handleSelectProject,
       onGlobeReady: () => {},
-      narrativeIndex: narrativeIndex,
-      onNarrativeChange: setNarrativeIndex,
-      showNarrativeIntro,
-      onNarrativeIntroChange: setShowNarrativeIntro
+      theme: currentTheme,
+      satelliteView
     }),
 
     // Bottom: Unified control center (themes, filters, projects, detail view)
@@ -173,6 +219,8 @@ export function App() {
       selectedProjectId: selectedProject ? selectedProject.id : null,
       onSelectTheme: handleSelectTheme,
       currentTheme: currentTheme,
+      satelliteView,
+      onToggleSatelliteView: handleToggleSatelliteView,
       onShare: handleShare
     })
   );

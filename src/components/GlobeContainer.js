@@ -1,13 +1,66 @@
 /**
- * GlobeContainer.js - Cesium 3D Globe viewer with markers and narrative intro
- * ES module version - simplified with CSS-animated intro overlay
+ * GlobeContainer.js - Cesium 3D Globe viewer with markers
+ * ES module version
  */
 
-import { IntroOverlay } from './globe/IntroOverlay.js';
-import { detectOSPreference, applyTheme } from '../utils/themeManager.js';
+import { MarkerTooltip } from './globe/MarkerTooltip.js';
+import { getMapStyleForTheme } from '../config/themes.js';
+import { resolveThemeColor } from '../utils/themeVars.js';
 
-const MARKER_PALETTE_FALLBACK = ['#4fc3f7', '#ff8a65', '#66bb6a', '#ffd54f', '#ba68c8'];
+const MARKER_PALETTE_FALLBACK = [
+  'var(--marker-palette-1, #4fc3f7)',
+  'var(--marker-palette-2, #ff8a65)',
+  'var(--marker-palette-3, #66bb6a)',
+  'var(--marker-palette-4, #ffd54f)',
+  'var(--marker-palette-5, #ba68c8)'
+];
 const EARTH_AT_NIGHT_SERVICE_URL = 'https://tiles.arcgis.com/tiles/P3ePLMYs2RVChkJx/arcgis/rest/services/Earth_at_Night_2016/MapServer';
+const CLUSTER_GRID_METERS = 3200;
+const MIN_OFFSET_METERS = 220;
+const OFFSET_STEP_METERS = 120;
+const OFFSETS_PER_RING = 6;
+const METERS_PER_DEGREE_LAT = 1 / 111000;
+
+function getClusterCellKey(lat, lon, cellDegrees) {
+  const latIndex = Math.floor(lat / cellDegrees);
+  const lonIndex = Math.floor(lon / cellDegrees);
+  return `${latIndex}:${lonIndex}`;
+}
+
+function buildClusterMetadata(projects = []) {
+  if (!Array.isArray(projects) || projects.length === 0) return new Map();
+  const cellDegrees = CLUSTER_GRID_METERS * METERS_PER_DEGREE_LAT;
+  const buckets = new Map();
+  projects.forEach(project => {
+    if (typeof project?.Latitude !== 'number' || typeof project?.Longitude !== 'number') return;
+    const key = getClusterCellKey(project.Latitude, project.Longitude, cellDegrees);
+    const bucket = buckets.get(key) || [];
+    bucket.push(project);
+    buckets.set(key, bucket);
+  });
+
+  const metadata = new Map();
+  const rad = Math.PI / 180;
+  buckets.forEach(bucket => {
+    if (bucket.length <= 1) return;
+    const angleIncrement = (Math.PI * 2) / bucket.length;
+    bucket.forEach((project, index) => {
+      const angle = angleIncrement * index;
+      const ringLevel = Math.floor(index / OFFSETS_PER_RING);
+      const radiusMeters = MIN_OFFSET_METERS + ringLevel * OFFSET_STEP_METERS;
+      const latOffset = Math.sin(angle) * radiusMeters * METERS_PER_DEGREE_LAT;
+      const cosLat = Math.cos((project.Latitude || 0) * rad) || 1;
+      const lonOffset = Math.cos(angle) * radiusMeters * METERS_PER_DEGREE_LAT / cosLat;
+      metadata.set(String(project.id), {
+        latOffset,
+        lonOffset,
+        clusterSize: bucket.length
+      });
+    });
+  });
+
+  return metadata;
+}
 
 // Initial camera position - Sonora region with wide view
 const INITIAL_CAMERA_CONFIG = {
@@ -30,31 +83,23 @@ function getMarkerLabelText(project, maxChars) {
  * - Initialize and manage Cesium 3D viewer
  * - Render project markers (via MarkerManager)
  * - Handle camera movements and animations
- * - Display narrative intro (via IntroOverlay with CSS animations)
  * - Dispatch click events to parent
  *
  * Uses modular components:
  * - MarkerManager: for marker visuals and updates
- * - IntroOverlay: for narrative intro UI (CSS-animated)
  *
  * PROPS:
  * - projects: Array of project objects
  * - selectedProject: Currently selected project
  * - onProjectClick: Callback when marker clicked
- * - narrativeIndex: Current narrative passage index
- * - onNarrativeChange: Callback for passage navigation
- * - showNarrativeIntro: Whether the intro overlay/mode is active
- * - onNarrativeIntroChange: Toggle callback for intro visibility
  */
 export function GlobeContainer({
   projects = [],
   selectedProject = null,
   onProjectClick,
   onGlobeReady,
-  narrativeIndex = 0,
-  onNarrativeChange,
-  showNarrativeIntro = false,
-  onNarrativeIntroChange = null
+  theme = 'light',
+  satelliteView = false
 }) {
   const { useEffect, useRef, useState } = React;
   const container3DRef = useRef(null);
@@ -63,6 +108,7 @@ export function GlobeContainer({
   const [markersRevealed, setMarkersRevealed] = useState(false);
   const [viewerReady, setViewerReady] = useState(false);
   const [qualityMenuOpen, setQualityMenuOpen] = useState(false);
+  const [tooltipData, setTooltipData] = useState(null); // { project, x, y, visible }
   const [qualityOverride, setQualityOverrideState] = useState(() => {
     try {
       return typeof window !== 'undefined'
@@ -73,7 +119,7 @@ export function GlobeContainer({
     }
   });
   const qualityLabel = qualityOverride || window.MapAppPerf?.qualityTier || 'auto';
-  const [mapStyle, setMapStyle] = useState('light'); // 'light', 'dark', 'zen'
+  const [mapStyle, setMapStyle] = useState(() => satelliteView ? 'satellite' : getMapStyleForTheme(theme)); // 'light', 'dark', 'zen', 'satellite'
   const revealTimeoutsRef = useRef([]);
   const mapStyleConfigsRef = useRef(null);
 
@@ -101,65 +147,58 @@ export function GlobeContainer({
         options: {
           credit: new Cesium.Credit('NASA Earth Observatory / Esri')
         }
+      },
+      satellite: {
+        type: 'ArcGis',
+        url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer',
+        options: {
+          credit: new Cesium.Credit('Esri')
+        }
       }
     };
   }
 
   const mapStyleConfigs = mapStyleConfigsRef.current || {};
-
-  // Initialize theme based on OS preference on mount
-  useEffect(() => {
-    const osPreference = detectOSPreference();
-    applyTheme(osPreference);
-
-    // Set initial map style to match theme (dark/zen both use dark theme)
-    if (osPreference === 'dark') {
-      setMapStyle('dark');
-    } else {
-      setMapStyle('light');
-    }
-  }, []);
+  const clusterMetadata = React.useMemo(() => buildClusterMetadata(projects), [projects]);
 
   useEffect(() => {
-    if (showNarrativeIntro) {
-      applyTheme('story');
-    } else {
-      applyTheme(mapStyle);
-    }
-  }, [showNarrativeIntro, mapStyle]);
+    setMapStyle(prev => {
+      const desired = satelliteView ? 'satellite' : getMapStyleForTheme(theme);
+      return prev === desired ? prev : desired;
+    });
+  }, [theme, satelliteView]);
 
-  useEffect(() => {
-    if (showNarrativeIntro && qualityMenuOpen) {
-      setQualityMenuOpen(false);
-    }
-  }, [showNarrativeIntro, qualityMenuOpen]);
-
-  useEffect(() => {
-    if (!showNarrativeIntro || !selectedProject) {
-      return;
-    }
-
-    if (typeof onNarrativeIntroChange === 'function') {
-      onNarrativeIntroChange(false);
-    }
-    revealMarkers();
-  }, [showNarrativeIntro, selectedProject, onNarrativeIntroChange]);
 
   const markerOptions = React.useMemo(() => {
     const config = window.CesiumConfig?.markers || {};
     const defaults = {
-      defaultColor: '#2196F3',
-      selectedColor: '#FF5722',
-      hoverColor: '#1976D2',
+      defaultColor: 'var(--marker-default-color, #2196F3)',
+      selectedColor: 'var(--marker-selected-color, #FF5722)',
+      hoverColor: 'var(--marker-hover-color, #1976D2)',
       size: 36,
       palette: MARKER_PALETTE_FALLBACK,
       showLabels: false,
       labelMaxChars: 18
     };
-    return {
+
+    const merged = {
       ...defaults,
       ...config,
       palette: Array.isArray(config.palette) && config.palette.length ? config.palette : defaults.palette
+    };
+
+    const finalPalette = merged.palette
+      .map(color => resolveThemeColor(color))
+      .filter(Boolean);
+
+    const fallbackPalette = finalPalette.length ? finalPalette : [resolveThemeColor(merged.defaultColor, '#2196F3')];
+
+    return {
+      ...merged,
+      defaultColor: resolveThemeColor(merged.defaultColor, '#2196F3'),
+      selectedColor: resolveThemeColor(merged.selectedColor, '#FF5722'),
+      hoverColor: resolveThemeColor(merged.hoverColor, '#1976D2'),
+      palette: fallbackPalette
     };
   }, []);
 
@@ -171,10 +210,6 @@ export function GlobeContainer({
     };
   }, []);
 
-  const narrativeConfig = React.useMemo(() => {
-    return window.MapAppConfig?.narrative || { passages: [] };
-  }, []);
-  const narrativePassages = narrativeConfig.passages || [];
 
   // Initialize 3D viewer
   useEffect(() => {
@@ -468,12 +503,12 @@ export function GlobeContainer({
         delete existingEntities[entityId];
       } else if (entity) {
         if (entity.billboard) {
-          entity.billboard.show = !showNarrativeIntro;
+          entity.billboard.show = true;
           entity.billboard.width = markerOptions.size;
           entity.billboard.height = Math.round(markerOptions.size * 1.25);
         }
         if (entity.label) {
-          entity.label.show = !!(markerOptions.showLabels && !showNarrativeIntro);
+          entity.label.show = !!markerOptions.showLabels;
           entity.label.text = getMarkerLabelText(entity.projectData, markerOptions.labelMaxChars);
         }
       }
@@ -486,36 +521,51 @@ export function GlobeContainer({
 
     validProjects.forEach(({ project, entityId }) => {
       const existing = existingEntities[entityId];
+      const clusterInfo = clusterMetadata.get(entityId);
+      const latitude = project.Latitude + (clusterInfo?.latOffset || 0);
+      const longitude = project.Longitude + (clusterInfo?.lonOffset || 0);
+      const entityProjectData = clusterInfo && clusterInfo.clusterSize > 1
+        ? { ...project, clusterSize: clusterInfo.clusterSize }
+        : project;
       if (existing) {
-        existing.projectData = project;
+        existing.projectData = entityProjectData;
+        existing.position = Cesium.Cartesian3.fromDegrees(longitude, latitude);
         if (existing.label) {
-          existing.label.text = getMarkerLabelText(project, markerOptions.labelMaxChars);
-          existing.label.show = !!(markerOptions.showLabels && !showNarrativeIntro);
+          const labelSource = clusterInfo && clusterInfo.clusterSize > 1
+            ? { ProjectName: `${clusterInfo.clusterSize} projects` }
+            : project;
+          existing.label.text = getMarkerLabelText(labelSource, markerOptions.labelMaxChars);
+          existing.label.show = !!markerOptions.showLabels;
         }
         if (existing.billboard) {
           existing.billboard.width = markerOptions.size;
           existing.billboard.height = Math.round(markerOptions.size * 1.25);
-          existing.billboard.show = !showNarrativeIntro;
+          existing.billboard.show = true;
         }
-        window.MapApp.MarkerManager.updateMarkerGraphics(existing, markerOptions, !!(selectedId && entityId === selectedId));
+        window.MapApp.MarkerManager.updateMarkerGraphics(existing, markerOptions, !!(selectedId && entityId === selectedId), theme);
         return;
       }
 
       const entity = view3D.entities.add({
         position: Cesium.Cartesian3.fromDegrees(
-          project.Longitude,
-          project.Latitude
+          longitude,
+          latitude
         ),
         billboard: {
           image: '',
           width: markerOptions.size,
           height: Math.round(markerOptions.size * 1.25),
           verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-          show: !showNarrativeIntro,
+          show: true,
           disableDepthTestDistance: Number.POSITIVE_INFINITY
         },
         label: markerOptions.showLabels ? {
-          text: getMarkerLabelText(project, markerOptions.labelMaxChars),
+          text: getMarkerLabelText(
+            clusterInfo && clusterInfo.clusterSize > 1
+              ? { ProjectName: `${clusterInfo.clusterSize} projects` }
+              : project,
+            markerOptions.labelMaxChars
+          ),
           font: '600 12px "Inter", sans-serif',
           fillColor: Cesium.Color.WHITE,
           outlineColor: Cesium.Color.fromAlpha(Cesium.Color.BLACK, 0.6),
@@ -525,26 +575,22 @@ export function GlobeContainer({
           pixelOffset: new Cesium.Cartesian2(0, 12),
           disableDepthTestDistance: Number.POSITIVE_INFINITY,
           translucencyByDistance: new Cesium.NearFarScalar(100000.0, 1.0, 600000.0, 0.0),
-          show: !showNarrativeIntro
+          show: !!markerOptions.showLabels
         } : undefined,
-        projectData: project
+        projectData: entityProjectData
       });
 
       existingEntities[entityId] = entity;
       newlyCreated.push(entity);
-      window.MapApp.MarkerManager.updateMarkerGraphics(entity, markerOptions, !!(selectedId && entityId === selectedId));
+      window.MapApp.MarkerManager.updateMarkerGraphics(entity, markerOptions, !!(selectedId && entityId === selectedId), theme);
     });
 
-    if (!showNarrativeIntro) {
-      if (!markersRevealed) {
-        revealMarkers();
-      } else if (newlyCreated.length > 0) {
-        revealMarkers(newlyCreated);
-      }
-    } else if (markersRevealed) {
-      setMarkersRevealed(false);
+    if (!markersRevealed) {
+      revealMarkers();
+    } else if (newlyCreated.length > 0) {
+      revealMarkers(newlyCreated);
     }
-  }, [projects, showNarrativeIntro, markerOptions, selectedProject]);
+  }, [projects, markerOptions, selectedProject, clusterMetadata]);
 
   // Fly to selected project
   useEffect(() => {
@@ -572,7 +618,7 @@ export function GlobeContainer({
     Object.values(entitiesRef.current).forEach(entity => {
       if (!entity || !entity.projectData) return;
       const isSelected = !!(selectedProject && entity.projectData.id === selectedProject.id);
-      window.MapApp.MarkerManager.updateMarkerGraphics(entity, markerOptions, isSelected);
+      window.MapApp.MarkerManager.updateMarkerGraphics(entity, markerOptions, isSelected, theme);
 
       if (isSelected && view3D) {
         view3D.selectedEntity = entity;
@@ -668,48 +714,6 @@ export function GlobeContainer({
     setMarkersRevealed(true);
   }
 
-  function handleNarrativeNavigate(index) {
-    const boundedIndex = Math.max(0, Math.min(index, narrativePassages.length - 1));
-    onNarrativeChange && onNarrativeChange(boundedIndex);
-  }
-
-  function toggleNarrativeMode(forceValue) {
-    const nextState = typeof forceValue === 'boolean' ? forceValue : !showNarrativeIntro;
-    if (typeof onNarrativeIntroChange === 'function') {
-      onNarrativeIntroChange(nextState);
-    }
-  }
-
-  // Update both map style and theme together
-  function handleStyleChange(newStyle) {
-    setMapStyle(newStyle);
-  }
-
-  // Handle continue: advance to next narrative passage (or begin journey if on last passage)
-  function continueNarrative() {
-    if (narrativeIndex < narrativePassages.length - 1) {
-      handleNarrativeNavigate(narrativeIndex + 1);
-    } else {
-      beginJourney();
-    }
-  }
-
-  // Handle intro begin: fly to Arizona-Sonora and then reveal markers
-  function beginJourney() {
-    toggleNarrativeMode(false);
-    flyToBorderlands(() => {
-      revealMarkers();
-    }, performanceFlags.isLowPower);
-  }
-
-  // Handle skip: jump to region immediately and reveal markers
-  function skipIntro() {
-    toggleNarrativeMode(false);
-    flyToBorderlands(() => {
-      revealMarkers();
-    }, true);
-  }
-
   // Handle quality tier change
   function handleQualityChange(tier) {
     if (!window.MapAppPerf) {
@@ -800,10 +804,24 @@ export function GlobeContainer({
       return entity;
     };
 
-    const faceColor = Cesium.Color.fromCssColorString(borderConfig.material?.face || borderConfig.material?.color || '#f97316').withAlpha(0.9);
-    const outerColor = Cesium.Color.fromCssColorString(borderConfig.material?.color || '#f97316').withAlpha(0.7);
-    const outlineColor = Cesium.Color.fromCssColorString(borderConfig.material?.outline || '#7a3f00').withAlpha(0.6);
-    const glowColor = Cesium.Color.fromCssColorString(borderConfig.material?.glow || '#ffd166').withAlpha(0.95);
+    const borderMaterial = borderConfig.material || {};
+    const fallbackFaceColor = resolveThemeColor('var(--border-wall-face, #ff6a3d)', '#ff6a3d');
+    const fallbackOuterColor = resolveThemeColor('var(--border-wall-color, #f97316)', '#f97316');
+    const fallbackOutlineColor = resolveThemeColor('var(--border-wall-outline, #7a3f00)', '#7a3f00');
+    const fallbackGlowColor = resolveThemeColor('var(--border-wall-glow, #ffd166)', '#ffd166');
+
+    const faceColor = Cesium.Color
+      .fromCssColorString(resolveThemeColor(borderMaterial.face || borderMaterial.color, fallbackFaceColor))
+      .withAlpha(0.9);
+    const outerColor = Cesium.Color
+      .fromCssColorString(resolveThemeColor(borderMaterial.color, fallbackOuterColor))
+      .withAlpha(0.7);
+    const outlineColor = Cesium.Color
+      .fromCssColorString(resolveThemeColor(borderMaterial.outline, fallbackOutlineColor))
+      .withAlpha(0.6);
+    const glowColor = Cesium.Color
+      .fromCssColorString(resolveThemeColor(borderMaterial.glow, fallbackGlowColor))
+      .withAlpha(0.95);
 
     registerEntity({
       name: borderConfig.name || 'Border Wall - Face',
@@ -844,8 +862,14 @@ export function GlobeContainer({
     });
 
     return () => {
+      if (!view3D) return;
       createdEntities.forEach(entity => {
-        if (entity && !entity.isDestroyed()) {
+        if (!entity) return;
+        if (typeof entity.isDestroyed === 'function') {
+          if (!entity.isDestroyed()) {
+            view3D.entities.remove(entity);
+          }
+        } else {
           view3D.entities.remove(entity);
         }
       });
@@ -856,9 +880,6 @@ export function GlobeContainer({
   const containerClasses = ['globe-container'];
   if (performanceFlags.isLowPower || performanceFlags.prefersReducedMotion) {
     containerClasses.push('low-power');
-  }
-  if (showNarrativeIntro) {
-    containerClasses.push('narrative-active');
   }
 
   return React.createElement('div', {
@@ -872,17 +893,11 @@ export function GlobeContainer({
       'aria-label': '3D Map View'
     }),
 
-    // Narrative intro overlay with CSS staggered fade-in
-    showNarrativeIntro && React.createElement(IntroOverlay, {
-      isActive: showNarrativeIntro,
-      narrativeIndex,
-      passages: narrativePassages,
-      onNavigatePassage: handleNarrativeNavigate,
-      onContinue: continueNarrative,
-      onSkip: skipIntro
+    // Marker tooltip (appears on hover)
+    tooltipData && React.createElement(MarkerTooltip, {
+      project: tooltipData.project,
+      position: { x: tooltipData.x, y: tooltipData.y },
+      visible: tooltipData.visible
     })
-
-    // Map controls moved to BottomSheet component in App.js
-    // Theme switching and share button are now in the draggable bottom sheet for better mobile UX
   );
 }
