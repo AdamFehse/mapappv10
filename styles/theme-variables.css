@@ -1,6 +1,6 @@
 /**
  * theme-variables.css - Simplified theme system
- * Light, Dark, Zen (dark), Story (dark) - all using CSS custom properties
+ * Light, Dark, Zen (dark), Story (dark) - using only CSS custom properties that are actively used
  */
 
 /* ===== GLOBAL TOKENS (all themes) ===== */
@@ -9,12 +9,6 @@
 
   /* Transitions */
   --transition-fast: 150ms ease;
-  --transition-smooth: 320ms ease;
-  --sidebar-transition: 300ms ease;
-  --shadow-card: 0 16px 38px rgba(0, 0, 0, 0.12);
-
-  /* Layout */
-  --layout-sidebar-width: 360px;
 
   /* Button tokens */
   --btn-radius-small: 6px;
@@ -29,41 +23,25 @@
   --btn-primary-shadow-hover: 0 4px 12px rgba(var(--primary-rgb), 0.35);
   --btn-primary-shadow-active: 0 1px 3px rgba(var(--primary-rgb), 0.2);
 
-  /* Secondary button styling */
-  --btn-secondary-bg: transparent;
-  --btn-secondary-text: var(--text-secondary);
-  --btn-secondary-border: rgba(var(--primary-rgb), 0.25);
-  --btn-secondary-bg-hover: rgba(var(--primary-rgb), 0.12);
-  --btn-secondary-text-hover: var(--text-primary);
-  --btn-secondary-border-hover: var(--primary);
-  --btn-secondary-shadow: none;
+  /* Detail view contrast elements (for hero overlays with images) */
+  --detail-contrast-border: rgba(255, 255, 255, 0.3);
+  --detail-contrast-border-strong: rgba(255, 255, 255, 0.45);
+  --detail-contrast-button-bg: rgba(255, 255, 255, 0.18);
+  --detail-contrast-button-bg-hover: rgba(255, 255, 255, 0.28);
+  --detail-contrast-ghost-bg: rgba(0, 0, 0, 0.15);
+  --detail-contrast-ghost-bg-hover: rgba(0, 0, 0, 0.25);
+  --detail-contrast-faint: rgba(255, 255, 255, 0.6);
 
-  /* Tertiary button styling */
-  --btn-tertiary-bg: transparent;
-  --btn-tertiary-text: var(--text-muted);
-  --btn-tertiary-border: transparent;
-  --btn-tertiary-bg-hover: rgba(var(--primary-rgb), 0.08);
-  --btn-tertiary-text-hover: var(--text-primary);
-  --btn-tertiary-border-hover: rgba(var(--primary-rgb), 0.25);
-
-  /* Detail view hero styling (white overlays - same across all themes) */
-  --detail-card-sheen: linear-gradient(120deg, rgba(255, 255, 255, 0.08), transparent 60%);
+  /* Detail view glass elements */
   --detail-glass-highlight: rgba(255, 255, 255, 0.04);
   --detail-chip-border: rgba(255, 255, 255, 0.15);
-  --detail-chip-text: rgba(255, 255, 255, 0.85);
-  --detail-pill-border: rgba(255, 255, 255, 0.3);
-  --detail-pill-bg: rgba(255, 255, 255, 0.08);
   --detail-pill-text: rgba(255, 255, 255, 0.85);
-  --detail-pill-muted-border: rgba(255, 255, 255, 0.2);
-  --detail-pill-muted-text: rgba(255, 255, 255, 0.7);
-  --detail-meta-color: rgba(255, 255, 255, 0.6);
 
   /* Overlay and background utility colors (theme-adaptive) */
   --overlay-strong: rgba(0, 0, 0, 0.35);
   --overlay-medium: rgba(0, 0, 0, 0.2);
   --overlay-light: rgba(0, 0, 0, 0.08);
   --white-overlay-subtle: rgba(255, 255, 255, 0.08);
-  --white-overlay-medium: rgba(255, 255, 255, 0.15);
 
   /* Bottom sheet specific */
   --sheet-handle-gradient: radial-gradient(circle at center, rgba(255, 255, 255, 0.08), transparent 50%);
@@ -74,31 +52,12 @@
   --media-text-light: #ffffff;
   --media-text-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
 
-  /* Detail view contrast elements (for hero overlays with images) */
-  --detail-contrast-border: rgba(255, 255, 255, 0.3);
-  --detail-contrast-border-strong: rgba(255, 255, 255, 0.45);
-  --detail-contrast-button-bg: rgba(255, 255, 255, 0.18);
-  --detail-contrast-button-bg-hover: rgba(255, 255, 255, 0.28);
-  --detail-contrast-ghost-bg: rgba(0, 0, 0, 0.15);
-  --detail-contrast-ghost-bg-hover: rgba(0, 0, 0, 0.25);
-  --detail-contrast-faint: rgba(255, 255, 255, 0.6);
-
   /* Badges and meta */
   --detail-subtle-badge-bg: rgba(var(--primary-rgb), 0.08);
   --detail-subtle-badge-border: rgba(var(--primary-rgb), 0.2);
   --detail-meta-card-bg: rgba(var(--primary-rgb), 0.06);
   --detail-meta-card-border: rgba(var(--primary-rgb), 0.15);
-
-  --border-wall-color: #f97316;
-  --border-wall-face: #ff6a3d;
-  --border-wall-top: #fef3c7;
-  --border-wall-glow: #ffd166;
-  --border-wall-outline: #7a3f00;
-  --marker-palette-1: #4fc3f7;
-  --marker-palette-2: #ff8a65;
-  --marker-palette-3: #66bb6a;
-  --marker-palette-4: #ffd54f;
-  --marker-palette-5: #ba68c8;
+  --badge-theme-bg: rgba(var(--primary-rgb), 0.15);
 }
 
 /* ===== LIGHT THEME (Default) ===== */
@@ -109,43 +68,30 @@
   --primary: #4a8fbf;
   --primary-hover: #5fa3d9;
   --primary-rgb: 74, 143, 191;
-  --marker-default-color: var(--primary);
-  --marker-selected-color: var(--primary-hover);
-  --marker-hover-color: rgba(var(--primary-rgb), 0.75);
+
   --overlay-strong: rgba(0, 0, 0, 0.25);
   --overlay-medium: rgba(0, 0, 0, 0.14);
   --overlay-light: rgba(0, 0, 0, 0.04);
+
   --bg-primary: #fafbfc;
   --bg-secondary: #f0f2f5;
-  --bg-tertiary: #e5eaef;
+
   --text-primary: #1a1f26;
   --text-secondary: #4a5568;
   --text-muted: #8a94a6;
 
-  --border-color: rgba(74, 143, 191, 0.2);
-  --border-strong: rgba(74, 143, 191, 0.32);
   --border-soft: rgba(74, 143, 191, 0.12);
+
   --shadow-light: rgba(26, 31, 38, 0.06);
   --shadow-medium: rgba(26, 31, 38, 0.12);
 
   --sidebar-bg: rgba(250, 251, 252, 0.96);
-  --panel-top-background: rgba(255, 255, 255, 0.90);
   --panel-clear-background: rgba(255, 255, 255, 0.95);
   --panel-clear-background-hover: rgba(255, 255, 255, 0.99);
-  --panel-clear-border: rgba(74, 143, 191, 0.22);
 
   --detail-close-background: rgba(26, 31, 38, 0.06);
   --detail-close-color: var(--text-primary);
   --detail-close-background-hover: rgba(26, 31, 38, 0.12);
-  --detail-back-background: rgba(74, 143, 191, 0.12);
-  --detail-back-background-hover: rgba(74, 143, 191, 0.20);
-  --detail-image-placeholder-bg: rgba(74, 143, 191, 0.08);
-  --detail-meta-background: rgba(74, 143, 191, 0.06);
-
-  --badge-theme-bg: rgba(74, 143, 191, 0.10);
-  --badge-theme-text: #1f3a52;
-  --badge-theme-border: rgba(74, 143, 191, 0.28);
-  --badge-theme-bg-hover: rgba(74, 143, 191, 0.16);
 
   --toolbar-background: rgba(250, 251, 252, 0.93);
   --toolbar-border: rgba(74, 143, 191, 0.15);
@@ -156,20 +102,7 @@
   --hero-text-color: #f8fafc;
   --hero-meta-color: rgba(95, 163, 217, 0.95);
 
-  --progress-bar-bg: rgba(74, 143, 191, 0.12);
-  --progress-bar-fill: linear-gradient(90deg, #4a8fbf 0%, #5fa3d9 45%, #3a7aa8 100%);
-  --progress-dot-inactive: rgba(74, 143, 191, 0.25);
   --progress-dot-active: rgba(250, 251, 252, 0.96);
-
-  --intro-overlay-gradient: linear-gradient(145deg, rgba(26, 31, 38, 0.55) 0%, rgba(50, 70, 90, 0.52) 48%, rgba(74, 100, 130, 0.7) 100%);
-  --intro-text-color: #f8fafc;
-  --intro-muted-color: rgba(95, 163, 217, 0.92);
-  --intro-button-background: linear-gradient(120deg, #4a8fbf 0%, #5fa3d9 45%, #3a7aa8 100%);
-  --intro-button-text: #1a1f26;
-  --intro-button-shadow: 0 12px 32px rgba(74, 143, 191, 0.25);
-  --intro-button-shadow-strong: 0 18px 48px rgba(74, 143, 191, 0.35);
-  --intro-skip-background: rgba(26, 31, 38, 0.06);
-  --intro-skip-border: rgba(74, 143, 191, 0.24);
 
   /* Detail view hero base for light theme */
   --detail-hero-base-rgb: 36, 44, 56;
@@ -183,18 +116,6 @@
   --detail-hero-placeholder-bg: radial-gradient(circle at 30% 30%, rgba(var(--primary-rgb), 0.30), rgba(var(--detail-hero-base-rgb), 0.78));
   --detail-hero-shadow: 0 30px 80px rgba(var(--detail-hero-base-rgb), 0.28);
   --detail-panel-shadow: 0 15px 35px rgba(var(--detail-hero-base-rgb), 0.10);
-  --detail-card-overlay: rgba(var(--detail-hero-base-rgb), 0.32);
-  --detail-chip-bg: rgba(var(--detail-hero-base-rgb), 0.25);
-  --detail-pill-muted-bg: rgba(var(--detail-hero-base-rgb), 0.12);
-
-  /* Project card colors (light theme) */
-  --project-card-description-color: rgba(26, 31, 38, 0.70);
-  --project-card-meta-color: rgba(26, 31, 38, 0.52);
-  --project-card-location-color: rgba(26, 31, 38, 0.72);
-
-  /* Marker system (simple placeholder) */
-  --marker-badge-text: #ffffff;
-
 }
 
 /* ===== DARK THEME ===== */
@@ -204,44 +125,30 @@
   --primary: #6aa8ff;
   --primary-hover: #8bc0ff;
   --primary-rgb: 106, 168, 255;
-  --marker-default-color: var(--primary);
-  --marker-selected-color: var(--primary-hover);
-  --marker-hover-color: rgba(var(--primary-rgb), 0.8);
+
   --overlay-strong: rgba(0, 0, 0, 0.35);
   --overlay-medium: rgba(0, 0, 0, 0.2);
   --overlay-light: rgba(0, 0, 0, 0.08);
 
   --bg-primary: #050914;
   --bg-secondary: #081126;
-  --bg-tertiary: #0f1c36;
+
   --text-primary: #dde6ff;
   --text-secondary: #9fb7ff;
   --text-muted: #6d7ba2;
 
-  --border-color: rgba(106, 168, 255, 0.28);
-  --border-strong: rgba(106, 168, 255, 0.45);
   --border-soft: rgba(106, 168, 255, 0.18);
+
   --shadow-light: rgba(2, 6, 17, 0.45);
   --shadow-medium: rgba(0, 3, 10, 0.65);
 
   --sidebar-bg: rgba(5, 9, 20, 0.92);
-  --panel-top-background: rgba(8, 13, 27, 0.86);
   --panel-clear-background: rgba(10, 16, 32, 0.9);
   --panel-clear-background-hover: rgba(12, 20, 40, 0.94);
-  --panel-clear-border: rgba(106, 168, 255, 0.24);
 
   --detail-close-background: rgba(255, 255, 255, 0.06);
   --detail-close-color: var(--text-primary);
   --detail-close-background-hover: rgba(255, 255, 255, 0.12);
-  --detail-back-background: rgba(106, 168, 255, 0.16);
-  --detail-back-background-hover: rgba(106, 168, 255, 0.28);
-  --detail-image-placeholder-bg: rgba(106, 168, 255, 0.22);
-  --detail-meta-background: rgba(106, 168, 255, 0.18);
-
-  --badge-theme-bg: rgba(106, 168, 255, 0.16);
-  --badge-theme-text: #dde6ff;
-  --badge-theme-border: rgba(106, 168, 255, 0.38);
-  --badge-theme-bg-hover: rgba(106, 168, 255, 0.25);
 
   --toolbar-background: rgba(5, 9, 20, 0.88);
   --toolbar-border: rgba(106, 168, 255, 0.3);
@@ -252,20 +159,12 @@
   --hero-text-color: #f4f7ff;
   --hero-meta-color: rgba(138, 192, 255, 0.95);
 
-  --progress-bar-bg: rgba(106, 168, 255, 0.2);
-  --progress-bar-fill: linear-gradient(90deg, #4c89ff 0%, #6aa8ff 45%, #8bc0ff 100%);
-  --progress-dot-inactive: rgba(106, 168, 255, 0.4);
   --progress-dot-active: rgba(255, 255, 255, 0.92);
 
-  --intro-overlay-gradient: linear-gradient(150deg, rgba(4, 8, 18, 0.94) 0%, rgba(8, 16, 34, 0.9) 48%, rgba(15, 30, 60, 0.95) 100%);
-  --intro-text-color: #f4f7ff;
-  --intro-muted-color: rgba(138, 192, 255, 0.9);
-  --intro-button-background: linear-gradient(120deg, #4c89ff 0%, #6aa8ff 45%, #8bc0ff 100%);
-  --intro-button-text: #031024;
-  --intro-button-shadow: 0 12px 32px rgba(74, 136, 255, 0.35);
-  --intro-button-shadow-strong: 0 18px 46px rgba(74, 136, 255, 0.48);
-  --intro-skip-background: rgba(255, 255, 255, 0.06);
-  --intro-skip-border: rgba(106, 168, 255, 0.35);
+  --btn-primary-text: #031024;
+  --btn-primary-shadow: 0 2px 6px rgba(var(--primary-rgb), 0.3);
+  --btn-primary-shadow-hover: 0 4px 12px rgba(var(--primary-rgb), 0.45);
+  --btn-primary-shadow-active: 0 1px 3px rgba(var(--primary-rgb), 0.25);
 
   /* Detail view hero base for dark theme */
   --detail-hero-base-rgb: 5, 9, 20;
@@ -279,23 +178,6 @@
   --detail-hero-placeholder-bg: radial-gradient(circle at 30% 30%, rgba(var(--primary-rgb), 0.35), rgba(var(--detail-hero-base-rgb), 0.9));
   --detail-hero-shadow: 0 30px 80px rgba(var(--detail-hero-base-rgb), 0.4);
   --detail-panel-shadow: 0 15px 35px rgba(var(--detail-hero-base-rgb), 0.15);
-  --detail-card-overlay: rgba(var(--detail-hero-base-rgb), 0.45);
-  --detail-chip-bg: rgba(var(--detail-hero-base-rgb), 0.35);
-  --detail-pill-muted-bg: rgba(var(--detail-hero-base-rgb), 0.18);
-
-  /* Project card colors (dark theme - light text for dark cards) */
-  --project-card-description-color: rgba(221, 230, 255, 0.9);
-  --project-card-meta-color: rgba(159, 183, 255, 0.85);
-  --project-card-location-color: rgba(221, 230, 255, 0.92);
-
-  --btn-primary-text: #031024;
-  --btn-primary-shadow: 0 2px 6px rgba(var(--primary-rgb), 0.3);
-  --btn-primary-shadow-hover: 0 4px 12px rgba(var(--primary-rgb), 0.45);
-  --btn-primary-shadow-active: 0 1px 3px rgba(var(--primary-rgb), 0.25);
-
-  /* Marker system (simple placeholder) */
-  --marker-badge-text: #031024;
-
 }
 
 /* ===== ZEN THEME (inherits from dark) ===== */
@@ -305,41 +187,26 @@
   --primary: #6fcfbf;
   --primary-hover: #8be0cf;
   --primary-rgb: 111, 207, 191;
-  --marker-default-color: var(--primary);
-  --marker-selected-color: var(--primary-hover);
-  --marker-hover-color: rgba(var(--primary-rgb), 0.75);
 
   --bg-primary: #041f1c;
   --bg-secondary: #052b25;
-  --bg-tertiary: #093932;
+
   --text-primary: #dff7f1;
   --text-secondary: #a8d8cf;
   --text-muted: #6ba99f;
 
-  --border-color: rgba(111, 207, 191, 0.25);
-  --border-strong: rgba(111, 207, 191, 0.45);
   --border-soft: rgba(111, 207, 191, 0.18);
+
   --shadow-light: rgba(0, 10, 8, 0.45);
   --shadow-medium: rgba(0, 10, 8, 0.65);
 
   --sidebar-bg: rgba(4, 27, 23, 0.93);
-  --panel-top-background: rgba(5, 32, 28, 0.86);
   --panel-clear-background: rgba(6, 38, 33, 0.9);
   --panel-clear-background-hover: rgba(8, 46, 40, 0.94);
-  --panel-clear-border: rgba(111, 207, 191, 0.24);
 
   --detail-close-background: rgba(255, 255, 255, 0.08);
   --detail-close-color: var(--text-primary);
   --detail-close-background-hover: rgba(255, 255, 255, 0.12);
-  --detail-back-background: rgba(111, 207, 191, 0.16);
-  --detail-back-background-hover: rgba(111, 207, 191, 0.26);
-  --detail-image-placeholder-bg: rgba(111, 207, 191, 0.22);
-  --detail-meta-background: rgba(111, 207, 191, 0.18);
-
-  --badge-theme-bg: rgba(111, 207, 191, 0.2);
-  --badge-theme-text: #dff7f1;
-  --badge-theme-border: rgba(111, 207, 191, 0.36);
-  --badge-theme-bg-hover: rgba(111, 207, 191, 0.3);
 
   --toolbar-background: rgba(4, 27, 23, 0.9);
   --toolbar-border: rgba(111, 207, 191, 0.3);
@@ -350,20 +217,12 @@
   --hero-text-color: #e9fbf6;
   --hero-meta-color: rgba(142, 227, 207, 0.95);
 
-  --progress-bar-bg: rgba(111, 207, 191, 0.2);
-  --progress-bar-fill: linear-gradient(90deg, #4db8a7 0%, #6fcfbf 45%, #8be0cf 100%);
-  --progress-dot-inactive: rgba(111, 207, 191, 0.35);
   --progress-dot-active: rgba(223, 247, 241, 0.95);
 
-  --intro-overlay-gradient: linear-gradient(150deg, rgba(3, 20, 18, 0.96) 0%, rgba(5, 32, 28, 0.9) 48%, rgba(7, 45, 39, 0.95) 100%);
-  --intro-text-color: #e9fbf6;
-  --intro-muted-color: rgba(142, 227, 207, 0.9);
-  --intro-button-background: linear-gradient(120deg, #4db8a7 0%, #6fcfbf 45%, #8be0cf 100%);
-  --intro-button-text: #04221d;
-  --intro-button-shadow: 0 12px 32px rgba(79, 190, 173, 0.32);
-  --intro-button-shadow-strong: 0 18px 46px rgba(79, 190, 173, 0.46);
-  --intro-skip-background: rgba(255, 255, 255, 0.08);
-  --intro-skip-border: rgba(111, 207, 191, 0.32);
+  --btn-primary-text: #04221d;
+  --btn-primary-shadow: 0 2px 6px rgba(var(--primary-rgb), 0.25);
+  --btn-primary-shadow-hover: 0 4px 12px rgba(var(--primary-rgb), 0.4);
+  --btn-primary-shadow-active: 0 1px 3px rgba(var(--primary-rgb), 0.22);
 
   /* Detail view hero base for zen theme */
   --detail-hero-base-rgb: 4, 27, 23;
@@ -377,23 +236,6 @@
   --detail-hero-placeholder-bg: radial-gradient(circle at 30% 30%, rgba(var(--primary-rgb), 0.35), rgba(var(--detail-hero-base-rgb), 0.9));
   --detail-hero-shadow: 0 30px 80px rgba(var(--detail-hero-base-rgb), 0.4);
   --detail-panel-shadow: 0 15px 35px rgba(var(--detail-hero-base-rgb), 0.15);
-  --detail-card-overlay: rgba(var(--detail-hero-base-rgb), 0.45);
-  --detail-chip-bg: rgba(var(--detail-hero-base-rgb), 0.35);
-  --detail-pill-muted-bg: rgba(var(--detail-hero-base-rgb), 0.18);
-
-  /* Project card colors (zen theme - light text for dark cards) */
-  --project-card-description-color: rgba(223, 247, 241, 0.92);
-  --project-card-meta-color: rgba(168, 216, 207, 0.88);
-  --project-card-location-color: rgba(223, 247, 241, 0.94);
-
-  --btn-primary-text: #04221d;
-  --btn-primary-shadow: 0 2px 6px rgba(var(--primary-rgb), 0.25);
-  --btn-primary-shadow-hover: 0 4px 12px rgba(var(--primary-rgb), 0.4);
-  --btn-primary-shadow-active: 0 1px 3px rgba(var(--primary-rgb), 0.22);
-
-  /* Marker system (simple placeholder) */
-  --marker-badge-text: #04221d;
-
 }
 
 /* ===== STORY THEME (inherits from dark but with coral colors) ===== */
@@ -403,44 +245,30 @@
   --primary: #f08b75;
   --primary-hover: #f6a86b;
   --primary-rgb: 240, 139, 117;
-  --marker-default-color: var(--primary);
-  --marker-selected-color: var(--primary-hover);
-  --marker-hover-color: rgba(var(--primary-rgb), 0.7);
+
   --overlay-strong: rgba(0, 0, 0, 0.35);
   --overlay-medium: rgba(0, 0, 0, 0.2);
   --overlay-light: rgba(0, 0, 0, 0.08);
 
   --bg-primary: #170b1c;
   --bg-secondary: #201029;
-  --bg-tertiary: #2c1538;
+
   --text-primary: #ffeef7;
   --text-secondary: #f9cce0;
   --text-muted: #cba0bd;
 
-  --border-color: rgba(240, 139, 117, 0.25);
-  --border-strong: rgba(240, 139, 117, 0.4);
   --border-soft: rgba(240, 139, 117, 0.2);
+
   --shadow-light: rgba(10, 2, 19, 0.45);
   --shadow-medium: rgba(10, 2, 19, 0.65);
 
   --sidebar-bg: rgba(23, 11, 28, 0.93);
-  --panel-top-background: rgba(32, 16, 41, 0.85);
   --panel-clear-background: rgba(37, 18, 48, 0.9);
   --panel-clear-background-hover: rgba(45, 22, 58, 0.94);
-  --panel-clear-border: rgba(240, 139, 117, 0.3);
 
   --detail-close-background: rgba(255, 255, 255, 0.08);
   --detail-close-color: var(--text-primary);
   --detail-close-background-hover: rgba(255, 255, 255, 0.15);
-  --detail-back-background: rgba(240, 139, 117, 0.2);
-  --detail-back-background-hover: rgba(240, 139, 117, 0.32);
-  --detail-image-placeholder-bg: rgba(240, 139, 117, 0.24);
-  --detail-meta-background: rgba(240, 139, 117, 0.18);
-
-  --badge-theme-bg: rgba(240, 139, 117, 0.24);
-  --badge-theme-text: #ffeef7;
-  --badge-theme-border: rgba(240, 139, 117, 0.38);
-  --badge-theme-bg-hover: rgba(240, 139, 117, 0.34);
 
   --toolbar-background: rgba(23, 11, 28, 0.9);
   --toolbar-border: rgba(240, 139, 117, 0.35);
@@ -451,20 +279,12 @@
   --hero-text-color: #fff1f4;
   --hero-meta-color: rgba(255, 197, 211, 0.95);
 
-  --progress-bar-bg: rgba(240, 139, 117, 0.22);
-  --progress-bar-fill: linear-gradient(90deg, #f08b75 0%, #f6a86b 45%, #ffcd84 100%);
-  --progress-dot-inactive: rgba(240, 139, 117, 0.4);
   --progress-dot-active: rgba(255, 241, 244, 0.95);
 
-  --intro-overlay-gradient: linear-gradient(150deg, rgba(34, 8, 44, 0.96) 0%, rgba(55, 11, 48, 0.92) 55%, rgba(73, 18, 52, 0.95) 100%);
-  --intro-text-color: #fff1f4;
-  --intro-muted-color: rgba(255, 197, 211, 0.92);
-  --intro-button-background: linear-gradient(120deg, #f08b75 0%, #f6a86b 45%, #ffcd84 100%);
-  --intro-button-text: #2b0b13;
-  --intro-button-shadow: 0 12px 32px rgba(240, 139, 117, 0.4);
-  --intro-button-shadow-strong: 0 18px 48px rgba(240, 139, 117, 0.52);
-  --intro-skip-background: rgba(255, 241, 244, 0.08);
-  --intro-skip-border: rgba(240, 139, 117, 0.45);
+  --btn-primary-text: #2b0b13;
+  --btn-primary-shadow: 0 2px 6px rgba(var(--primary-rgb), 0.25);
+  --btn-primary-shadow-hover: 0 4px 12px rgba(var(--primary-rgb), 0.35);
+  --btn-primary-shadow-active: 0 1px 3px rgba(var(--primary-rgb), 0.2);
 
   /* Detail view hero base for story theme */
   --detail-hero-base-rgb: 34, 8, 44;
@@ -478,21 +298,4 @@
   --detail-hero-placeholder-bg: radial-gradient(circle at 30% 30%, rgba(var(--primary-rgb), 0.35), rgba(var(--detail-hero-base-rgb), 0.9));
   --detail-hero-shadow: 0 30px 80px rgba(var(--detail-hero-base-rgb), 0.4);
   --detail-panel-shadow: 0 15px 35px rgba(var(--detail-hero-base-rgb), 0.15);
-  --detail-card-overlay: rgba(var(--detail-hero-base-rgb), 0.45);
-  --detail-chip-bg: rgba(var(--detail-hero-base-rgb), 0.35);
-  --detail-pill-muted-bg: rgba(var(--detail-hero-base-rgb), 0.18);
-
-  /* Project card colors (story theme - light text for dark cards) */
-  --project-card-description-color: rgba(255, 238, 247, 0.94);
-  --project-card-meta-color: rgba(249, 204, 224, 0.9);
-  --project-card-location-color: rgba(255, 238, 247, 0.96);
-
-  --btn-primary-text: #2b0b13;
-  --btn-primary-shadow: 0 2px 6px rgba(var(--primary-rgb), 0.25);
-  --btn-primary-shadow-hover: 0 4px 12px rgba(var(--primary-rgb), 0.35);
-  --btn-primary-shadow-active: 0 1px 3px rgba(var(--primary-rgb), 0.2);
-
-  /* Marker system (simple placeholder) */
-  --marker-badge-text: #2b0b13;
-
 }
