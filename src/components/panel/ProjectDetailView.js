@@ -15,9 +15,7 @@ export function ProjectDetailView({
   const projectName = project.ProjectName || 'Untitled Project';
   const description = project.DescriptionLong || project.DescriptionShort || project.Description || '';
   const descriptionTrimmed = description ? description.trim().replace(/\s+/g, ' ') : '';
-  const heroSubtitle = descriptionTrimmed
-    ? (descriptionTrimmed.length > 220 ? `${descriptionTrimmed.slice(0, 217).trim()}…` : descriptionTrimmed)
-    : '';
+  const heroSubtitle = descriptionTrimmed;
 
   const tagKey = project.id !== undefined && project.id !== null ? String(project.id) : project;
   const tagInfo = projectTagsMap.get(tagKey) || { tags: [], themes: [] };
