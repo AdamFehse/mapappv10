@@ -68,32 +68,25 @@ export function App() {
 
   // Keep selected project in sync with hash routing
   useEffect(() => {
-    if (!Router) return;
-    if (projects.length === 0) return;
+    if (!Router || projects.length === 0) return;
 
     if (routeSubscriptionRef.current) {
       routeSubscriptionRef.current();
-      routeSubscriptionRef.current = null;
     }
 
     const cleanup = Router.onHashChange((route) => {
       if (route.route === 'project' && route.projectId && projectMap.has(route.projectId)) {
-        const nextProject = projectMap.get(route.projectId);
-        setSelectedProject(prev => (prev && prev.id === nextProject.id) ? prev : nextProject);
-      } else if (route.route === 'home') {
-        setSelectedProject(prev => (prev ? null : prev));
+        setSelectedProject(projectMap.get(route.projectId));
       } else {
-        setSelectedProject(prev => (prev ? null : prev));
+        setSelectedProject(null);
       }
     });
 
     routeSubscriptionRef.current = cleanup;
 
     return () => {
-      if (routeSubscriptionRef.current) {
-        routeSubscriptionRef.current();
-        routeSubscriptionRef.current = null;
-      }
+      if (cleanup) cleanup();
+      routeSubscriptionRef.current = null;
     };
   }, [Router, projects.length, projectMap]);
 

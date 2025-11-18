@@ -93,57 +93,8 @@ export function GlobeContainer({
   const highlightPolygonRef = useRef(null);
   const [markersRevealed, setMarkersRevealed] = useState(false);
   const [viewerReady, setViewerReady] = useState(false);
-  const [setQualityMenuOpen] = useState(false);
-  const [qualityOverride, setQualityOverrideState] = useState(() => {
-    try {
-      return typeof window !== 'undefined'
-        ? localStorage.getItem('mapapp-quality-override')
-        : null;
-    } catch (error) {
-      return null;
-    }
-  });
-  const qualityLabel = qualityOverride || window.MapAppPerf?.qualityTier || 'auto';
   const [mapStyle, setMapStyle] = useState(() => satelliteView ? 'satellite' : getMapStyleForTheme(theme)); // 'light', 'dark', 'night', 'satellite'
   const revealTimeoutsRef = useRef([]);
-  const mapStyleConfigsRef = useRef(null);
-
-  if (!mapStyleConfigsRef.current && typeof Cesium !== 'undefined') {
-    mapStyleConfigsRef.current = {
-      light: {
-        type: 'UrlTemplate',
-        options: {
-          url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-          subdomains: ['a', 'b', 'c'],
-          credit: new Cesium.Credit('OpenStreetMap contributors')
-        }
-      },
-      dark: {
-        type: 'UrlTemplate',
-        options: {
-          url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
-          subdomains: ['a', 'b', 'c', 'd'],
-          credit: new Cesium.Credit('CartoDB / OpenStreetMap')
-        }
-      },
-      night: {
-        type: 'ArcGis',
-        url: EARTH_AT_NIGHT_SERVICE_URL,
-        options: {
-          credit: new Cesium.Credit('NASA Earth Observatory / Esri')
-        }
-      },
-      satellite: {
-        type: 'ArcGis',
-        url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer',
-        options: {
-          credit: new Cesium.Credit('Esri')
-        }
-      }
-    };
-  }
-
-  const mapStyleConfigs = mapStyleConfigsRef.current || {};
   const clusterMetadata = React.useMemo(() => buildClusterMetadata(projects), [projects]);
 
   useEffect(() => {
@@ -396,6 +347,41 @@ export function GlobeContainer({
     if (!view3D || !viewerReady) return;
 
     const layers = view3D.imageryLayers;
+
+    // Map style configurations
+    const mapStyleConfigs = {
+      light: {
+        type: 'UrlTemplate',
+        options: {
+          url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+          subdomains: ['a', 'b', 'c'],
+          credit: new Cesium.Credit('OpenStreetMap contributors')
+        }
+      },
+      dark: {
+        type: 'UrlTemplate',
+        options: {
+          url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png',
+          subdomains: ['a', 'b', 'c', 'd'],
+          credit: new Cesium.Credit('CartoDB / OpenStreetMap')
+        }
+      },
+      night: {
+        type: 'ArcGis',
+        url: EARTH_AT_NIGHT_SERVICE_URL,
+        options: {
+          credit: new Cesium.Credit('NASA Earth Observatory / Esri')
+        }
+      },
+      satellite: {
+        type: 'ArcGis',
+        url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer',
+        options: {
+          credit: new Cesium.Credit('Esri')
+        }
+      }
+    };
+
     const config = mapStyleConfigs[mapStyle] || mapStyleConfigs.light;
     if (!config) return;
 
@@ -427,7 +413,7 @@ export function GlobeContainer({
     return () => {
       cancelled = true;
     };
-  }, [mapStyle, viewerReady, mapStyleConfigs]);
+  }, [mapStyle, viewerReady]);
 
   // Update markers when projects change
   useEffect(() => {
@@ -615,26 +601,6 @@ export function GlobeContainer({
       }
     });
     setMarkersRevealed(true);
-  }
-
-  // Handle quality tier change
-  function handleQualityChange(tier) {
-    if (!window.MapAppPerf) {
-      setQualityMenuOpen(false);
-      return;
-    }
-
-    const applied = window.MapAppPerf.setQualityOverride(tier);
-    if (applied) {
-      setQualityOverrideState(tier || null);
-      const view3D = view3DRef.current;
-      const nextSettings = window.MapAppPerf.getQualitySettings();
-      if (view3D && nextSettings) {
-        applyQualitySettings(view3D, nextSettings);
-      }
-    }
-
-    setQualityMenuOpen(false);
   }
 
   // Camera animation to configured center

@@ -5,12 +5,7 @@ export const COLOR_THEMES = [
     cssClass: 'theme-light',
     mapStyle: 'light',
     colorScheme: 'light',
-    metaColor: '#ffffff',
-    lensColors: {
-      rectangleBase: '#d4845c',
-      rectangleOutline: '#e8a876',
-      vignetteColor: '#1a1410'
-    }
+    metaColor: '#ffffff'
   },
   {
     id: 'dark',
@@ -18,12 +13,7 @@ export const COLOR_THEMES = [
     cssClass: 'theme-dark',
     mapStyle: 'dark',
     colorScheme: 'dark',
-    metaColor: '#050914',
-    lensColors: {
-      rectangleBase: '#f6a55d',
-      rectangleOutline: '#ffe8cf',
-      vignetteColor: '#050505'
-    }
+    metaColor: '#050914'
   },
   {
     id: 'night',
@@ -31,12 +21,7 @@ export const COLOR_THEMES = [
     cssClass: 'theme-night',
     mapStyle: 'night',
     colorScheme: 'dark',
-    metaColor: '#041f1c',
-    lensColors: {
-      rectangleBase: '#4da6a0',
-      rectangleOutline: '#7fbbb5',
-      vignetteColor: '#051715'
-    }
+    metaColor: '#041f1c'
   }
 ];
 
@@ -47,12 +32,7 @@ export const CINEMATIC_THEME = {
   mapStyle: 'dark',
   colorScheme: 'dark',
   metaColor: '#170b1c',
-  selectable: false,
-  lensColors: {
-    rectangleBase: '#e85d6a',
-    rectangleOutline: '#f5a8b0',
-    vignetteColor: '#1a0b15'
-  }
+  selectable: false
 };
 
 export const ALL_THEMES = [...COLOR_THEMES, CINEMATIC_THEME];
@@ -79,9 +59,4 @@ export function getMetaColorForTheme(themeId) {
 
 export function getSelectableThemes() {
   return COLOR_THEMES.map(({ id, label }) => ({ id, label }));
-}
-
-export function getLensColorsForTheme(themeId) {
-  const definition = getThemeDefinition(themeId);
-  return definition?.lensColors || COLOR_THEMES[0].lensColors;
 }
