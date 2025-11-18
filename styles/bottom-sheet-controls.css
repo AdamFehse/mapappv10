@@ -122,6 +122,37 @@
   box-shadow: 0 8px 20px rgba(var(--primary-rgb), 0.25);
 }
 
+/* ===== AUTO-ROTATE BUTTON ===== */
+.bottom-sheet-autorotate-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.45rem 0.9rem;
+  border-radius: var(--btn-radius-pill);
+  border: 1px solid rgba(var(--primary-rgb), 0.35);
+  background: rgba(var(--primary-rgb), 0.08);
+  color: var(--text-primary);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: var(--btn-transition);
+  margin-right: 0.4rem;
+}
+
+.bottom-sheet-autorotate-btn:hover,
+.bottom-sheet-autorotate-btn:focus-visible {
+  border-color: var(--primary);
+  background: rgba(var(--primary-rgb), 0.16);
+}
+
+.bottom-sheet-autorotate-btn.active {
+  background: linear-gradient(120deg, rgba(var(--primary-rgb), 0.55), rgba(var(--primary-rgb), 0.25));
+  border-color: var(--primary);
+  color: var(--btn-primary-text);
+  box-shadow: 0 8px 20px rgba(var(--primary-rgb), 0.25);
+}
+
 /* ===== FILTERS PANEL ===== */
 .panel-filters {
   padding: 0;

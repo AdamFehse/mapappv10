@@ -81,15 +81,19 @@ export function GlobeContainer({
   onProjectClick,
   onGlobeReady,
   theme = 'light',
-  satelliteView = false
+  satelliteView = false,
+  autoRotate = false,
+  highlightRegion = false
 }) {
   const { useEffect, useRef, useState } = React;
   const container3DRef = useRef(null);
   const view3DRef = useRef(null);
   const entitiesRef = useRef({}); // Map of project.id -> Cesium.Entity
+  const spinListenerRef = useRef(null);
+  const highlightPolygonRef = useRef(null);
   const [markersRevealed, setMarkersRevealed] = useState(false);
   const [viewerReady, setViewerReady] = useState(false);
-  const [qualityMenuOpen, setQualityMenuOpen] = useState(false);
+  const [setQualityMenuOpen] = useState(false);
   const [qualityOverride, setQualityOverrideState] = useState(() => {
     try {
       return typeof window !== 'undefined'
@@ -774,6 +778,86 @@ export function GlobeContainer({
       });
     };
   }, [viewerReady]);
+
+  // Handle auto-rotate
+  useEffect(() => {
+    const view3D = view3DRef.current;
+    if (!view3D || !viewerReady || !autoRotate) return;
+
+    const spinRate = 0.02;
+    let previousTime = Date.now();
+    let isSpinning = true;
+
+    const listener = view3D.clock.onTick.addEventListener(() => {
+      if (!isSpinning) return;
+      
+      const currentTime = Date.now();
+      const delta = (currentTime - previousTime) / 1000;
+      previousTime = currentTime;
+      view3D.scene.camera.rotate(Cesium.Cartesian3.UNIT_Z, -spinRate * delta);
+    });
+
+    spinListenerRef.current = listener;
+
+    return () => {
+      isSpinning = false;
+      if (listener && view3D.clock.onTick) {
+        view3D.clock.onTick.removeEventListener(listener);
+      }
+      spinListenerRef.current = null;
+    };
+  }, [autoRotate, viewerReady]);
+
+  // Handle region highlight polygon
+  useEffect(() => {
+    const view3D = view3DRef.current;
+    if (!view3D || !viewerReady) return;
+
+    // Clean up existing polygon if any
+    if (highlightPolygonRef.current && view3D.entities.contains(highlightPolygonRef.current)) {
+      view3D.entities.remove(highlightPolygonRef.current);
+      highlightPolygonRef.current = null;
+    }
+
+    if (highlightRegion) {
+      // Create a semi-transparent polygon around Arizona-Sonora border region
+      // Approximate bounds: Arizona/Sonora area
+      const entity = view3D.entities.add({
+        polygon: {
+          hierarchy: Cesium.Cartesian3.fromDegreesArray([
+            -114.8, 36.5,  // NW corner
+            -109.0, 36.5,  // NE corner
+            -109.0, 31.3,  // SE corner
+            -114.8, 31.3   // SW corner
+          ]),
+          material: Cesium.Color.fromAlpha(
+            Cesium.Color.fromCssColorString('#FF6B35'),
+            0.25
+          ),
+          outline: true,
+          outlineColor: Cesium.Color.fromCssColorString('#FF6B35'),
+          outlineWidth: 2
+        }
+      });
+
+      highlightPolygonRef.current = entity;
+      view3D.scene.requestRender();
+    } else {
+      // Ensure polygon is removed
+      if (highlightPolygonRef.current && view3D.entities.contains(highlightPolygonRef.current)) {
+        view3D.entities.remove(highlightPolygonRef.current);
+        highlightPolygonRef.current = null;
+      }
+      view3D.scene.requestRender();
+    }
+
+    return () => {
+      if (highlightPolygonRef.current && view3D.entities.contains(highlightPolygonRef.current)) {
+        view3D.entities.remove(highlightPolygonRef.current);
+        highlightPolygonRef.current = null;
+      }
+    };
+  }, [highlightRegion, viewerReady]);
 
   // Render 3D globe
   const containerClasses = ['globe-container'];

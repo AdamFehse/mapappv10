@@ -19,6 +19,10 @@ export function BottomSheet({
   currentTheme = 'light',
   satelliteView = false,
   onToggleSatelliteView = () => {},
+  autoRotate = false,
+  onToggleAutoRotate = () => {},
+  highlightRegion = false,
+  onToggleHighlightRegion = () => {},
   onShare = () => {}
 }) {
   const { useState, useMemo, useEffect, useRef } = React;
@@ -189,6 +193,22 @@ export function BottomSheet({
               type: 'button',
               'aria-pressed': satelliteView ? 'true' : 'false'
             }, satelliteView ? 'Satellite On' : 'Satellite View'),
+
+            React.createElement('button', {
+              className: `bottom-sheet-autorotate-btn ${autoRotate ? 'active' : ''}`,
+              onClick: onToggleAutoRotate,
+              type: 'button',
+              'aria-pressed': autoRotate ? 'true' : 'false',
+              title: 'Toggle auto-rotate'
+            }, autoRotate ? 'Rotating' : 'Spin'),
+
+            React.createElement('button', {
+              className: `bottom-sheet-autorotate-btn ${highlightRegion ? 'active' : ''}`,
+              onClick: onToggleHighlightRegion,
+              type: 'button',
+              'aria-pressed': highlightRegion ? 'true' : 'false',
+              title: 'Highlight border region'
+            }, highlightRegion ? 'Highlighted' : 'Highlight'),
 
             React.createElement('button', {
               className: 'bottom-sheet-share-btn',

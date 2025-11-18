@@ -34,6 +34,8 @@ export function App() {
   const [loading, setLoading] = useState(true);
   const [currentTheme, setCurrentTheme] = useState(() => detectOSPreference());
   const [satelliteView, setSatelliteView] = useState(false);
+  const [autoRotate, setAutoRotate] = useState(false);
+  const [highlightRegion, setHighlightRegion] = useState(false);
 
   // Router from global scope (loaded as plain script)
   const Router = window.MapAppUtils && window.MapAppUtils.Router;
@@ -129,6 +131,14 @@ export function App() {
     setSatelliteView(prev => !prev);
   }
 
+  function handleToggleAutoRotate() {
+    setAutoRotate(prev => !prev);
+  }
+
+  function handleToggleHighlightRegion() {
+    setHighlightRegion(prev => !prev);
+  }
+
   function handleShare() {
     if (window.MapAppUtils && window.MapAppUtils.Share) {
       window.MapAppUtils.Share.shareProject(selectedProject);
@@ -154,7 +164,9 @@ export function App() {
       onProjectClick: handleSelectProject,
       onGlobeReady: () => {},
       theme: currentTheme,
-      satelliteView
+      satelliteView,
+      autoRotate,
+      highlightRegion
     }),
 
     // Bottom: Unified control center (themes, filters, projects, detail view)
@@ -166,6 +178,10 @@ export function App() {
       currentTheme: currentTheme,
       satelliteView,
       onToggleSatelliteView: handleToggleSatelliteView,
+      autoRotate,
+      onToggleAutoRotate: handleToggleAutoRotate,
+      highlightRegion,
+      onToggleHighlightRegion: handleToggleHighlightRegion,
       onShare: handleShare
     })
   );
