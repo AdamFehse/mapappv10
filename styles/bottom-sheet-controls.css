@@ -28,12 +28,14 @@
 .bottom-sheet-themes {
   display: flex;
   gap: 0.5rem;
+  flex-shrink: 0;
 }
 
 .bottom-sheet-themes-row {
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
+  flex-shrink: 0;
 }
 
 .bottom-sheet-theme-btn {
