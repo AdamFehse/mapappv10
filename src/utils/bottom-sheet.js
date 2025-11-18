@@ -8,7 +8,14 @@ export function initializeBottomSheet() {
   const handle = document.querySelector('.bottom-sheet-handle');
   const overlay = document.querySelector('.bottom-sheet-overlay');
 
-  if (!sheet || !handle) return;
+  if (!sheet || !handle) {
+    console.warn('Bottom sheet elements not found, will retry...');
+    // Retry after a short delay if elements don't exist yet
+    requestAnimationFrame(() => {
+      initializeBottomSheet();
+    });
+    return;
+  }
   if (sheet.dataset.bottomSheetReady === 'true') return;
 
   sheet.dataset.bottomSheetReady = 'true';
@@ -43,7 +50,17 @@ export function initializeBottomSheet() {
   };
 
   const recalcBounds = ({ preservePosition = true } = {}) => {
-    const nextCollapsed = Math.max(0, sheet.getBoundingClientRect().height - MIN_VISIBLE_HEIGHT);
+    const rect = sheet.getBoundingClientRect();
+    const sheetHeight = rect.height;
+    
+    // If height is still 0, something's wrong - wait a bit more
+    if (sheetHeight === 0) {
+      console.warn('Sheet height is 0, retrying...');
+      requestAnimationFrame(() => recalcBounds({ preservePosition }));
+      return;
+    }
+
+    const nextCollapsed = Math.max(0, sheetHeight - MIN_VISIBLE_HEIGHT);
     let openness = 0;
 
     if (preservePosition && collapsedOffset > 0) {
@@ -52,7 +69,15 @@ export function initializeBottomSheet() {
 
     collapsedOffset = nextCollapsed;
     const targetOffset = preservePosition ? collapsedOffset * (1 - openness) : collapsedOffset;
+    
+    // Force transition to be removed during initial setup
+    sheet.style.transition = 'none';
     setOffset(targetOffset);
+    
+    // Re-enable transitions after setup
+    setTimeout(() => {
+      sheet.style.transition = 'transform 300ms ease';
+    }, 0);
   };
 
   const beginDrag = (clientY) => {
@@ -77,7 +102,7 @@ export function initializeBottomSheet() {
   const endDrag = () => {
     if (!isDragging) return;
     isDragging = false;
-    sheet.style.removeProperty('transition');
+    sheet.style.transition = 'transform 300ms ease';
   };
 
   const handleTouchStart = (event) => {
@@ -107,7 +132,7 @@ export function initializeBottomSheet() {
   const stopMouseDrag = () => endDrag();
 
   const toggleSheet = () => {
-    sheet.style.removeProperty('transition');
+    sheet.style.transition = 'transform 300ms ease';
     const ratio = getExpansionRatio();
 
     if (ratio > 0.5) {
@@ -138,12 +163,13 @@ export function initializeBottomSheet() {
   if (overlay) {
     overlay.addEventListener('click', () => {
       ignoreClick = false;
-      sheet.style.removeProperty('transition');
+      sheet.style.transition = 'transform 300ms ease';
       setOffset(collapsedOffset);
     });
   }
 
   window.addEventListener('resize', () => recalcBounds());
 
+  // Initial calculation
   recalcBounds({ preservePosition: false });
 }

@@ -5,7 +5,6 @@
 
 import { GlobeContainer } from './GlobeContainer.js';
 import { BottomSheet } from './BottomSheet.js';
-import { initializeBottomSheet } from '../utils/bottom-sheet.js';
 import { detectOSPreference, applyTheme } from '../utils/themeManager.js';
 
 /**
@@ -109,14 +108,9 @@ export function App() {
     }
   }, [Router, selectedProject]);
 
-  // Initialize bottom sheet drag functionality
   useEffect(() => {
-    const timer = setTimeout(() => {
-      initializeBottomSheet();
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, []);
+    applyTheme(currentTheme);
+  }, [currentTheme]);
 
   // Event Handlers
   function handleSelectProject(project) {
@@ -126,10 +120,6 @@ export function App() {
     }
     setSelectedProject(project);
   }
-
-  useEffect(() => {
-    applyTheme(currentTheme);
-  }, [currentTheme]);
 
   function handleSelectTheme(themeId) {
     setCurrentTheme(themeId);

@@ -9,6 +9,7 @@ import { ProjectList } from './panel/ProjectList.js';
 import { ProjectDetailView } from './panel/ProjectDetailView.js';
 import { buildProjectTagsMap, extractThemes, extractCategories, extractYears, extractProducts } from '../utils/filterUtils.js';
 import { getSelectableThemes } from '../config/themes.js';
+import { initializeBottomSheet } from '../utils/bottom-sheet.js';
 
 export function BottomSheet({
   projects = [],
@@ -20,7 +21,8 @@ export function BottomSheet({
   onToggleSatelliteView = () => {},
   onShare = () => {}
 }) {
-  const { useState, useMemo, useEffect } = React;
+  const { useState, useMemo, useEffect, useRef } = React;
+  const bottomSheetRef = useRef(null);
 
   // All filtering state
   const [expandedProject, setExpandedProject] = useState(null);
@@ -149,9 +151,16 @@ export function BottomSheet({
 
   const themes = useMemo(() => getSelectableThemes(), []);
 
+  // Initialize bottom sheet drag when component mounts
+  useEffect(() => {
+    if (bottomSheetRef.current) {
+      initializeBottomSheet();
+    }
+  }, []);
+
   return React.createElement(React.Fragment, null,
     // Bottom Sheet Container
-    React.createElement('div', { className: 'bottom-sheet' },
+    React.createElement('div', { className: 'bottom-sheet', ref: bottomSheetRef },
       // Drag Handle
       React.createElement('div', { className: 'bottom-sheet-handle', title: 'Drag to expand' }),
 
