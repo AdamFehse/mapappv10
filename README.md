@@ -8,9 +8,9 @@ Interactive 3D globe for exploring Arizona-Sonora borderlands research and art p
   2. Researchers have access to money (through Gov. funding)
   3. Researchers need artists' work
 
-We bring artists, researchers, and community members together with a shareable, social platform. (Engaging, I always forget engaging)
+We bring artists, researchers, and community members together with a shareable, engaging social platform.
 
-Designed with multiplexing in mind. Native ES6 modules give me the modular experience. Performant across devices and connections and should be browser compatible.
+Designed with multiplexing in mind. Native ES6 modules give the modular experience. Performant across devices and connections and should be browser compatible.
 
 No backend. No servers were hurt in making this.
 No build, all CDN.
