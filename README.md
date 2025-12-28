@@ -4,11 +4,9 @@
 
 Interactive 3D globe for exploring Arizona-Sonora borderlands research and art projects.
 
-/*:
   1. Artists need money
   2. Researchers have access to money (through Gov. funding)
   3. Researchers need artists' work
- */
 
 We bring artists, researchers, and community members together with a shareable, social platform. (Engaging, I always forget engaging)
 

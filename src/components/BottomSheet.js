@@ -45,7 +45,7 @@ export function BottomSheet({
   const allYears = useMemo(() => extractYears(projects), [projects]);
   const allProducts = useMemo(() => extractProducts(projects), [projects]);
 
-  // Filter projects (same logic as RightPanel)
+  // Filter project
   const filteredProjects = useMemo(() => {
     return projects.filter(project => {
       // Search filter
@@ -170,7 +170,7 @@ export function BottomSheet({
 
       // Content Area
       React.createElement('div', { className: 'bottom-sheet-content' },
-        // Header Section: Controls + Filters (scrollable if needed)
+        // Header Section: Controls + Filter
         React.createElement('div', { className: 'bottom-sheet-header' },
           // Top Control Bar: Themes + Share
           React.createElement('div', { className: 'bottom-sheet-controls-bar' },

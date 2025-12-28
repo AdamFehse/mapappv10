@@ -253,6 +253,10 @@
     flex-shrink: 0;
   }
 
+  .filter-items {
+    max-height: 250px;
+  }
+
   .filter-clear-all-btn {
     order: 3;
     flex: 0 1 auto;
