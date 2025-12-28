@@ -20,7 +20,7 @@ export function initializeBottomSheet() {
 
   sheet.dataset.bottomSheetReady = 'true';
 
-  const MIN_VISIBLE_HEIGHT = 56; // matches handle height
+  const MIN_VISIBLE_HEIGHT = 32; // matches handle height
   const EXPANDED_THRESHOLD = 0.25; // overlay once 25% open
 
   let collapsedOffset = 0;
