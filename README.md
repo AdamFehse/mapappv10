@@ -10,9 +10,9 @@ Interactive 3D globe for exploring Arizona-Sonora borderlands research and art p
 
 We bring artists, researchers, and community members together with a shareable, social platform. (Engaging, I always forget engaging)
 
-Designed with multiplexing in mind. Native ES6 modules give me that modular developer experince. Performant across devices and connections and should be very browser compatible.
+Designed with multiplexing in mind. Native ES6 modules give me the modular experience. Performant across devices and connections and should be browser compatible.
 
-No backend. No servers were hurt in mkaing this.
-No build. All CDN.
+No backend. No servers were hurt in making this.
+No build, all CDN.
 
 It was built for the Confluencenter for [Creative Inquiry at the University of Arizona] (https://confluencenter.arizona.edu/) with CORAZON and GitHub Pages.
