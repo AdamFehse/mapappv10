@@ -15,4 +15,4 @@ Designed with multiplexing in mind. Native ES6 modules give the modular experien
 No backend. No servers were hurt in making this.
 No build, all CDN.
 
-It was built for the Confluencenter for [Creative Inquiry at the University of Arizona] (https://confluencenter.arizona.edu/) with CORAZON and GitHub Pages.
+It was built for the Confluencenter for [Creative Inquiry at the University of Arizona](https://confluencenter.arizona.edu/) with CORAZON and GitHub Pages.
